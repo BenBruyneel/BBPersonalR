@@ -122,10 +122,11 @@ scales::oob_squish_infinite is used. Note: y-axis only}
 \item{rotateGraph}{if TRUE, then x-axis and y-axis are swapped, essentially
 resulting in a graph rotated 90 degrees}
 
-\item{xOptions}{y-axis options character vector, "1" normal scale,
-"2" reversed scale,"3" logarithmic scale (log10)}
+\item{xOptions}{x-axis options character vector, "1" normal scale,
+"2" reversed scale, "3" logarithmic scale (log10)}
 
-\item{standardized}{if TRUE: use standardized residuals}
+\item{yOptions}{y-axis options character vector, "1" normal scale,
+"2" reversed scale,"3" logarithmic scale (log10)}
 }
 \value{
 ggplot object

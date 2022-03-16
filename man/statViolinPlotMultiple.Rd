@@ -12,7 +12,7 @@ statViolinPlotMultiple(
   variableName = "variable",
   outlineColor = "black",
   fillColor = NA,
-  outLineSize = 0.5,
+  outlineSize = 0.5,
   outlineType = "solid",
   violinAlpha = 1,
   scale = c("area", "count", "width")[1],
@@ -53,11 +53,16 @@ the boxplot. By default sampleSize = NA, in which case all data is used}
 \item{removeNA}{if TRUE, the NA 'values' in the vector will be removed prior
 to plotting. @note this will remove warning messages and errors}
 
+\item{variableName}{sets the 'combined' name of the columns (IF there is more
+than one!)}
+
 \item{outlineColor}{defines the color of the line around the 'violin'}
 
 \item{fillColor}{defines the color of the boxes themselves. @Note: if the 
 number of colors does not match the number of columns then ggplot2 default
 colors will be used}
+
+\item{outlineSize}{defines the width of the line around the 'violin'}
 
 \item{outlineType}{defines the linetype of the line around the 'violin'}
 
@@ -91,6 +96,8 @@ Note: If set to 0 then they will be located on a straight line}
 \item{shape}{shape of the datapoints (default = 16), see vignette
 ggplot2::ggplot2-specs}
 
+\item{jitterFill}{fill color of the data points}
+
 \item{vertical}{if TRUE, flips x- and y-axis}
 
 \item{xAxis}{defines if the x-axis is shown}
@@ -103,20 +110,18 @@ used to define the exact range of the Y-axis}
 \item{yLimits}{default = c(0,NA), together with yLimits, this can be
 used to define the exact range of the Y-axis}
 
+\item{xLabel}{set x-axis title}
+
 \item{yLabel}{set y-axis title}
 
 \item{title}{sets title of graph}
 
+\item{showLegend}{defines if the legend is to be shown or not}
+
+\item{legend.position}{defines where a legend is to be placed}
+
 \item{...}{can be used to pass on other arguments to graphAdjust()
 (like xLimits, xExpand, etc)}
-
-\item{outlineSize}{defines the width of the line around the 'violin'}
-
-\item{xDefault}{default is set to FALSE, together with xLimits this can be
-used to tweak the positioning and with of the box}
-
-\item{xLimits}{default = c(-0.75,0.75), together with xDefault this can be
-used to tweak the positioning and with of the box}
 }
 \value{
 a ggplot object

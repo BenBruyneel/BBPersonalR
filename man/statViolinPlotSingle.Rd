@@ -11,7 +11,7 @@ statViolinPlotSingle(
   sampleSize = NA,
   outlineColor = "black",
   fillColor = "red",
-  outLineSize = 0.5,
+  outlineSize = 0.5,
   outlineType = "solid",
   violinAlpha = 1,
   scale = c("area", "count", "width")[1],
@@ -53,6 +53,8 @@ the boxplot. By default sampleSize = NA, in which case all data is used}
 \item{outlineColor}{defines the color of the line around the 'violin'}
 
 \item{fillColor}{defines the color of the 'violin' itself}
+
+\item{outlineSize}{defines the width of the line around the 'violin'}
 
 \item{outlineType}{defines the linetype of the line around the 'violin'}
 
@@ -110,8 +112,6 @@ used to define the exact range of the Y-axis}
 
 \item{...}{can be used to pass on other arguments to graphAdjust()
 (like xLimits, xExpand, etc)}
-
-\item{outlineSize}{defines the width of the line around the 'violin'}
 }
 \value{
 a ggplot object

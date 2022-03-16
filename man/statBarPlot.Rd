@@ -100,6 +100,10 @@ value of 0.1 is equivalent to extending the y-range 10 percent}
 
 \item{legend.position}{defines the place of the legend (default = "bottom")}
 
+\item{returnData}{if TRUE then a list with 2 elements is returned. The first
+element is the data.frame used to generate the graph and the second element
+is the graph itself}
+
 \item{...}{can be used to pass on other arguments to graphAdjust()
  (like xLimits, xExpand, etc)
 

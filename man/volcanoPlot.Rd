@@ -76,9 +76,14 @@ marked as significant (usually p-value < 0.05)}
 
 \item{pointColor}{defines the color of the border of the data points}
 
+\item{significantPointColor}{color of the data points that lie outside the
+xCutoff values and below the yCutoff value}
+
 \item{pointShape}{shape of the data points}
 
 \item{pointSize}{size of the data points}
+
+\item{pointAlpha}{alpha ('see through' value) of the data points}
 
 \item{xDefault}{default is set to TRUE, together with xLimits, this can be
 used to define the exact range of the X-axis}
@@ -147,13 +152,6 @@ will be returned}
 vector) should be included in the data.frame returned}
 
 \item{...}{can be used to pass on other arguments to graphAdjust()}
-
-\item{significantColor}{color of the data points that lie outside the xCutoff
-values and below the yCutoff value}
-
-\item{pointfill}{defines the color of the data points themselves}
-
-\item{pointsAlpha}{alpha ('see through' value) of the data points}
 }
 \value{
 a ggplot object or a list

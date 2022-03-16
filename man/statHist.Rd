@@ -82,6 +82,26 @@ title == NA}
 \item{xDefault}{this defines if default x-sxis limits should be used or not,
 see also graphAdjust() for info}
 
+\item{xLimits}{default = c(0,NA), together with xDefault, this can be
+used to define the exact range of the x-axis}
+
+\item{xSymmetric}{if TRUE then the range of x-axis will be adjusted to be
+equal on both the left and the right side of the center}
+
+\item{xSymmetricExpand}{allows for padding around data (x-axis), 0.05 means
+5 percent extra wide x-axis range}
+
+\item{xCentered}{if TRUE, the plot will be 'cemtered' around the either the
+mean or median x-value}
+
+\item{xMedian}{if TRUE then median and mean absolute deviation (mad) are
+used for centering the plot along the x-axis; if FALSE then the mean and the
+standard deviation are used}
+
+\item{xDeviations}{defines how many deviations the range of the x-axis may
+differ from the mean or median. Range will be either (median-xDeviations*mad
+,median+xDeviations**mad) or (mean - xDeviations*sd,mean + xDeviations*sd)}
+
 \item{showLegend}{defines if the legend is to be shown or not}
 
 \item{legend.position}{defines where a legend is to be placed}
@@ -90,9 +110,6 @@ see also graphAdjust() for info}
 
 \item{...}{can be used to pass on other arguments to graphAdjust()
 (like xLimits, xExpand, etc)}
-
-\item{yDefault}{this defines if default y-sxis limits should be used or not,
-see also graphAdjust() for info}
 }
 \value{
 a ggplot object

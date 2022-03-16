@@ -168,7 +168,7 @@ toNumeric <- function(chrs = "N/A"){
 #' @param autoScalePredictor if TRUE then default autoscaling of the x-axis
 #'  takes place, most other settings delaing with scaling of the x-axis the are
 #'  then ignored
-#' @param autoScalePredictor if TRUE then default autoscaling of the y-axis
+#' @param autoScaleResponse if TRUE then default autoscaling of the y-axis
 #'  takes place,most other settings delaing with scaling of the y-axis the are
 #'  then ignored
 #' @param predictorLimits 2 element numeric vector with the minimum and maximum value
@@ -184,7 +184,7 @@ toNumeric <- function(chrs = "N/A"){
 #' @param predictorOob integer vector, indicating how to deal with out of bounds
 #'  datapoints. 1 = censor scales::oob_censor is used, 2 = infinite,
 #'  scales::oob_squish_infinite is used. Note: x-axis only
-#' @param respomseOob integer vector, indicating how to deal with out of bounds
+#' @param responseOob integer vector, indicating how to deal with out of bounds
 #'  datapoints. 1 = censor scales::oob_censor is used, 2 = infinite,
 #'  scales::oob_squish_infinite is used. Note: y-axis only
 #' @param regressionColor color of the regression line
@@ -460,7 +460,7 @@ stdResidualLimits <- function(){
 #'  resulting in a graph rotated 90 degrees
 #' @param xOptions x-axis options character vector, "1" normal scale,
 #'  "2" reversed scale, "3" logarithmic scale (log10)
-#' @param xOptions y-axis options character vector, "1" normal scale,
+#' @param yOptions y-axis options character vector, "1" normal scale,
 #'  "2" reversed scale,"3" logarithmic scale (log10)
 #'  
 #' @returns ggplot object
@@ -594,7 +594,6 @@ stdRecoveryLimits <- function(){
 #' @param title title for the graph, character vector
 #' @param figureNo number of the figure, used for the caption ("Figure ..." )
 #' @param caption caption for the graph, character vector
-#' @param standardized if TRUE: use standardized residuals
 #' @param showLimits  if TRUE, draw the lines for the limits defined in limits
 #' @param limits definition of the limits to draw, see stdRecoveryLimits for an
 #'  example
@@ -634,7 +633,7 @@ stdRecoveryLimits <- function(){
 #'  resulting in a graph rotated 90 degrees
 #' @param xOptions x-axis options character vector, "1" normal scale,
 #'  "2" reversed scale, "3" logarithmic scale (log10)
-#' @param xOptions y-axis options character vector, "1" normal scale,
+#' @param yOptions y-axis options character vector, "1" normal scale,
 #'  "2" reversed scale,"3" logarithmic scale (log10)
 #'  
 #' @returns ggplot object

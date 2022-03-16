@@ -65,6 +65,8 @@ to plotting. @note this will remove warning messages and errors}
 \item{variableName}{sets the 'combined' name of the columns, 
 must be a single word}
 
+\item{valueName}{sets the name of the 'y'-values, must be a single word}
+
 \item{outlineColor}{defines the color of the line around the box}
 
 \item{fillColor}{defines the color of the boxes themselves. Note: if the 
@@ -94,11 +96,15 @@ ggplot2::ggplot2-specs}
 
 \item{yAxis}{defines if the x-axis is shown}
 
+\item{xDiscrete}{defines if x-axis should be/is discrete}
+
 \item{yDefault}{default is set to TRUE, together with yLimits, this can be
 used to define the exact range of the Y-axis}
 
 \item{yLimits}{default = c(0,NA), together with yLimits, this can be
 used to define the exact range of the Y-axis}
+
+\item{xLabel}{set x-axis title}
 
 \item{yLabel}{set y-axis title}
 
@@ -120,10 +126,6 @@ is the graph itself}
 
 \item{...}{can be used to pass on other arguments to graphAdjust()
 (like xLimits, xExpand, etc)}
-
-\item{showLegend}{defines if the legend is to be shown or not}
-
-\item{legend.position}{defines where a legend is to be placed}
 }
 \value{
 a ggplot object or a list

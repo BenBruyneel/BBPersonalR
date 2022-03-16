@@ -44,6 +44,8 @@ multiple columns with data.frame's}
 \item{yLabel}{defines y-axis label}
 
 \item{title}{specifies the title}
+
+\item{...}{can be used to pass on other arguments to graphAdjust()}
 }
 \value{
 a ggplot object

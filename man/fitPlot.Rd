@@ -67,8 +67,8 @@ x- & y-axis is not possible}
 
 \item{caption}{caption for the graph, character vector}
 
-\item{autoScalePredictor}{if TRUE then default autoscaling of the y-axis
-takes place,most other settings delaing with scaling of the y-axis the are
+\item{autoScalePredictor}{if TRUE then default autoscaling of the x-axis
+takes place, most other settings delaing with scaling of the x-axis the are
 then ignored}
 
 \item{predictorLimits}{2 element numeric vector with the minimum and maximum value
@@ -82,12 +82,20 @@ minimum/maximum value}
 datapoints. 1 = censor scales::oob_censor is used, 2 = infinite,
 scales::oob_squish_infinite is used. Note: x-axis only}
 
+\item{autoScaleResponse}{if TRUE then default autoscaling of the y-axis
+takes place,most other settings delaing with scaling of the y-axis the are
+then ignored}
+
 \item{responseLimits}{2 element numeric vector with the minimum and maximum value
 for the y-axis. If an element is a character vector or something that
 cannot be converted to a numeric value, then NA is used which leads to
 minimum/maximum value}
 
 \item{responseLabel}{name of the y-axis, character vector}
+
+\item{responseOob}{integer vector, indicating how to deal with out of bounds
+datapoints. 1 = censor scales::oob_censor is used, 2 = infinite,
+scales::oob_squish_infinite is used. Note: y-axis only}
 
 \item{regressionColor}{color of the regression line}
 
@@ -135,10 +143,6 @@ resulting in a graph rotated 90 degrees}
 
 \item{responseOptions}{y-axis options character vector, "1" normal scale,
 "2" reversed scale,"3" logarithmic scale (log10)}
-
-\item{respomseOob}{integer vector, indicating how to deal with out of bounds
-datapoints. 1 = censor scales::oob_censor is used, 2 = infinite,
-scales::oob_squish_infinite is used. Note: y-axis only}
 }
 \value{
 ggplot object

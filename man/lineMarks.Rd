@@ -16,16 +16,16 @@ lineMarks(
 \item{graphs}{a ggplot object or a list of ggplot-objects to which the lines
 have to be added}
 
-\item{vLines}{a numeric vector defining where the vertical lines are to be
+\item{vlines}{a numeric vector defining where the vertical lines are to be
 placed}
 
-\item{hLines}{a numeric vector defining where the vertical lines are to be
+\item{hlines}{a numeric vector defining where the vertical lines are to be
 placed}
 
-\item{vLinesAttributes}{list which defines the type of line to be used for
+\item{vlinesAttributes}{list which defines the type of line to be used for
 vlines parameter}
 
-\item{hLinesAttributes}{list which defines the type of line to be used for
+\item{hlinesAttributes}{list which defines the type of line to be used for
 hlines parameter}
 }
 \value{

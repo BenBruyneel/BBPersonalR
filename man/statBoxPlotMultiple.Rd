@@ -102,7 +102,11 @@ used to define the exact range of the Y-axis}
 \item{yLimits}{default = c(0,NA), together with yLimits, this can be
 used to define the exact range of the Y-axis}
 
+\item{xLabel}{set x-axis title}
+
 \item{yLabel}{set y-axis title}
+
+\item{xDiscrete}{defines if x-axis should be/is discrete}
 
 \item{title}{sets title of graph}
 
@@ -115,6 +119,8 @@ used to define the exact range of the Y-axis}
 \item{meanFill}{fill color of the shape of the mean symbol}
 
 \item{meanSize}{size of the mean symbol}
+
+\item{legend.title}{if not NA, then to give a non-default name to the legend}
 
 \item{showLegend}{defines if the legend is to be shown or not}
 

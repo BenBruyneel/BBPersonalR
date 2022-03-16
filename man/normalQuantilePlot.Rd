@@ -45,13 +45,19 @@ the boxplot. By default sampleSize = NA, in which case all data is used}
 
 \item{pointColor}{defines the color of the border of the data points}
 
+\item{pointFill}{defines the color of the data points themselves}
+
 \item{pointShape}{shape of the data points}
 
 \item{pointSize}{size of the data points}
 
+\item{pointAlpha}{alpha ('see through' value) of the data points}
+
 \item{lineColor}{color of the normal distribution 'line'}
 
 \item{lineType}{type of the normal distribution 'line'}
+
+\item{lineWidth}{width of the normal distribution 'line'}
 
 \item{lineAlpha}{alpha ('see through' value) of the normal distribution
 'line'}
@@ -78,12 +84,6 @@ used to define the exact range of the Y-axis}
 
 \item{...}{can be used to pass on other arguments to graphAdjust()
 (like xLimits, xExpand, etc)}
-
-\item{pointfill}{defines the color of the data points themselves}
-
-\item{pointsAlpha}{alpha ('see through' value) of the data points}
-
-\item{lineWidh}{width of the normal distribution 'line'}
 }
 \value{
 a ggplot object

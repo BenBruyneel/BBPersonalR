@@ -11,7 +11,7 @@ library(rlang)
 #' 
 #' @param base_size size of the lettering  of axis, title etc
 #' @param base_family letter type of axis, title etc
-#' @param base_line_sze width of gridlines, set  to 0 for none
+#' @param base_line_size width of gridlines, set  to 0 for none
 #' @param base_rect_size width of axis lines, set to 0 for none
 #' @param xAxis if TRUE then display xAxis title
 #' @param yAxis if TRUE then display yAxis title
@@ -19,7 +19,7 @@ library(rlang)
 #' @param legend.position defines where to place the legend
 #' @param gridLines if TRUE then display gridlines
 #' @param gridLinesX if TRUE then display gridlines 'along' the x-axis
-#' @param gridLinesy if TRUE then display gridlines 'along' the y-axis
+#' @param gridLinesY if TRUE then display gridlines 'along' the y-axis
 #' @param titleSize if NA, use default title size, else use titleSize value
 #' 
 #' To be used as ggplot-object + theme_minimal_adapted() 
@@ -372,13 +372,13 @@ linesMarkDefaults <- function(){
 #'
 #' @param graphs a ggplot object or a list of ggplot-objects to which the lines
 #'  have to be added
-#' @param vLines a numeric vector defining where the vertical lines are to be
+#' @param vlines a numeric vector defining where the vertical lines are to be
 #'  placed
-#' @param hLines  a numeric vector defining where the vertical lines are to be
+#' @param hlines  a numeric vector defining where the vertical lines are to be
 #'  placed
-#' @param vLinesAttributes list which defines the type of line to be used for
+#' @param vlinesAttributes list which defines the type of line to be used for
 #'  vlines parameter
-#' @param hLinesAttributes list which defines the type of line to be used for
+#' @param hlinesAttributes list which defines the type of line to be used for
 #'  hlines parameter
 #'  
 #' @note due to the graphs parameter you can use:

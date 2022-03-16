@@ -40,8 +40,20 @@ library(data.table)
 #' @param yAxis defines if the x-axis is shown
 #' @param xDefault this defines if default x-sxis limits should be used or not,
 #'  see also graphAdjust() for info
-#' @param yDefault this defines if default y-sxis limits should be used or not,
-#'  see also graphAdjust() for info
+#' @param xLimits  default = c(0,NA), together with xDefault, this can be
+#'  used to define the exact range of the x-axis
+#' @param xSymmetric if TRUE then the range of x-axis will be adjusted to be
+#'  equal on both the left and the right side of the center
+#' @param xSymmetricExpand allows for padding around data (x-axis), 0.05 means
+#'  5 percent extra wide x-axis range
+#' @param xCentered if TRUE, the plot will be 'cemtered' around the either the
+#'  mean or median x-value
+#' @param xMedian if TRUE then median and mean absolute deviation (mad) are
+#'  used for centering the plot along the x-axis; if FALSE then the mean and the
+#'  standard deviation are used
+#' @param xDeviations defines how many deviations the range of the x-axis may
+#'  differ from the mean or median. Range will be either (median-xDeviations*mad
+#'  ,median+xDeviations**mad) or (mean - xDeviations*sd,mean + xDeviations*sd)
 #' @param showLegend defines if the legend is to be shown or not
 #' @param legend.position defines where a legend is to be placed
 #' @param vertical if TRUE, flips x- and y-axis
@@ -410,7 +422,7 @@ statDensity <- function(data, column = 1,
 statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
                                  sampleSize = NA,
                                  outlineColor = "black", fillColor = "red",
-                                 outLineSize = 0.5, outlineType = "solid",
+                                 outlineSize = 0.5, outlineType = "solid",
                                  violinAlpha = 1,
                                  scale = c("area","count","width")[1],
                                  trim = TRUE,
@@ -454,7 +466,7 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
   g <- ggplot2::ggplot(data = data, ggplot2::aes(x = 0, y = !!dplyr::sym(whichColumn)))
   g <- g + ggplot2::geom_violin(na.rm = removeNA,
                        fill = fillColor, col = outlineColor,
-                       size = outLineSize, linetype = outlineType,
+                       size = outlineSize, linetype = outlineType,
                        alpha = violinAlpha, scale = scale, trim = trim,
                        adjust = bandwidth, draw_quantiles = quantiles)
   # g <- g + stat_boxplot(geom = "errorbar", width = whiskerWidth,
@@ -483,7 +495,9 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #'  column and yLabel are defined, column is used as label for the Y-axis. If
 #'  not defined, then all columns of the data.frame will be used.
 #' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
-#'  to plotting. @note this will remove warning messages and errors 
+#'  to plotting. @note this will remove warning messages and errors
+#' @param variableName sets the 'combined' name of the columns (IF there is more
+#'  than one!)
 #' @param sampleSize allows to the use of a sample of the data to be used for
 #'  the boxplot. By default sampleSize = NA, in which case all data is used
 #' @param outlineColor defines the color of the line around the 'violin'
@@ -513,15 +527,15 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #' @param size size of the data points
 #' @param shape shape of the datapoints (default = 16), see vignette
 #'  ggplot2::ggplot2-specs
+#' @param jitterFill fill color of the data points
 #' @param xAxis defines if the x-axis is shown
 #' @param yAxis defines if the x-axis is shown
+#' @param xLabel set x-axis title
 #' @param yLabel set y-axis title
 #' @param title sets title of graph
+#' @param showLegend defines if the legend is to be shown or not
+#' @param legend.position defines where a legend is to be placed
 #' @param vertical if TRUE, flips x- and y-axis
-#' @param xDefault default is set to FALSE, together with xLimits this can be
-#'  used to tweak the positioning and with of the box
-#' @param xLimits default = c(-0.75,0.75), together with xDefault this can be
-#'  used to tweak the positioning and with of the box
 #' @param yDefault default is set to TRUE, together with yLimits, this can be
 #'  used to define the exact range of the Y-axis
 #' @param yLimits  default = c(0,NA), together with yLimits, this can be
@@ -535,7 +549,7 @@ statViolinPlotMultiple <- function(data, column = 1:ncol(data),
                                    sampleSize = NA, removeNA = TRUE,
                                    variableName = "variable",
                                    outlineColor = "black", fillColor = NA,
-                                   outLineSize = 0.5, outlineType = "solid",
+                                   outlineSize = 0.5, outlineType = "solid",
                                    violinAlpha = 1,
                                    scale = c("area","count","width")[1],
                                    trim = TRUE,
@@ -568,7 +582,7 @@ statViolinPlotMultiple <- function(data, column = 1:ncol(data),
   g <- g + ggplot2::geom_violin(na.rm = removeNA, col = outlineColor, 
                        ggplot2::aes_string(group = variableName,
                                   fill = variableName),
-                       size = outLineSize, linetype = outlineType,
+                       size = outlineSize, linetype = outlineType,
                        alpha = violinAlpha, scale = scale, trim = trim,
                        adjust = bandwidth, draw_quantiles = quantiles)
   if (!is.na(jitter)){
@@ -756,7 +770,9 @@ statBoxPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #' @param boxWidth defines the width of the box (0-1)
 #' @param xAxis defines if the x-axis is shown
 #' @param yAxis defines if the x-axis is shown
+#' @param xLabel set x-axis title
 #' @param yLabel set y-axis title
+#' @param xDiscrete defines if x-axis should be/is discrete
 #' @param title sets title of graph
 #' @param yDefault default is set to TRUE, together with yLimits, this can be
 #'  used to define the exact range of the Y-axis
@@ -769,6 +785,7 @@ statBoxPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #' @param meanFill fill color of the shape of the mean symbol
 #' @param meanSize size of the mean symbol
 #' @param showLegend defines if the legend is to be shown or not
+#' @param legend.title if not NA, then to give a non-default name to the legend
 #' @param legend.position defines where a legend is to be placed
 #' @param ... can be used to pass on other arguments to graphAdjust()
 #'  (like xLimits, xExpand, etc)
@@ -932,7 +949,9 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
 #' @param boxWidth defines the width of the box (0-1)
 #' @param xAxis defines if the x-axis is shown
 #' @param yAxis defines if the x-axis is shown
+#' @param xLabel set x-axis title
 #' @param yLabel set y-axis title
+#' @param xDiscrete defines if x-axis should be/is discrete
 #' @param title sets title of graph
 #' @param yDefault default is set to TRUE, together with yLimits, this can be
 #'  used to define the exact range of the Y-axis
@@ -1143,6 +1162,7 @@ statBoxPlotMultipleVar <- function(data, column = 1,
 #'  to plotting. @note this will remove warning messages and errors
 #' @param variableName sets the 'combined' name of the columns, 
 #'  must be a single word
+#' @param valueName sets the name of the 'y'-values, must be a single word
 #' @param outlineColor defines the color of the line around the box
 #' @param fillColor defines the color of the boxes themselves. Note: if the 
 #'  number of colors does not match the number of columns then ggplot2 default
@@ -1159,7 +1179,9 @@ statBoxPlotMultipleVar <- function(data, column = 1,
 #' @param boxWidth defines the width of the box (0-1)
 #' @param xAxis defines if the x-axis is shown
 #' @param yAxis defines if the x-axis is shown
+#' @param xLabel set x-axis title
 #' @param yLabel set y-axis title
+#' @param xDiscrete defines if x-axis should be/is discrete
 #' @param title sets title of graph
 #' @param yDefault default is set to TRUE, together with yLimits, this can be
 #'  used to define the exact range of the Y-axis
@@ -1171,8 +1193,6 @@ statBoxPlotMultipleVar <- function(data, column = 1,
 #' @param meanColor color of the line around the mean symbol
 #' @param meanFill fill color of the shape of the mean symbol
 #' @param meanSize size of the mean symbol
-#' @param showLegend defines if the legend is to be shown or not
-#' @param legend.position defines where a legend is to be placed
 #' @param returnData if TRUE then a list with 2 elements is returned. The first
 #'  element is the data.frame used to generate the graph and the second element
 #'  is the graph itself
@@ -1329,6 +1349,9 @@ statBoxPlotMultiTable <- function(data, idColumn = 1, varColumn = 2,
 #' @param gridLines if TRUE then gridlines are shown
 #' @param showLegend if TRUE then the legend is shown
 #' @param legend.position defines the place of the legend (default = "bottom")
+#' @param returnData if TRUE then a list with 2 elements is returned. The first
+#'  element is the data.frame used to generate the graph and the second element
+#'  is the graph itself
 #' @param ... can be used to pass on other arguments to graphAdjust()
 #'  (like xLimits, xExpand, etc)
 #' 
@@ -1430,13 +1453,13 @@ statBarPlot <- function(data, idColumn = 1,
 #' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
 #'  to plotting. Note: this will remove warning messages and errors
 #' @param pointColor defines the color of the border of the data points
-#' @param pointfill defines the color of the data points themselves
-#' @param pointsAlpha alpha ('see through' value) of the data points
+#' @param pointFill defines the color of the data points themselves
+#' @param pointAlpha alpha ('see through' value) of the data points
 #' @param pointShape shape of the data points
 #' @param pointSize size of the data points
 #' @param lineColor color of the normal distribution 'line'
 #' @param lineType type of the normal distribution 'line'
-#' @param lineWidh width of the normal distribution 'line'
+#' @param lineWidth width of the normal distribution 'line'
 #' @param lineAlpha alpha ('see through' value) of the normal distribution
 #'  'line'
 #' @param xAxis defines if the x-axis is shown
@@ -1506,13 +1529,13 @@ normalQuantilePlot <- function(data, column, removeNA = TRUE, sampleSize = NA,
 #' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
 #'  to plotting. @note this will remove warning messages and errors
 #' @param pointColor defines the color of the border of the data points
-#' @param pointfill defines the color of the data points themselves
-#' @param pointsAlpha alpha ('see through' value) of the data points
+#' @param pointFill defines the color of the data points themselves
+#' @param pointAlpha alpha ('see through' value) of the data points
 #' @param pointShape shape of the data points
 #' @param pointSize size of the data points
 #' @param lineColor color of the normal distribution 'line'
 #' @param lineType type of the normal distribution 'line'
-#' @param lineWidh width of the normal distribution 'line'
+#' @param lineWidth width of the normal distribution 'line'
 #' @param lineAlpha alpha ('see through' value) of the normal distribution
 #'  'line'
 #' @param bandType sets the type of confidence bands calculations.
@@ -1783,10 +1806,9 @@ volcanoMarkerAttributesDefaults <- function(){
 #' @param yCutoff minimum value of the statColumn data. any value lower is
 #'  marked as significant (usually p-value < 0.05)
 #' @param pointColor defines the color of the border of the data points
-#' @param significantColor color of the data points that lie outside the xCutoff
-#'  values and below the yCutoff value
-#' @param pointfill defines the color of the data points themselves
-#' @param pointsAlpha alpha ('see through' value) of the data points
+#' @param significantPointColor color of the data points that lie outside the
+#'  xCutoff values and below the yCutoff value
+#' @param pointAlpha alpha ('see through' value) of the data points
 #' @param pointShape shape of the data points
 #' @param pointSize size of the data points
 #' @param xDefault default is set to TRUE, together with xLimits, this can be
@@ -2139,14 +2161,14 @@ clearPlot <- function(){
 #' @param xLabel defines x-axis label
 #' @param yLabel defines y-axis label
 #' @param pointColor defines the color of the border of the data points
-#' @param pointfill defines the color of the data points themselves
+#' @param pointFill defines the color of the data points themselves
 #' @param pointAlpha alpha ('see through' value) of the data points
 #' @param pointShape shape of the data points
 #' @param pointSize size of the data points
 #' @param smoothLine if TRUE then a smoothing line is drawn (via geom_smooth())
 #' @param smoothLineColor color of the smoothing line
 #' @param smoothLineType type of the smoothing line
-#' @param smoothWidh width of the smoothing nline
+#' @param smoothWidth width of the smoothing nline
 #' @param smoothAlpha alpha ('see through' value) of the smoothing line
 #' @param smoothOrientation eihter "x" or "y", specifies what the smoothing
 #'  orientation should be. See ?ggplot2::geom_smooth for more information
@@ -2198,6 +2220,7 @@ clearPlot <- function(){
 #'  FALSE when using this)
 #' @param gridLinesY if TRUE then horizontal gridlines are shown (set gridLines
 #'  to FALSE when using this)
+#' @param ... can be used to pass on other arguments to graphAdjust()
 #'  
 #' @return a ggplot object
 #' @export
@@ -2345,6 +2368,7 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
 #' @param xLabel defines x-axis label
 #' @param yLabel defines y-axis label
 #' @param title specifies the title
+#' @param ... can be used to pass on other arguments to graphAdjust()
 #'  
 #' @return a ggplot object
 #' 
@@ -2439,7 +2463,7 @@ plotPlusMatrix <- function(sPlot,
 #'  
 #' @param sPlot ggplot object to be placed in the middle
 #' @param yLeft ggplot object to be placed on the left (along y-axis of sPlot)
-#' @param yright ggplot object to be placed on the right (along y-axis of sPlot)
+#' @param yRight ggplot object to be placed on the right (along y-axis of sPlot)
 #' @param widths horizontal: two number (integer) vector specifying the amount
 #'  of the plot to be used for the plots (horizontally)
 #'  

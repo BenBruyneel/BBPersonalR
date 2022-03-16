@@ -24,6 +24,8 @@ theme_minimal_adapted(
 
 \item{base_family}{letter type of axis, title etc}
 
+\item{base_line_size}{width of gridlines, set  to 0 for none}
+
 \item{base_rect_size}{width of axis lines, set to 0 for none}
 
 \item{xAxis}{if TRUE then display xAxis title}
@@ -38,13 +40,11 @@ theme_minimal_adapted(
 
 \item{gridLinesX}{if TRUE then display gridlines 'along' the x-axis}
 
+\item{gridLinesY}{if TRUE then display gridlines 'along' the y-axis}
+
 \item{titleSize}{if NA, use default title size, else use titleSize value
 
 To be used as ggplot-object + theme_minimal_adapted()}
-
-\item{base_line_sze}{width of gridlines, set  to 0 for none}
-
-\item{gridLinesy}{if TRUE then display gridlines 'along' the y-axis}
 }
 \value{
 theme definition

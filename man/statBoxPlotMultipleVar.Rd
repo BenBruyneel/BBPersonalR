@@ -121,7 +121,11 @@ used to define the exact range of the Y-axis}
 \item{yLimits}{default = c(0,NA), together with yLimits, this can be
 used to define the exact range of the Y-axis}
 
+\item{xLabel}{set x-axis title}
+
 \item{yLabel}{set y-axis title}
+
+\item{xDiscrete}{defines if x-axis should be/is discrete}
 
 \item{title}{sets title of graph}
 

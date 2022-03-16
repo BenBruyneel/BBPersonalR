@@ -80,6 +80,8 @@ multiple columns with data.frame's}
 
 \item{pointColor}{defines the color of the border of the data points}
 
+\item{pointFill}{defines the color of the data points themselves}
+
 \item{pointShape}{shape of the data points}
 
 \item{pointSize}{size of the data points}
@@ -93,6 +95,8 @@ multiple columns with data.frame's}
 \item{smoothAlpha}{alpha ('see through' value) of the smoothing line}
 
 \item{smoothFill}{specifies fill color pf tje smoothing confidence 'band'}
+
+\item{smoothWidth}{width of the smoothing nline}
 
 \item{smoothOrientation}{eihter "x" or "y", specifies what the smoothing
 orientation should be. See ?ggplot2::geom_smooth for more information}
@@ -169,9 +173,7 @@ FALSE when using this)}
 \item{gridLinesY}{if TRUE then horizontal gridlines are shown (set gridLines
 to FALSE when using this)}
 
-\item{pointfill}{defines the color of the data points themselves}
-
-\item{smoothWidh}{width of the smoothing nline}
+\item{...}{can be used to pass on other arguments to graphAdjust()}
 }
 \value{
 a ggplot object

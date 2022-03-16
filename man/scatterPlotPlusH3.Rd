@@ -17,10 +17,10 @@ scatterPlotPlusH3(
 
 \item{yLeft}{ggplot object to be placed on the left (along y-axis of sPlot)}
 
+\item{yRight}{ggplot object to be placed on the right (along y-axis of sPlot)}
+
 \item{widths}{horizontal: two number (integer) vector specifying the amount
 of the plot to be used for the plots (horizontally)}
-
-\item{yright}{ggplot object to be placed on the right (along y-axis of sPlot)}
 }
 \value{
 a ggplot object
