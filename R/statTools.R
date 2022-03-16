@@ -79,9 +79,9 @@ tableSummary <- function(data, column, removeNA = TRUE, alpha = 0.05){
                                  "Confidence Level (%)", "n","NA"),
                    value = c(0,0,0,0,0,0,0,0))
   df$value[1] <- mean(data, na.rm = removeNA)
-  df$value[2] <- sd(data, na.rm = removeNA)
+  df$value[2] <- stats::sd(data, na.rm = removeNA)
   if (removeNA){
-    df$value[7] <- data %>% na.omit() %>% length()
+    df$value[7] <- data %>% stats::na.omit() %>% length()
   } else {
     df$value[7] <- data %>% length()
   }
@@ -126,26 +126,28 @@ confidenceIntervals <- function(data, column, removeNA = TRUE, alpha = 0.05){
                                  "N", "Confidence Level"), 
                    value = c(0,0,0,0,0,0,0,0))
   if (removeNA){
-    stdErrMean <-  sd(data, na.rm = removeNA)/sqrt(length(data %>% na.omit()))
+    stdErrMean <-  stats::sd(data,
+                             na.rm = removeNA)/sqrt(length(data %>%
+                                                             stats::na.omit()))
   } else {
-    stdErrMean <-  sd(data, na.rm = removeNA)/sqrt(length(data))
+    stdErrMean <-  stats::sd(data, na.rm = removeNA)/sqrt(length(data))
   }
   df$value[1] <- mean(data, na.rm = removeNA)
-  df$value[4] <- sd(data, na.rm = removeNA)
+  df$value[4] <- stats::sd(data, na.rm = removeNA)
   if (removeNA){
-    df$value[7] <- data %>% na.omit() %>% length()
+    df$value[7] <- data %>% stats::na.omit() %>% length()
   } else {
     df$value[7] <- data %>% length()
   }
   df$value[8] <- (1-alpha)*100
-  df$value[2] <- df$value[1] + (qt(1-(alpha/2),
-                                   df = df$value[7]-1) * stdErrMean)
-  df$value[3] <- df$value[1] - (qt(1-(alpha/2),
-                                   df = df$value[7]-1) * stdErrMean)
+  df$value[2] <- df$value[1] + (stats::qt(1-(alpha/2),
+                                          df = df$value[7]-1) * stdErrMean)
+  df$value[3] <- df$value[1] - (stats::qt(1-(alpha/2),
+                                          df = df$value[7]-1) * stdErrMean)
   df$value[5] <- sqrt(((df$value[7]-1)*(df$value[4]^2))/
-                        (qchisq((alpha/2), df = df$value[7]-1)))
+                        (stats::qchisq((alpha/2), df = df$value[7]-1)))
   df$value[6] <- sqrt(((df$value[7]-1)*(df$value[4]^2))/
-                        (qchisq(1-(alpha/2), df = df$value[7]-1)))
+                        (stats::qchisq(1-(alpha/2), df = df$value[7]-1)))
   return(df)
 }
 
@@ -179,7 +181,7 @@ toleranceInterval <- function(data, column, removeNA = TRUE,
     data <- data[,column]
   }
   if (removeNA){
-    data <- data %>% na.omit()
+    data <- data %>% stats::na.omit()
   }
   ni <- normtol.int(data, alpha = alpha, P = proportion, side = 2)
   return(data.frame(statistic = c("confidence (alpha)","proportion",

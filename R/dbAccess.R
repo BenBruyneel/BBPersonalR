@@ -125,10 +125,11 @@ DBtoVector <- function(dbData = NA, collapseChar = ";", vectorClass = "integer")
 #' @export
 vectorToBlob <- function(dataVector = NA, collapseChar = ";",
                          formatNumbers = FALSE, type = "gzip", ...){
-  tempRaw <- memCompress(dbAccess::vectorToDB(dataVector = dataVector,
-                                              collapseChar = collapseChar,
-                                              formatNumbers = formatNumbers,
-                                              ...), type = type)
+  tempRaw <- memCompress(vectorToDB(dataVector = dataVector,
+                                    collapseChar = collapseChar,
+                                    formatNumbers = formatNumbers,
+                                    ...),
+                         type = type)
   tempRaw <- paste(PKI::raw2hex(tempRaw), collapse = "")
   return(tempRaw)
 }
@@ -152,11 +153,11 @@ blobToVector <- function(blobData = NA,
   blobData <- stringr::str_split(blobData,"")[[1]]
   blobData <- paste0(blobData[c(TRUE, FALSE)], blobData[c(FALSE, TRUE)])
   blobData <- wkb::hex2raw(blobData)
-  return(dbAccess::DBtoVector(dbData = memDecompress(blobData,
-                                              type = type,
-                                              asChar = TRUE),
-                       collapseChar = collapseChar,
-                       vectorClass = vectorClass))
+  return(DBtoVector(dbData = memDecompress(blobData,
+                                           type = type,
+                                           asChar = TRUE),
+                    collapseChar = collapseChar,
+                    vectorClass = vectorClass))
 }
 
 #' Converts a data.frames to a single data.frame where each data.frame from the
@@ -665,7 +666,7 @@ db_createColumnDefinitions <- function(dataframe, dbType = "SQLite",
 #' @export
 db_createDataframe <- function(db, tableName, dbType = "SQLite"){
   if (dbType == "SQLite"){
-    tableInfo <- dbAccess::db_columnInfo(db = db, tableName = tableName)
+    tableInfo <- db_columnInfo(db = db, tableName = tableName)
     df <- data.frame()
     for (counter in 1:(nrow(tableInfo))){
       if (tableInfo$type[counter] == "blob"){

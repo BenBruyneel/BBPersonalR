@@ -38,7 +38,7 @@ y-data (refer to column via number or character vector (column name))}
 log10 (if logTransform = TRUE!)}
 
 \item{removeNA}{if TRUE, the NA 'values' in the vector will be removed prior
-to plotting. @note this has consquence that ROWS will be removed when using
+to plotting. Note: this has consquence that ROWS will be removed when using
 multiple columns with data.frame's}
 
 \item{xLabel}{defines x-axis label}

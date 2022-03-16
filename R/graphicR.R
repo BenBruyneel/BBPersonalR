@@ -5,6 +5,7 @@ library(ggforce)
 library(scales)
 library(grid)
 library(gridExtra)
+library(rlang)
 
 #' to be able to use the theme theme_minimal with some adjustments
 #' 
@@ -399,7 +400,7 @@ lineMarks <- function(graphs,
   }
   for (counter in 1:(length(graphs))){
     if ((!identical(vlines,NA))){
-      graphs[[counter]] <- graphs[[counter]] + geom_vline(xintercept = vlines,
+      graphs[[counter]] <- graphs[[counter]] + ggplot2::geom_vline(xintercept = vlines,
                                                           size = vlinesAttributes$size,
                                                           linetype = vlinesAttributes$linetype,
                                                           color = vlinesAttributes$color,
@@ -407,7 +408,7 @@ lineMarks <- function(graphs,
       )
     }
     if ((!identical(hlines,NA))){
-      graphs[[counter]] <- graphs[[counter]] + geom_hline(yintercept = hlines,
+      graphs[[counter]] <- graphs[[counter]] + ggplot2::geom_hline(yintercept = hlines,
                                                           size = hlinesAttributes$size,
                                                           linetype = hlinesAttributes$linetype,
                                                           color = hlinesAttributes$color,
@@ -474,6 +475,7 @@ areaDefinition <- function(x = NA, y = NA){
 #'  list(ggplot objects) %>% graphAdjust() %>% areaMarks()
 #'
 #' @returns a list of ggplot objects
+#'
 #' @export
 areaMarks <- function(graphs,
                       areas = areaDefinition(),
@@ -481,13 +483,14 @@ areaMarks <- function(graphs,
   if (!identical(areas,NA)){
     for (counter in 1:(length(graphs))){
       for (counter2 in (1:length(areas))){
-        graphs[[counter]] <- graphs[[counter]] + geom_polygon(data = areas[[counter2]],
-                                                           aes(x = x, y= y),
-                                                           size = areaAttributes$size,
-                                                           linetype = areaAttributes$linetype,
-                                                           color = areaAttributes$color,
-                                                           fill = areaAttributes$fillColor,
-                                                           alpha = areaAttributes$alpha)
+        graphs[[counter]] <- graphs[[counter]] +
+          ggplot2::geom_polygon(data = areas[[counter2]],
+                                ggplot2::aes_string(x = "x",y = "y"),
+                                size = areaAttributes$size,
+                                linetype = areaAttributes$linetype,
+                                color = areaAttributes$color,
+                                fill = areaAttributes$fillColor,
+                                alpha = areaAttributes$alpha)
       }
     }
   }
@@ -524,7 +527,7 @@ graphCurves <- function(tables, x, y, lineWidth = 0.5, xLimits = NA,
       tables[[counter]][y] <- (tables[[counter]][y]/max(tables[[counter]][y], na.rm = TRUE))*100
     }
     tempList[[counter]] <- tables[[counter]] %>%
-      ggplot(aes_string(x,y)) + geom_line(size = lineWidth)
+      ggplot(aes_string(x,y)) + ggplot2::geom_line(size = lineWidth)
   }
   return(tempList)
 }
@@ -550,7 +553,7 @@ graphCurves <- function(tables, x, y, lineWidth = 0.5, xLimits = NA,
 #'  color (default = "black") then all curves will be the same color, otherwise
 #'  must be character vector of same length as the combine vector
 #'
-#' @returns a list of
+#' @returns a list of ggplot objects
 #' @export
 graphCurvesCombine <- function(tables, x, y, lineWidth = 0.5, xLimits = NA,
                                yPercentage = FALSE, combine = NA,
@@ -567,7 +570,7 @@ graphCurvesCombine <- function(tables, x, y, lineWidth = 0.5, xLimits = NA,
     if (yPercentage){
       tables[[counter]][y] <- (tables[[counter]][y]/max(tables[[counter]][y], na.rm = TRUE))*100
     }
-    tempList[[1]] <- tempList[[1]] + geom_line(data = tables[[counter]], aes_string(x,y),
+    tempList[[1]] <- tempList[[1]] + ggplot2::geom_line(data = tables[[counter]], aes_string(x,y),
                                                size = ifelse(length(lineWidth)>1,lineWidth[counter], lineWidth),
                                                color = ifelse(length(colors)>1,colors[counter], colors))
   }
@@ -650,26 +653,26 @@ customLegend <- function(p, legend = legendDefinition(),
     fakedf <- data.frame(x1x = fakePosition[1],
                          y1y = fakePosition[2],
                          group = legend$labels[counter])
-    p <- p + geom_point(data = fakedf, aes(x = x1x, y = y1y,
-                                           color = group,
-                                           fill = group,
-                                           shape = group,
-                                           size = group))
+    p <- p + ggplot2::geom_point(data = fakedf, ggplot2::aes_string(x = "x1x", y = "y1y",
+                                           color = "group",
+                                           fill = "group",
+                                           shape = "group",
+                                           size = "group"))
   }
   p <- p +
-    scale_color_manual(values = legend$colors, breaks = legend$labels) +
-    scale_fill_manual(values = legend$fills, breaks = legend$labels) +
-    scale_shape_manual(values = legend$shapes, breaks = legend$labels) +
-    scale_size_manual(values = legend$sizes, breaks = legend$labels) +
-    labs(color = legend.title, fill = legend.title, shape = legend.title, size = legend.title) +
-    theme(legend.title=element_text(size = legend.title.size, face = legend.title.face),
-          legend.margin=margin(l=0),
+    ggplot2::scale_color_manual(values = legend$colors, breaks = legend$labels) +
+    ggplot2::scale_fill_manual(values = legend$fills, breaks = legend$labels) +
+    ggplot2::scale_shape_manual(values = legend$shapes, breaks = legend$labels) +
+    ggplot2::scale_size_manual(values = legend$sizes, breaks = legend$labels) +
+    ggplot2::labs(color = legend.title, fill = legend.title, shape = legend.title, size = legend.title) +
+    ggplot2::theme(legend.title=ggplot2::element_text(size = legend.title.size, face = legend.title.face),
+          legend.margin=ggplot2::margin(l=0),
           legend.text=element_text(size = legend.element.size),
           legend.position = legend.position)
   if (axesAsis){
     p <- p + 
-      scale_x_continuous(limits = xLimits) + 
-      scale_y_continuous(limits = yLimits)
+      ggplot2::scale_x_continuous(limits = xLimits) + 
+      ggplot2::scale_y_continuous(limits = yLimits)
   }
   return(p)
 }

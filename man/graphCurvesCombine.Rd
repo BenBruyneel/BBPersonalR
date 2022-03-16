@@ -43,7 +43,7 @@ color (default = "black") then all curves will be the same color, otherwise
 must be character vector of same length as the combine vector}
 }
 \value{
-a list of
+a list of ggplot objects
 }
 \description{
 to generate a ggplot object (actually a list(ggplot object) ) which combines

@@ -56,9 +56,16 @@ drawn}
 
 \item{pointColor}{defines the color of the border of the data points}
 
+\item{pointFill}{defines the color of the data points themselves}
+
 \item{pointShape}{shape of the data points}
 
 \item{pointSize}{size of the data points}
+
+\item{pointAlpha}{alpha ('see through' value) of the data points}
+
+\item{drawLine}{boolean, if TRUE then a line through the data points will be
+drawn}
 
 \item{lineColor}{color of the line}
 
@@ -98,13 +105,6 @@ used to define the exact range of the Y-axis}
 
 \item{...}{can be used to pass on other arguments to graphAdjust()
 (like xLimits, xExpand, etc)}
-
-\item{pointfill}{defines the color of the data points themselves}
-
-\item{pointsAlpha}{alpha ('see through' value) of the data points}
-
-\item{drawLines}{boolean, if TRUE then a line through the data points will be
-drawn}
 
 \item{lineWidh}{width of the nline}
 }

@@ -35,7 +35,7 @@ weightsVector <- function(weight = NULL, wvalues, infiniteValue = NA){
 #' @returns a vector of weighted values (or NULL)
 #' @export
 weightsFromResidualsVector <- function(fit){
-  return(1/lm(abs(fit$residuals) ~ fit$fitted.values)$fitted.values^2)
+  return(1/stats::lm(abs(fit$residuals) ~ fit$fitted.values)$fitted.values^2)
 }
 
 #' wrapper around the lm() function to streamline it's use a bit
@@ -57,12 +57,12 @@ fitLM <- function(fitTable,
   x <- fitTable[,predictorColumn]
   y <- fitTable[,responseColumn]
   if (length(weights) == 1){
-      return(lm(formula = y ~ x, weights = weightsVector(weight = weights,x)))
+      return(stats::lm(formula = y ~ x, weights = weightsVector(weight = weights,x)))
   } else {
     if (is.null(weights)){
-      return(lm(formula = y ~ x))
+      return(stats::lm(formula = y ~ x))
     } else {
-      return(lm(formula = y ~ x, weights = weights))
+      return(stats::lm(formula = y ~ x, weights = weights))
     }
     
   }
@@ -104,7 +104,7 @@ fitDF <- function(fitTable, predictorColumn = 1, responseColumn = 2,
     responseColumn <- colnames(fitTable)[responseColumn]
   }
   if (!is.null(weights)){
-    fitTable$calculated <- unname(predict(fit,
+    fitTable$calculated <- unname(stats::predict(fit,
                                           newdata =
                                             {
                                               tempdf <- data.frame(x = fitTable[,predictorColumn])
@@ -113,7 +113,7 @@ fitDF <- function(fitTable, predictorColumn = 1, responseColumn = 2,
                                             },
                                           weights = weights))
   } else {
-    fitTable$calculated <- unname(predict(fit,
+    fitTable$calculated <- unname(stats::predict(fit,
                                           newdata = 
                                             {
                                               tempdf <- data.frame(x = fitTable[,predictorColumn])
@@ -250,7 +250,7 @@ fitPlot <- function(fitTable,
   if (!is.character(responseColumn)){
     responseColumn <- colnames(fitTable)[responseColumn]
   }
-  tempdf <- fitTable %>% dplyr::select(all_of(c(predictorColumn,
+  tempdf <- fitTable %>% dplyr::select(tidyselect::all_of(c(predictorColumn,
                                                 responseColumn)))
   colnames(tempdf) <- c("x","y")
   g <- ggplot(data = tempdf,aes(x = x, y = y))
@@ -263,55 +263,55 @@ fitPlot <- function(fitTable,
     }
     if (!is.null(weights)){
       if (length(weights) == 1){
-        yC <- as.data.frame(predict(fit,
+        yC <- as.data.frame(stats::predict(fit,
                                     newdata = data.frame(x = x2),
                                     weights = weightsVector(weight = weights, x2),
                                     interval = "confidence",
                                     level = confidenceLevel))
-        yP <- as.data.frame(predict(fit,
+        yP <- as.data.frame(stats::predict(fit,
                                     newdata = data.frame(x = x2),
                                     weights = weightsVector(weight = weights, x2),
                                     interval = "prediction",
                                     level = predictionLevel))
       } else {
         x2 <- x2[-c(1,length(x2))] # no weights for min, max
-        yC <- as.data.frame(predict(fit,
+        yC <- as.data.frame(stats::predict(fit,
                                     newdata = data.frame(x = x2),
                                     weights = weights,
                                     interval = "confidence",
                                     level = confidenceLevel))
-        yP <- as.data.frame(predict(fit,
+        yP <- as.data.frame(stats::predict(fit,
                                     newdata = data.frame(x = x2),
                                     weights = weights,
                                     interval = "prediction",
                                     level = predictionLevel))
       }
     } else {
-      yC <- as.data.frame(predict(fit,
+      yC <- as.data.frame(stats::predict(fit,
                                   newdata = data.frame(x = x2),
                                   interval = "confidence",
                                   level = confidenceLevel))
-      yP <- as.data.frame(predict(fit,
+      yP <- as.data.frame(stats::predict(fit,
                                   newdata = data.frame(x = x2),
                                   interval = "prediction",
                                   level = predictionLevel))
     }
     if (showPrediction){
-      g <- g + geom_ribbon(data = data.frame(x = x2, y = yC$fit),
+      g <- g + ggplot2::geom_ribbon(data = data.frame(x = x2, y = yC$fit),
                            aes(ymin = yP$lwr, ymax = yP$upr),
                            fill = predictionColor, alpha = predictionAlpha)
     }
     if (showConfidence){
-      g <- g + geom_ribbon(data = data.frame(x = x2, y = yC$fit),
+      g <- g + ggplot2::geom_ribbon(data = data.frame(x = x2, y = yC$fit),
                            aes(ymin = yC$lwr, ymax = yC$upr),
                            fill = confidenceColor, alpha = confidenceAlpha)
     }
-    g <- g + geom_line(data = data.frame(x = x2 ,y=yC$fit), aes(x=x,y=y),
+    g <- g + ggplot2::geom_line(data = data.frame(x = x2 ,y=yC$fit), aes(x=x,y=y),
                        color = regressionColor,
                        linetype = regressionLineType,
                        size = regressionWidth,
                        alpha = regressionAlpha)
-  g <- g + geom_point(shape = pointsShape,
+  g <- g + ggplot2::geom_point(shape = pointsShape,
                       size = pointsSize,
                       col = pointsColor, fill = pointsFill,
                       alpha = pointsAlpha)
@@ -498,12 +498,12 @@ residualPlot <- function(fitTable,
   } else {
     l <- ggplot(data.frame(x=fit$model$x,y=resStd),aes(x,y))
   }
-  l <- l + stat_smooth(geom = "line",
+  l <- l + ggplot2::stat_smooth(geom = "line",
                        color = fitColor,
                        linetype = fitLineType,
                        size = fitWidth,
                        alpha = fitAlpha)
-  l <- l + geom_point(shape = pointsShape,
+  l <- l + ggplot2::geom_point(shape = pointsShape,
                       size = pointsSize,
                       col = pointsColor, fill = pointsFill,
                       alpha = pointsAlpha)
@@ -530,7 +530,7 @@ residualPlot <- function(fitTable,
   if (showLimits){
     if (!identical(limits,NA)){
       for (counter in 1:nrow(limits)){
-        l <- l + geom_hline(yintercept = limits$yIntercept[counter],
+        l <- l + ggplot2::geom_hline(yintercept = limits$yIntercept[counter],
                             color = limits$color[counter],
                             linetype = limits$linetype[counter],
                             size = limits$size[counter],
@@ -673,12 +673,12 @@ recoveryPlot <- function(fitTable,
     l <- ggplot(data.frame(x=fitTable[,predictorColumn],
                            y=fitTable$recovery),aes(x,y))
   }
-  l <- l + stat_smooth(geom = "line",
+  l <- l + ggplot2::stat_smooth(geom = "line",
                        color = fitColor,
                        linetype = fitLineType,
                        size = fitWidth,
                        alpha = fitAlpha)
-  l <- l + geom_point(shape = pointsShape,
+  l <- l + ggplot2::geom_point(shape = pointsShape,
                       size = pointsSize,
                       col = pointsColor, fill = pointsFill,
                       alpha = pointsAlpha)
@@ -701,7 +701,7 @@ recoveryPlot <- function(fitTable,
   if (showLimits){
     if (!identical(limits,NA)){
       for (counter in 1:nrow(limits)){
-        l <- l + geom_hline(yintercept = limits$yIntercept[counter],
+        l <- l + ggplot2::geom_hline(yintercept = limits$yIntercept[counter],
                             color = limits$color[counter],
                             linetype = limits$linetype[counter],
                             size = limits$size[counter],
@@ -765,7 +765,7 @@ newDataDF <- function(fit, weight = NULL,
     predictionColumn <- which(colnames(sampleTable) == predictionColumn)
   }
   if (!is.null(weight)){
-    prdf <- predict(fit,
+    prdf <- stats::predict(fit,
                     newdata = 
                       {
                         tempdf = data.frame(x = sampleTable[,predictionColumn])
@@ -775,7 +775,7 @@ newDataDF <- function(fit, weight = NULL,
                     weights = weightsVector(weight = weight, wvalues = sampleTable[, predictionColumn]),
                     interval = c("prediction"), level = predictionLevel)
   } else {
-    prdf <- predict(fit,
+    prdf <- stats::predict(fit,
                     newdata = 
                       {
                         tempdf = data.frame(x = sampleTable[,predictionColumn])
@@ -784,7 +784,7 @@ newDataDF <- function(fit, weight = NULL,
                       },
                     interval = c("prediction"), level = predictionLevel)
   }
-  sampleTable <- sampleTable %>% dplyr::select(all_of(c(nameColumn, predictionColumn)))
+  sampleTable <- sampleTable %>% dplyr::select(tidyselect::all_of(c(nameColumn, predictionColumn)))
   sampleTable$calculated <- as.data.frame(prdf)$fit
   sampleTable$Lower <- as.data.frame(prdf)$lwr
   sampleTable$Upper <- as.data.frame(prdf)$upr

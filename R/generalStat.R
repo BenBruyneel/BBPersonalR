@@ -83,21 +83,21 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
     if (length(column) == 1){
       if (!statCount){
         if (removeNA){
-          g <- ggplot(data = data.frame(x = data) %>% na.omit(), aes(x))
+          g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x))
         } else {
-          g <- ggplot(data = data.frame(x = data), aes(x))
+          g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x))
         }
-        g <- g + geom_histogram(binwidth = binwidth, bins = bins,
+        g <- g + ggplot2::geom_histogram(binwidth = binwidth, bins = bins,
                                 col = outlineColor,
                                 fill = fillColor) + theme_classic()
       } else {
         if (removeNA){
-          g <- ggplot(data = data.frame(x = data) %>% na.omit(), aes(x))
+          g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x))
         } else {
-          g <- ggplot(data = data.frame(x = data), aes(x))
+          g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x))
         }
         suppressWarnings(
-          g <- g + geom_histogram(col = outlineColor, fill = fillColor,
+          g <- g + ggplot2::geom_histogram(col = outlineColor, fill = fillColor,
                                   stat = 'count') + theme_classic())
       }
     } else {
@@ -107,13 +107,13 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
                                    variable.name = variableName,
                                    value.name = "value"))
         if (removeNA){
-          g <- ggplot(data = data %>% na.omit(), aes(value))
+          g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes(value))
         } else {
-          g <- ggplot(data = data, aes(value))
+          g <- ggplot2::ggplot(data = data, ggplot2::aes(value))
         }
-        g <- g + geom_histogram(binwidth = binwidth, bins = bins,
+        g <- g + ggplot2::geom_histogram(binwidth = binwidth, bins = bins,
                                 col = outlineColor,
-                                aes_string(fill = variableName))
+                                ggplot2::aes_string(fill = variableName))
         if (length(fillColor) == length(column)){
           g <- g + scale_fill_manual(values = fillColor)
         }
@@ -124,12 +124,12 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
                                    variable.name = variableName,
                                    value.name = "value"))
         if (removeNA){
-          g <- ggplot(data = data %>% na.omit(), aes(value))
+          g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes(value))
         } else {
-          g <- ggplot(data = data, aes(value))
+          g <- ggplot2::ggplot(data = data, ggplot2::aes(value))
         }
-        g <- g + geom_histogram(binwidth = binwidth, col = outlineColor,
-                                aes_string(fill = variableName),
+        g <- g + ggplot2::geom_histogram(binwidth = binwidth, col = outlineColor,
+                                ggplot2::aes_string(fill = variableName),
                                 stat = 'count')
         if (length(fillColor) == length(column)){
           g <- g + scale_fill_manual(values = fillColor)
@@ -140,21 +140,21 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
   } else {
     if (!statCount){
       if (removeNA){
-        g <- ggplot(data = data.frame(x = data) %>% na.omit(), aes(x))
+        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x))
       } else {
-        g <- ggplot(data = data.frame(x = data), aes(x))
+        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x))
       }
-      g <- g + geom_histogram(binwidth = binwidth, bins = bins,
+      g <- g + ggplot2::geom_histogram(binwidth = binwidth, bins = bins,
                               col = outlineColor,
                               fill = fillColor) + theme_classic()
     } else {
       if (removeNA){
-        g <- ggplot(data = data.frame(x = data) %>% na.omit(), aes(x))
+        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x))
       } else {
-        g <- ggplot(data = data.frame(x = data), aes(x))
+        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x))
       }
       suppressWarnings(
-        g <- g + geom_histogram(col = outlineColor, fill = fillColor,
+        g <- g + ggplot2::geom_histogram(col = outlineColor, fill = fillColor,
                                 stat = 'count') + theme_classic()
       )
     }
@@ -286,11 +286,11 @@ statDensity <- function(data, column = 1,
     data <- data[,column]
     if (length(column) == 1){
       if (removeNA){
-        g <- ggplot(data = data.frame(x = data) %>% na.omit(), aes(x))
+        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x))
       } else {
-        g <- ggplot(data = data.frame(x = data), aes(x))
+        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x))
       }
-      g <- g + geom_density(col = outlineColor, fill = fillColor,
+      g <- g + ggplot2::geom_density(col = outlineColor, fill = fillColor,
                             alpha = alpha) + theme_classic()
     } else {
       data <- as.data.frame(melt(as.data.table(data),
@@ -298,20 +298,20 @@ statDensity <- function(data, column = 1,
                                  variable.name = variableName,
                                  value.name = "value"))
       if (removeNA){
-        g <- ggplot(data = data %>% na.omit(), aes(value))
+        g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes(value))
       } else {
-        g <- ggplot(data = data, aes(value))
+        g <- ggplot2::ggplot(data = data, ggplot2::aes(value))
       }
-      g <- g + geom_density(col = outlineColor, alpha = alpha,
-                            aes_string(fill = variableName))
+      g <- g + ggplot2::geom_density(col = outlineColor, alpha = alpha,
+                            ggplot2::aes_string(fill = variableName))
       if (length(fillColor) == length(column)){
         g <- g + scale_fill_manual(values = fillColor)
       }
       g <- g + theme_classic()
     }
   } else {
-    g <- ggplot(data = data.frame(x = data) %>% na.omit(), aes(x)) +
-      geom_density(col = outlineColor,
+    g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x)) +
+      ggplot2::geom_density(col = outlineColor,
                    fill = fillColor, alpha = alpha) + theme_classic()
   }
   if (xSymmetric){
@@ -451,8 +451,8 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
   if (!is.na(sampleSize)){
     data <- data[sample(1:nrow(data), sampleSize, replace = FALSE),]
   }
-  g <- ggplot(data = data, aes(x = 0, y = !!sym(whichColumn)))
-  g <- g + geom_violin(na.rm = removeNA,
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(x = 0, y = !!sym(whichColumn)))
+  g <- g + ggplot2::geom_violin(na.rm = removeNA,
                        fill = fillColor, col = outlineColor,
                        size = outLineSize, linetype = outlineType,
                        alpha = violinAlpha, scale = scale, trim = trim,
@@ -460,7 +460,7 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
   # g <- g + stat_boxplot(geom = "errorbar", width = whiskerWidth,
   #                       na.rm = removeNA)
   if (!identical(jitter,NA)){
-    g <- g + geom_jitter(aes(x = 0, y = !!sym(whichColumn)), na.rm = removeNA,
+    g <- g + ggplot2::geom_jitter(ggplot2::aes(x = 0, y = !!sym(whichColumn)), na.rm = removeNA,
                          position = position_jitter(jitter),
                          fill = fillColor, col = outlineColor, alpha = alpha,
                          size = size, shape = shape)
@@ -562,17 +562,17 @@ statViolinPlotMultiple <- function(data, column = 1:ncol(data),
                              variable.name = variableName,
                              value.name = "value"))
   if (removeNA){
-    data <- data %>% na.omit()
+    data <- data %>% stats::na.omit()
   }
-  g <- ggplot(data = data, aes_string(x = variableName, y = "value"))
-  g <- g + geom_violin(na.rm = removeNA, col = outlineColor, 
-                       aes_string(group = variableName,
+  g <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = variableName, y = "value"))
+  g <- g + ggplot2::geom_violin(na.rm = removeNA, col = outlineColor, 
+                       ggplot2::aes_string(group = variableName,
                                   fill = variableName),
                        size = outLineSize, linetype = outlineType,
                        alpha = violinAlpha, scale = scale, trim = trim,
                        adjust = bandwidth, draw_quantiles = quantiles)
   if (!is.na(jitter)){
-    g <- g + geom_jitter(aes_string(x = variableName, y = "value"),
+    g <- g + ggplot2::geom_jitter(ggplot2::aes_string(x = variableName, y = "value"),
                          position = position_jitter(jitter),
                          fill = jitterFill, col = outlineColor,
                          alpha = alpha, size = size, shape = shape)
@@ -686,29 +686,29 @@ statBoxPlotSingle <- function(data, column = 1, removeNA = TRUE,
   if (!is.na(sampleSize)){
     data <- data[sample(1:nrow(data), sampleSize, replace = FALSE),]
   }
-  g <- ggplot(data = data, aes(y = !!sym(whichColumn)))
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(y = !!sym(whichColumn)))
   if (!is.na(jitter)){
-    g <- g + geom_boxplot(na.rm = removeNA, outlier.shape = NA,
+    g <- g + ggplot2::geom_boxplot(na.rm = removeNA, outlier.shape = NA,
                           fill = fillColor, col = outlineColor,
                           width = boxWidth)
-    g <- g + stat_boxplot(geom = "errorbar", width = whiskerWidth,
+    g <- g + ggplot2::stat_boxplot(geom = "errorbar", width = whiskerWidth,
                           na.rm = removeNA)
-    g <- g + geom_jitter(aes(x = 0, y = !!sym(whichColumn)), na.rm = removeNA,
+    g <- g + ggplot2::geom_jitter(ggplot2::aes(x = 0, y = !!sym(whichColumn)), na.rm = removeNA,
                          position = position_jitter(jitter), 
                          fill = fillColor, col = outlineColor, alpha = alpha,
                          size = size, shape = shape)
   } else {
-    g <- g + geom_boxplot(na.rm = removeNA, fill = fillColor,
+    g <- g + ggplot2::geom_boxplot(na.rm = removeNA, fill = fillColor,
                           col = outlineColor, width = boxWidth,
                           outlier.color = outlineColor,
                           outlier.fill = fillColor, outlier.alpha = alpha,
                           outlier.shape = shape, outlier.size = size)
-    g <- g + stat_boxplot(geom = "errorbar", width = whiskerWidth,
+    g <- g + ggplot2::stat_boxplot(geom = "errorbar", width = whiskerWidth,
                           na.rm = removeNA)
   }
   if (showMean){
     theMean <- mean(as.data.frame(data)[,whichColumn], na.rm = removeNA)
-    g <- g + geom_point(aes(x = 0, y = theMean) ,shape = meanShape,
+    g <- g + ggplot2::geom_point(ggplot2::aes(x = 0, y = theMean) ,shape = meanShape,
                         size = meanSize, col = meanColor, fill = meanFill)
   }
   g <- graphsAdjust(list(g), vertical = vertical,
@@ -827,31 +827,31 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
     colnames(data) <- c(variableName,"value")
   }
   if (removeNA){
-    data <- data %>% na.omit()
+    data <- data %>% stats::na.omit()
   }
-  g <- ggplot(data = data, aes_string(x = variableName, y = "value"))
+  g <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = variableName, y = "value"))
   if (!is.na(jitter)){
-    g <- g + geom_boxplot(na.rm = removeNA, col = outlineColor, 
+    g <- g + ggplot2::geom_boxplot(na.rm = removeNA, col = outlineColor, 
                           outlier.shape = NA,
-                          width = boxWidth, aes_string(group = variableName,
+                          width = boxWidth, ggplot2::aes_string(group = variableName,
                                                        fill = variableName))
-    g <- g + stat_boxplot(geom = "errorbar", width = whiskerWidth, aes_string(group = variableName))
-    g <- g + geom_jitter(aes_string(x = variableName, y = "value"),
+    g <- g + ggplot2::stat_boxplot(geom = "errorbar", width = whiskerWidth, ggplot2::aes_string(group = variableName))
+    g <- g + ggplot2::geom_jitter(ggplot2::aes_string(x = variableName, y = "value"),
                          position = position_jitter(jitter),
                          fill = jitterFill, col = outlineColor, alpha = alpha, size = size, shape = shape)
   } else {
-    g <- g + geom_boxplot(na.rm = removeNA, col = outlineColor, 
-                          width = boxWidth, aes_string(group = variableName,
+    g <- g + ggplot2::geom_boxplot(na.rm = removeNA, col = outlineColor, 
+                          width = boxWidth, ggplot2::aes_string(group = variableName,
                                                        fill = variableName),
                           outlier.color = outlineColor, outlier.fill = jitterFill, outlier.alpha = alpha,
                           outlier.shape = shape, outlier.size = size)
-    g <- g + stat_boxplot(geom = "errorbar", width = whiskerWidth, aes_string(group = variableName))
+    g <- g + ggplot2::stat_boxplot(geom = "errorbar", width = whiskerWidth, ggplot2::aes_string(group = variableName))
   }
   if (showMean){
     means <- data %>%
       group_by(!!sym(variableName)) %>%
       summarize(theMean = mean(value, na.rm = removeNA))
-    g <- g + geom_jitter(data = means, aes_string(x = variableName, y = "theMean"),
+    g <- g + ggplot2::geom_jitter(data = means, ggplot2::aes_string(x = variableName, y = "theMean"),
                          shape = meanShape, size = meanSize, col = meanColor, fill = meanFill,
                          width = 0, height = 0)
   }
@@ -1035,41 +1035,41 @@ statBoxPlotMultipleVar <- function(data, column = 1,
     }
   }
   if (removeNA){
-    data <- data %>% na.omit()
+    data <- data %>% stats::na.omit()
   }
-  g <- ggplot(data = data, aes_string(x = ifelse(isVarNumeric,
+  g <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = ifelse(isVarNumeric,
                                                  "cut",
                                                  varColumn),
                                       y = whichColumn))
   if (identical(fillColor,NA)){
     if (isVarNumeric){
-      g <- g + geom_boxplot(na.rm = removeNA, outlier.shape = NA,
+      g <- g + ggplot2::geom_boxplot(na.rm = removeNA, outlier.shape = NA,
                             col = outlineColor,
-                            aes(fill = cut),
+                            ggplot2::aes(fill = cut),
                             width = boxWidth)
     } else {
-      g <- g + geom_boxplot(na.rm = removeNA, outlier.shape = NA,
+      g <- g + ggplot2::geom_boxplot(na.rm = removeNA, outlier.shape = NA,
                             col = outlineColor,
-                            aes_string(fill = varColumn),
+                            ggplot2::aes_string(fill = varColumn),
                             width = boxWidth)
     }
   } else {
     if (isVarNumeric){
-      g <- g + geom_boxplot(na.rm = removeNA, outlier.shape = NA,
+      g <- g + ggplot2::geom_boxplot(na.rm = removeNA, outlier.shape = NA,
                             col = outlineColor,
-                            aes(fill = cut),
+                            ggplot2::aes(fill = cut),
                             width = boxWidth)
     } else {
-      g <- g + geom_boxplot(na.rm = removeNA, outlier.shape = NA,
+      g <- g + ggplot2::geom_boxplot(na.rm = removeNA, outlier.shape = NA,
                             col = outlineColor,
-                            aes_string(fill = varColumn),
+                            ggplot2::aes_string(fill = varColumn),
                             width = boxWidth)
     }
   }
-  g <- g + stat_boxplot(geom = "errorbar", width = whiskerWidth,
+  g <- g + ggplot2::stat_boxplot(geom = "errorbar", width = whiskerWidth,
                         na.rm = removeNA)
   if (!is.na(jitter)){
-    g <- g + geom_jitter(aes_string(x = ifelse(isVarNumeric,
+    g <- g + ggplot2::geom_jitter(ggplot2::aes_string(x = ifelse(isVarNumeric,
                                                "cut",
                                                varColumn),
                                     y = whichColumn), na.rm = removeNA,
@@ -1083,7 +1083,7 @@ statBoxPlotMultipleVar <- function(data, column = 1,
                                     "cut",
                                     varColumn)))) %>%
       summarize(theMean = mean(!!sym(whichColumn), na.rm = removeNA))
-    g <- g + geom_jitter(data = means, aes_string(x = ifelse(isVarNumeric,
+    g <- g + ggplot2::geom_jitter(data = means, ggplot2::aes_string(x = ifelse(isVarNumeric,
                                                              "cut",
                                                              varColumn),
                                                   y = "theMean"),
@@ -1376,10 +1376,10 @@ statBarPlot <- function(data, idColumn = 1,
                         measure.vars = varColumn,
                         variable.name = variableName,
                         value.name = valueName)
-  g <- ggplot(data = data, aes_string(x = idColumn,
+  g <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = idColumn,
                                       y = valueName,
                                       fill = variableName))
-  g <- g + geom_bar(position = barPosition, stat = "identity",
+  g <- g + ggplot2::geom_bar(position = barPosition, stat = "identity",
                     linetype = outlineType, color = outlineColor,
                     size = outlineWidth, alpha = fillAlpha)
   if (yDefault){
@@ -1470,7 +1470,7 @@ normalQuantilePlot <- function(data, column, removeNA = TRUE, sampleSize = NA,
     data <- data[,column]
   }
   if (removeNA) {
-    data <- data %>% na.omit()
+    data <- data %>% stats::na.omit()
   }
   if (!is.na(sampleSize)){
     data <- data[sample(1:length(data), sampleSize, replace = FALSE)]
@@ -1479,10 +1479,10 @@ normalQuantilePlot <- function(data, column, removeNA = TRUE, sampleSize = NA,
   theoryQuantiles <- qnorm(qpoints, mean = 0, sd = 1)
   theoryQuantiles <- ((theoryQuantiles - mean(theoryQuantiles))/((max(theoryQuantiles) - min(theoryQuantiles)))) + 0.5
   data <- data.frame(Sample = data %>% sort(), Theoretical = theoryQuantiles)
-  g <- ggplot(data = data, aes(Theoretical,Sample))
-  g <- g + geom_point(col = pointColor, fill = pointFill, shape = pointShape, size = pointSize, alpha = pointAlpha)
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(Theoretical,Sample))
+  g <- g + ggplot2::geom_point(col = pointColor, fill = pointFill, shape = pointShape, size = pointSize, alpha = pointAlpha)
   qlm <- lm(data = data, Sample~Theoretical)
-  g <- g + geom_abline(slope = coef(qlm)[2], intercept = coef(qlm)[1],
+  g <- g + ggplot2::ggplot2::geom_abline(slope = coef(qlm)[2], intercept = coef(qlm)[1],
                        col = lineColor, linetype = lineType, size = lineWidth, alpha = lineAlpha)
   g <- graphsAdjust(list(g), vertical = vertical, titles = title,
                     xDefault = xDefault, xLimits = xLimits,
@@ -1554,17 +1554,17 @@ normalQQPlot <- function(data, column, removeNA = TRUE,
     data <- data[,column]
   }
   if (removeNA) {
-    data <- data %>% na.omit()
+    data <- data %>% stats::na.omit()
   }
   if (!is.na(sampleSize)){
     data <- data[sample(1:length(data), sampleSize, replace = FALSE)]
   }
-  g <- ggplot(data = data.frame(x = data), aes(sample = x))
-  g <- g + geom_qq_band(bandType = bandType, alpha = bandAlpha, fill = bandFill)
-  g <- g + stat_qq_point(col = pointColor, fill = pointFill,
+  g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(sample = x))
+  g <- g + qqplotr::ggplot2::geom_qq_band(bandType = bandType, alpha = bandAlpha, fill = bandFill)
+  g <- g + qqplotr::stat_qq_point(col = pointColor, fill = pointFill,
                          shape = pointShape, size = pointSize,
                          alpha = pointAlpha)
-  g <- g + stat_qq_line(col = lineColor, linetype = lineType, size = lineWidth, alpha = lineAlpha)
+  g <- g + qqplotr::stat_qq_line(col = lineColor, linetype = lineType, size = lineWidth, alpha = lineAlpha)
   g <- graphsAdjust(list(g), vertical = vertical, titles = title,
                     xDefault = xDefault, xLimits = xLimits,
                     yDefault = yDefault, yLimits = yLimits,
@@ -1622,11 +1622,11 @@ controlChartMarkerLines <- function(yValues = NA,
 #' @param drawPoints boolean, if TRUE then the data points themselves will be
 #'  drawn
 #' @param pointColor defines the color of the border of the data points
-#' @param pointfill defines the color of the data points themselves
-#' @param pointsAlpha alpha ('see through' value) of the data points
+#' @param pointFill defines the color of the data points themselves
+#' @param pointAlpha alpha ('see through' value) of the data points
 #' @param pointShape shape of the data points
 #' @param pointSize size of the data points
-#' @param drawLines boolean, if TRUE then a line through the data points will be
+#' @param drawLine boolean, if TRUE then a line through the data points will be
 #'  drawn
 #' @param lineColor color of the line
 #' @param lineType type of the line
@@ -1698,18 +1698,18 @@ controlChart <- function(data, yColumn, xColumn = NA, removeNA = TRUE,
     colnames(data) <- c("x","y")
   }
   if (removeNA) {
-    data <- data %>% na.omit()
+    data <- data %>% stats::stats::na.omit()
   }
-  g <- ggplot(data = data, aes_string(colnames(data)[1],colnames(data)[2]))
+  g <- ggplot2::ggplot(data = data, ggplot2::aes_string(colnames(data)[1],colnames(data)[2]))
   if (drawPoints){
-    g <- g + geom_point(col = pointColor, fill = pointFill, shape = pointShape, size = pointSize, alpha = pointAlpha)
+    g <- g + ggplot2::geom_point(col = pointColor, fill = pointFill, shape = pointShape, size = pointSize, alpha = pointAlpha)
   }
   if (drawLine) {
-    g <- g + geom_line(col = lineColor, linetype = lineType, size = lineWidth, alpha = lineAlpha)
+    g <- g + ggplot2::geom_line(col = lineColor, linetype = lineType, size = lineWidth, alpha = lineAlpha)
   }
   if (!identical(controlLines,NA)){
     for (counter in 1:(nrow(controlLines))){
-      g <- g + geom_hline(yintercept = controlLines$yValues[counter],
+      g <- g + ggplot2::geom_hline(yintercept = controlLines$yValues[counter],
                           col = controlLines$color[counter],
                           size = controlLines$width[counter],
                           linetype = controlLines$type[counter],
@@ -1873,14 +1873,14 @@ volcanoPlot <- function(data, quantColumn = 1, statColumn = 2,
   if (identical(identifierColumn,NA)){
     data <- data %>%
       dplyr::select(all_of(xColumn), all_of(yColumn)) %>%
-      na.omit()
+      stats::na.omit()
   } else {
     if (!is.character(identifierColumn)){
       identifierColumn <- colnames(data)[identifierColumn]
     }
     data <- data %>%
       dplyr::select(all_of(identifierColumn), all_of(xColumn), all_of(yColumn)) %>%
-      na.omit()
+      stats::na.omit()
   }
   data$col <- "1"
   if (nrow(data[(data[,xColumn] <= xCutoffs[1] | data[,xColumn] >= xCutoffs[2]) &
@@ -1890,8 +1890,8 @@ volcanoPlot <- function(data, quantColumn = 1, statColumn = 2,
   }
   data$x <- quantTransform(data[,xColumn])
   data$y <- statTransform(data[,yColumn])
-  g <- ggplot(data = data, aes(x = x, y = y, color = col, fill = col))
-  g <- g + geom_point(shape = pointShape, size = pointSize, alpha = pointAlpha)
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(x = x, y = y, color = col, fill = col))
+  g <- g + ggplot2::geom_point(shape = pointShape, size = pointSize, alpha = pointAlpha)
   if (length(unique(data$col)) > 1){
     g <- g + scale_color_manual(values = c(pointColor, significantPointColor))
     g <- g + scale_fill_manual(values = c(pointColor, significantPointColor))
@@ -2116,7 +2116,7 @@ volcanoPlotPlus <- function(data, quantColumn = 1, statColumn = 2,
 #' @return empty ggplot object
 #' @export
 clearPlot <- function(){
-  ggplot()+theme_void()
+  ggplot2::ggplot()+ggplot2::theme_void()
 }
 
 #' generates a ggplot object of a scatterplot
@@ -2241,7 +2241,7 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
   data <- data %>%
     dplyr::select(all_of(xColumn), all_of(yColumn))
   if (removeNA){
-    data <- data %>% na.omit()
+    data <- data %>% stats::na.omit()
   }
   if (!identical(xTransform, NA)){
     data[,xColumn] <- xTransform(data[,xColumn])
@@ -2249,12 +2249,12 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
   if (!identical(yTransform, NA)){
     data[,yColumn] <- yTransform(data[,yColumn])
   }
-  g <- ggplot(data = data, (aes(x = !!sym(xColumn), y = !!sym(yColumn)))) +
-    geom_point(alpha = pointAlpha, color = pointColor,
+  g <- ggplot2::ggplot(data = data, (ggplot2::aes(x = !!sym(xColumn), y = !!sym(yColumn)))) +
+    ggplot2::geom_point(alpha = pointAlpha, color = pointColor,
                fill = pointFill, shape = pointShape,
                size = pointSize)
   if (smoothLine){
-    g <- g + stat_smooth(color = smoothLineColor,
+    g <- g + ggplot2::stat_smooth(color = smoothLineColor,
                          fill = smoothFill,
                          linetype = smoothLineType,
                          size = smoothWidth,
@@ -2339,7 +2339,7 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
 #' @param log2Transform if TRUE do log2 transformation o/t data in stead of
 #'  log10 (if logTransform = TRUE!)
 #' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
-#'  to plotting. @note this has consquence that ROWS will be removed when using
+#'  to plotting. Note: this has consquence that ROWS will be removed when using
 #'  multiple columns with data.frame's
 #' @param xLabel defines x-axis label
 #' @param yLabel defines y-axis label
@@ -2373,7 +2373,7 @@ scatterBlandAltman <- function(data, xColumn = 1, yColumn = 2,
     yColumn <- colnames(data)[yColumn]
   }
   if (removeNA){
-    data <- data %>% na.omit()
+    data <- data %>% stats::na.omit()
   }
   data <- data %>%
     dplyr::select(all_of(xColumn), all_of(yColumn))
