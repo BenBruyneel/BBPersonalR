@@ -253,7 +253,7 @@ fitPlot <- function(fitTable,
   tempdf <- fitTable %>% dplyr::select(tidyselect::all_of(c(predictorColumn,
                                                 responseColumn)))
   colnames(tempdf) <- c("x","y")
-  g <- ggplot(data = tempdf,aes(x = x, y = y))
+  g <- ggplot2::ggplot(data = tempdf,ggplot2::aes_string(x = "x", y = "y"))
     if (!autoScalePredictor){  # add numbers  to make lm hit the axis
       x2 <- c(toNumeric(predictorLimits[1]),fitTable[,predictorColumn],
               toNumeric(predictorLimits[2]))
@@ -298,15 +298,15 @@ fitPlot <- function(fitTable,
     }
     if (showPrediction){
       g <- g + ggplot2::geom_ribbon(data = data.frame(x = x2, y = yC$fit),
-                           aes(ymin = yP$lwr, ymax = yP$upr),
+                           ggplot2::aes(ymin = yP$lwr, ymax = yP$upr),
                            fill = predictionColor, alpha = predictionAlpha)
     }
     if (showConfidence){
       g <- g + ggplot2::geom_ribbon(data = data.frame(x = x2, y = yC$fit),
-                           aes(ymin = yC$lwr, ymax = yC$upr),
+                           ggplot2::aes(ymin = yC$lwr, ymax = yC$upr),
                            fill = confidenceColor, alpha = confidenceAlpha)
     }
-    g <- g + ggplot2::geom_line(data = data.frame(x = x2 ,y=yC$fit), aes(x=x,y=y),
+    g <- g + ggplot2::geom_line(data = data.frame(x = x2 ,y=yC$fit), ggplot2::aes(x=x,y=y),
                        color = regressionColor,
                        linetype = regressionLineType,
                        size = regressionWidth,
@@ -494,9 +494,9 @@ residualPlot <- function(fitTable,
     resStd <- fit$residuals
   }
   if (!usePredictor){
-    l <- ggplot(data.frame(x=fit$model$y,y=resStd),aes(x,y))
+    l <- ggplot2::ggplot(data.frame(x=fit$model$y,y=resStd),ggplot2::aes(x,y))
   } else {
-    l <- ggplot(data.frame(x=fit$model$x,y=resStd),aes(x,y))
+    l <- ggplot2::ggplot(data.frame(x=fit$model$x,y=resStd),ggplot2::aes(x,y))
   }
   l <- l + ggplot2::stat_smooth(geom = "line",
                        color = fitColor,
@@ -667,11 +667,11 @@ recoveryPlot <- function(fitTable,
                     fit = fit,
                     weights = weights)
   if (!usePredictor){
-    l <- ggplot(data.frame(x=fitTable[,responseColumn],
-                           y= fitTable$recovery),aes(x,y))
+    l <- ggplot2::ggplot(data.frame(x=fitTable[,responseColumn],
+                           y= fitTable$recovery),ggplot2::aes(x,y))
   } else {
-    l <- ggplot(data.frame(x=fitTable[,predictorColumn],
-                           y=fitTable$recovery),aes(x,y))
+    l <- ggplot2::ggplot(data.frame(x=fitTable[,predictorColumn],
+                           y=fitTable$recovery),ggplot2::aes(x,y))
   }
   l <- l + ggplot2::stat_smooth(geom = "line",
                        color = fitColor,

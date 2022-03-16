@@ -631,8 +631,8 @@ customLegend <- function(p, legend = legendDefinition(),
                          fakePosition = NA,
                          axesAsis = TRUE){
   if (axesAsis){
-    xLimits <- ggplot_build(p)$layout$panel_scales_x[[1]]$range$range
-    yLimits <- ggplot_build(p)$layout$panel_scales_y[[1]]$range$range
+    xLimits <- ggplot2::ggplot_build(p)$layout$panel_scales_x[[1]]$range$range
+    yLimits <- ggplot2::ggplot_build(p)$layout$panel_scales_y[[1]]$range$range
   }
   if (identical(fakePosition,NA)){
     fakePosition <- c(0,0)
@@ -667,7 +667,7 @@ customLegend <- function(p, legend = legendDefinition(),
     ggplot2::labs(color = legend.title, fill = legend.title, shape = legend.title, size = legend.title) +
     ggplot2::theme(legend.title=ggplot2::element_text(size = legend.title.size, face = legend.title.face),
           legend.margin=ggplot2::margin(l=0),
-          legend.text=element_text(size = legend.element.size),
+          legend.text=ggplot2::element_text(size = legend.element.size),
           legend.position = legend.position)
   if (axesAsis){
     p <- p + 
