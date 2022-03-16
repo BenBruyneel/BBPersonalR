@@ -1482,7 +1482,7 @@ normalQuantilePlot <- function(data, column, removeNA = TRUE, sampleSize = NA,
   g <- ggplot2::ggplot(data = data, ggplot2::aes(Theoretical,Sample))
   g <- g + ggplot2::geom_point(col = pointColor, fill = pointFill, shape = pointShape, size = pointSize, alpha = pointAlpha)
   qlm <- lm(data = data, Sample~Theoretical)
-  g <- g + ggplot2::ggplot2::geom_abline(slope = coef(qlm)[2], intercept = coef(qlm)[1],
+  g <- g + ggplot2::geom_abline(slope = coef(qlm)[2], intercept = coef(qlm)[1],
                        col = lineColor, linetype = lineType, size = lineWidth, alpha = lineAlpha)
   g <- graphsAdjust(list(g), vertical = vertical, titles = title,
                     xDefault = xDefault, xLimits = xLimits,
@@ -1560,7 +1560,7 @@ normalQQPlot <- function(data, column, removeNA = TRUE,
     data <- data[sample(1:length(data), sampleSize, replace = FALSE)]
   }
   g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(sample = x))
-  g <- g + qqplotr::ggplot2::geom_qq_band(bandType = bandType, alpha = bandAlpha, fill = bandFill)
+  g <- g + qqplotr::geom_qq_band(bandType = bandType, alpha = bandAlpha, fill = bandFill)
   g <- g + qqplotr::stat_qq_point(col = pointColor, fill = pointFill,
                          shape = pointShape, size = pointSize,
                          alpha = pointAlpha)
@@ -1698,7 +1698,7 @@ controlChart <- function(data, yColumn, xColumn = NA, removeNA = TRUE,
     colnames(data) <- c("x","y")
   }
   if (removeNA) {
-    data <- data %>% stats::stats::na.omit()
+    data <- data %>% stats::na.omit()
   }
   g <- ggplot2::ggplot(data = data, ggplot2::aes_string(colnames(data)[1],colnames(data)[2]))
   if (drawPoints){
