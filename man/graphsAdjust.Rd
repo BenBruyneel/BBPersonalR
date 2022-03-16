@@ -15,12 +15,12 @@ graphsAdjust(
   yDefault = FALSE,
   xLimits = c(0, NA),
   yLimits = c(0, NA),
-  xExpand = expansion(mult = 0, add = 0),
-  yExpand = expansion(mult = 0, add = 0),
-  xLabelFormat = waiver(),
-  yLabelFormat = waiver(),
-  xOob = oob_squish_infinite,
-  yOob = oob_squish_infinite,
+  xExpand = ggplot2::expansion(mult = 0, add = 0),
+  yExpand = ggplot2::expansion(mult = 0, add = 0),
+  xLabelFormat = ggplot2::waiver(),
+  yLabelFormat = ggplot2::waiver(),
+  xOob = scales::oob_squish_infinite,
+  yOob = scales::oob_squish_infinite,
   xLog = FALSE,
   yLog = FALSE,
   xIsDate = FALSE,
@@ -105,7 +105,7 @@ theme (can also be ggplot2 included themes, such as theme_bw())}
 \item{plot.margins}{defines margins (from the border) of the plot
 c(top, right, bottom, left)}
 
-\item{plot.nargins.units}{default = "points", other possibilities:
+\item{plot.margins.units}{default = "points", other possibilities:
 ?grid::unit , examples "cm", "points", "inches", "npc" (viewport) etc etc}
 }
 \value{

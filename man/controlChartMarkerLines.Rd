@@ -3,22 +3,7 @@
 \name{controlChartMarkerLines}
 \alias{controlChartMarkerLines}
 \title{Creates a data.frame with the values provided to be used in the controlChart
- function as controlLines
- 
- @param yValues a numeric vector specifying the 'heights' or y-axis values
-  where a horizontal line is needed
- @param type linetype of the horizontal lines needed, either a single value
-  or a vector of same length as yValues
- @param color color of the horizontal lines needed, either a single value
-  or a vector of same length as yValues
- @param width width of the horizontal lines needed, either a single value
-  or a vector of same length as yValues
- @param alpha alpha ('see through' value) of the horizontal lines needed,
-  either a single value or a vector of same length as yValues
-  
- @returns a data.frame with columns: yValues, type, color, width, alpha
- @note if yValues == NA or empty then the function returns NA
- @export}
+ function as controlLines}
 \usage{
 controlChartMarkerLines(
   yValues = NA,
@@ -28,22 +13,29 @@ controlChartMarkerLines(
   alpha = 0.75
 )
 }
+\arguments{
+\item{yValues}{a numeric vector specifying the 'heights' or y-axis values
+where a horizontal line is needed}
+
+\item{type}{linetype of the horizontal lines needed, either a single value
+or a vector of same length as yValues}
+
+\item{color}{color of the horizontal lines needed, either a single value
+or a vector of same length as yValues}
+
+\item{width}{width of the horizontal lines needed, either a single value
+or a vector of same length as yValues}
+
+\item{alpha}{alpha ('see through' value) of the horizontal lines needed,
+either a single value or a vector of same length as yValues}
+}
 \description{
 Creates a data.frame with the values provided to be used in the controlChart
  function as controlLines
- 
- @param yValues a numeric vector specifying the 'heights' or y-axis values
-  where a horizontal line is needed
- @param type linetype of the horizontal lines needed, either a single value
-  or a vector of same length as yValues
- @param color color of the horizontal lines needed, either a single value
-  or a vector of same length as yValues
- @param width width of the horizontal lines needed, either a single value
-  or a vector of same length as yValues
- @param alpha alpha ('see through' value) of the horizontal lines needed,
-  either a single value or a vector of same length as yValues
+}
+\note{
+if yValues == NA or empty then the function returns NA
   
  @returns a data.frame with columns: yValues, type, color, width, alpha
- @note if yValues == NA or empty then the function returns NA
  @export
 }

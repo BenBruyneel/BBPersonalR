@@ -38,7 +38,7 @@ tableQuantiles <- function(data, column, removeNA = TRUE,
       label <- "x"
     }
   }
-  data = quantile(data, probs = limits, na.rm = removeNA)
+  data = stats::quantile(data, probs = limits, na.rm = removeNA)
   if (quantilePercentage){
     df <- data.frame(quantile = names(data), x2 = data,
                      stringsAsFactors = FALSE)
@@ -86,9 +86,9 @@ tableSummary <- function(data, column, removeNA = TRUE, alpha = 0.05){
     df$value[7] <- data %>% length()
   }
   df$value[3] <- df$value[2]/sqrt(df$value[7])
-  df$value[4] <- df$value[1] + (qt(1-(alpha/2),
+  df$value[4] <- df$value[1] + (stats::qt(1-(alpha/2),
                                    df = df$value[7]-1) * df$value[3])
-  df$value[5] <- df$value[1] - (qt(1-(alpha/2),
+  df$value[5] <- df$value[1] - (stats::qt(1-(alpha/2),
                                    df = df$value[7]-1) * df$value[3]) 
   df$value[6] <- (1-alpha)*100
   df$value[8] <- sum(is.na(data))
@@ -183,7 +183,7 @@ toleranceInterval <- function(data, column, removeNA = TRUE,
   if (removeNA){
     data <- data %>% stats::na.omit()
   }
-  ni <- normtol.int(data, alpha = alpha, P = proportion, side = 2)
+  ni <- tolerance::normtol.int(data, alpha = alpha, P = proportion, side = 2)
   return(data.frame(statistic = c("confidence (alpha)","proportion",
                                   "Lower","Upper"),
                     value = c(alpha,proportion,

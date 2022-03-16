@@ -1,6 +1,6 @@
 Package: BBPersonalR
 Type: Package
-Imports: DBI, RSQLite, magrittr, pool, dplyr, stringr, purrr, tibble, PKI, wkb, ggplot2, qqplotr, grid, gridExtra, cowplot, tolerance, scales, data.table, ggforce, MASS, tidyselect, flextable, reshape2
+Imports: stats, DBI, RSQLite, magrittr, pool, dplyr, stringr, purrr, tibble, PKI, wkb, ggplot2, qqplotr, grid, gridExtra, cowplot, tolerance, scales, data.table, ggforce, MASS, tidyselect, flextable, reshape2
 Title: BBPersonalR
 Version: 0.2.0
 Author: Ben Bruyneel <benbruyneel@gmail.com>

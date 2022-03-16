@@ -35,48 +35,48 @@ theme_minimal_adapted <- function(base_size = 11, base_family = "",
                                   gridLinesX = TRUE,
                                   gridLinesY = TRUE,
                                   titleSize = NA){
-  theTheme <- theme_bw(base_size = base_size, base_family = base_family, 
+  theTheme <- ggplot2::theme_bw(base_size = base_size, base_family = base_family, 
                        base_line_size = base_line_size,
                        base_rect_size = base_rect_size) %+replace% 
-    theme(axis.ticks = element_blank(), legend.background = element_blank(), 
-          legend.key = element_blank(), panel.background = element_blank(), 
-          strip.background = element_blank(), #panel.border = element_blank(),
-          plot.background = element_blank(), complete = TRUE)
+    ggplot2::theme(axis.ticks = ggplot2::element_blank(), legend.background = ggplot2::element_blank(), 
+          legend.key = ggplot2::element_blank(), panel.background = ggplot2::element_blank(), 
+          strip.background = ggplot2::element_blank(), #panel.border = ggplot2::element_blank(),
+          plot.background = ggplot2::element_blank(), complete = TRUE)
   if (!xAxis) {
     theTheme <- theTheme %+replace%
-      theme(axis.title.x = element_blank(),
-            axis.text.x = element_blank(), axis.ticks.x = element_blank())
+      ggplot2::theme(axis.title.x = ggplot2::element_blank(),
+            axis.text.x = ggplot2::element_blank(), axis.ticks.x = ggplot2::element_blank())
   }
   if (!yAxis) {
     theTheme <- theTheme %+replace%
-      theme(axis.title.y = element_blank(),
-            axis.text.y = element_blank(), axis.ticks.y = element_blank())
+      ggplot2::theme(axis.title.y = ggplot2::element_blank(),
+            axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank())
   }
   if (showLegend){
     theTheme <- theTheme %+replace%
-      theme(legend.position = legend.position)
+      ggplot2::theme(legend.position = legend.position)
   } else {
     theTheme <- theTheme %+replace%
-      theme(legend.position = "none")
+      ggplot2::theme(legend.position = "none")
   }
   if (!gridLines){
     theTheme <- theTheme %+replace%
-      theme(panel.grid = element_blank())
+      ggplot2::theme(panel.grid = ggplot2::element_blank())
   } else {
     if (!gridLinesX){
       theTheme <- theTheme %+replace%
-        theme(panel.grid.major.x = element_blank(),
-              panel.grid.minor.x = element_blank())
+        ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
+              panel.grid.minor.x = ggplot2::element_blank())
     }
     if (!gridLinesY){
       theTheme <- theTheme %+replace%
-        theme(panel.grid.major.y = element_blank(),
-              panel.grid.minor.y = element_blank())
+        ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
+              panel.grid.minor.y = ggplot2::element_blank())
     }
   }
   if (!identical(titleSize,NA)){
     theTheme <- theTheme %+replace%
-      theme(plot.title = element_text(size = titleSize))
+      ggplot2::theme(plot.title = ggplot2::element_text(size = titleSize))
   }
   return(theTheme)
 }
@@ -168,7 +168,7 @@ formatScientificDigits <- function(digits){
 #' @param plot.margins.default if TRUE, ignore plot.margins and other parameters
 #' @param plot.margins defines margins (from the border) of the plot
 #'  c(top, right, bottom, left)   
-#' @param plot.nargins.units default = "points", other possibilities:
+#' @param plot.margins.units default = "points", other possibilities:
 #'  ?grid::unit , examples "cm", "points", "inches", "npc" (viewport) etc etc
 #'  
 #' @returns a list of ggplot objects
@@ -178,11 +178,11 @@ graphsAdjust <- function(graphs, vertical = FALSE,
                          xReverse = FALSE, yReverse = FALSE,
                          xDefault = FALSE, yDefault = FALSE, 
                          xLimits = c(0,NA), yLimits = c(0,NA),
-                         xExpand = expansion(mult = 0, add = 0),
-                         yExpand = expansion(mult = 0, add = 0),
-                         xLabelFormat = waiver(), yLabelFormat = waiver(),
-                         xOob = oob_squish_infinite,
-                         yOob = oob_squish_infinite,
+                         xExpand = ggplot2::expansion(mult = 0, add = 0),
+                         yExpand = ggplot2::expansion(mult = 0, add = 0),
+                         xLabelFormat = ggplot2::waiver(), yLabelFormat = ggplot2::waiver(),
+                         xOob = scales::oob_squish_infinite,
+                         yOob = scales::oob_squish_infinite,
                          xLog = FALSE, yLog = FALSE,
                          xIsDate = FALSE, yIsDate = FALSE,
                          titles = NA, xLabel = NA, yLabel = NA,
@@ -212,42 +212,42 @@ graphsAdjust <- function(graphs, vertical = FALSE,
       if (xLog) {
         if (!xDefault){
           graphs[[counter]] <- graphs[[counter]] + 
-            scale_x_continuous(expand = xExpand,
+            ggplot2::scale_x_continuous(expand = xExpand,
                                limits = xLimits,
                                oob = xOob,
                                trans = xReverse,
                                labels = xLabelFormat)
         } else {
           graphs[[counter]] <- graphs[[counter]] + 
-            scale_x_continuous(labels = xLabelFormat, trans = xReverse)
+            ggplot2::scale_x_continuous(labels = xLabelFormat, trans = xReverse)
         }
       } else {
         if (!xDefault){
           if (!xReverse){
             graphs[[counter]] <- graphs[[counter]] + 
-              scale_x_continuous(expand = xExpand, limits = xLimits, oob = xOob,
+              ggplot2::scale_x_continuous(expand = xExpand, limits = xLimits, oob = xOob,
                                  labels = xLabelFormat)
           } else {
             graphs[[counter]] <- graphs[[counter]] + 
-              scale_x_reverse(expand = xExpand, limits = xLimits[2:1], oob = xOob,
+              ggplot2::scale_x_reverse(expand = xExpand, limits = xLimits[2:1], oob = xOob,
                                  labels = xLabelFormat)
           }
         } else {
           if (!xDiscrete){
             if (!xReverse){
               graphs[[counter]] <- graphs[[counter]] + 
-                scale_x_continuous(labels = xLabelFormat)
+                ggplot2::scale_x_continuous(labels = xLabelFormat)
             } else {
               graphs[[counter]] <- graphs[[counter]] + 
-                scale_x_reverse(labels = xLabelFormat)
+                ggplot2::scale_x_reverse(labels = xLabelFormat)
             }
           } else {
             if (!xReverse){
               graphs[[counter]] <- graphs[[counter]] + 
-                scale_x_discrete(labels = xLabelFormat)
+                ggplot2::scale_x_discrete(labels = xLabelFormat)
             } else {
               graphs[[counter]] <- graphs[[counter]] + 
-                scale_x_discrete(limits = rev, labels = xLabelFormat)
+                ggplot2::scale_x_discrete(limits = rev, labels = xLabelFormat)
             }
           }
         }
@@ -255,7 +255,7 @@ graphsAdjust <- function(graphs, vertical = FALSE,
     } else {
       if (!xDefault){
         graphs[[counter]] <- graphs[[counter]] +
-          scale_x_date(limits = xLimits,
+          ggplot2::scale_x_date(limits = xLimits,
                        labels = xLabelFormat)#, trans = xReverse)  -- do not know if works
       }
     }
@@ -263,42 +263,42 @@ graphsAdjust <- function(graphs, vertical = FALSE,
       if (yLog) {
         if (!yDefault){
           graphs[[counter]] <- graphs[[counter]] + 
-            scale_y_continuous(expand = yExpand,
+            ggplot2::scale_y_continuous(expand = yExpand,
                                limits = yLimits,
                                oob = yOob,
                                trans = yReverse,
                                labels = yLabelFormat)
         } else {
           graphs[[counter]] <- graphs[[counter]] + 
-            scale_y_continuous(labels = yLabelFormat, trans = yReverse)
+            ggplot2::scale_y_continuous(labels = yLabelFormat, trans = yReverse)
         }
       } else {
         if (!yDefault){
           if (!yReverse){
             graphs[[counter]] <- graphs[[counter]] + 
-              scale_y_continuous(expand = yExpand, limits = yLimits, oob = yOob,
+              ggplot2::scale_y_continuous(expand = yExpand, limits = yLimits, oob = yOob,
                                  labels = yLabelFormat)
           } else {
             graphs[[counter]] <- graphs[[counter]] + 
-              scale_y_reverse(expand = yExpand, limits = yLimits[2:1], oob = yOob,
+              ggplot2::scale_y_reverse(expand = yExpand, limits = yLimits[2:1], oob = yOob,
                               labels = yLabelFormat)
           }
         } else {
           if (!yDiscrete){
             if (!yReverse){
               graphs[[counter]] <- graphs[[counter]] + 
-                scale_y_continuous(labels = yLabelFormat)
+                ggplot2::scale_y_continuous(labels = yLabelFormat)
             } else {
               graphs[[counter]] <- graphs[[counter]] + 
-                scale_y_reverse(labels = yLabelFormat)
+                ggplot2::scale_y_reverse(labels = yLabelFormat)
             }
           } else {
             if (!yReverse){
               graphs[[counter]] <- graphs[[counter]] + 
-                scale_y_discrete(labels = yLabelFormat)
+                ggplot2::scale_y_discrete(labels = yLabelFormat)
             } else {
               graphs[[counter]] <- graphs[[counter]] + 
-                scale_y_discrete(limits = rev, labels = yLabelFormat)
+                ggplot2::scale_y_discrete(limits = rev, labels = yLabelFormat)
             }
           }
         }
@@ -306,30 +306,30 @@ graphsAdjust <- function(graphs, vertical = FALSE,
     } else {
       if (!yDefault){
         graphs[[counter]] <- graphs[[counter]] +
-          scale_y_date(limits = yLimits,
+          ggplot2::scale_y_date(limits = yLimits,
                        labels = yLabelFormat, trans = yReverse)
       }
     }
     # swap x & y
     if (vertical){
-      graphs[[counter]] <- graphs[[counter]] + coord_flip()
+      graphs[[counter]] <- graphs[[counter]] + ggplot2::coord_flip()
     }
     # labels
     if (!identical(titles,NA)){
-      graphs[[counter]] <- graphs[[counter]] + ggtitle(titles[counter])
+      graphs[[counter]] <- graphs[[counter]] + ggplot2::ggtitle(titles[counter])
     }
     if (!identical(xLabel,NA)){
-      graphs[[counter]] <- graphs[[counter]] + xlab(xLabel)
+      graphs[[counter]] <- graphs[[counter]] + ggplot2::xlab(xLabel)
     }
     if (!identical(yLabel,NA)){
-      graphs[[counter]] <- graphs[[counter]] + ylab(yLabel)
+      graphs[[counter]] <- graphs[[counter]] + ggplot2::ylab(yLabel)
     }
     if (!identical(setTheme,NA)){
       graphs[[counter]] <- graphs[[counter]] + setTheme
     }
     if (!plot.margins.default){
       graphs[[counter]] <- graphs[[counter]] + 
-        theme(plot.margin = unit(plot.margins, plot.margins.units))
+        ggplot2::theme(plot.margin = ggplot2::unit(plot.margins, plot.margins.units))
     }
   }
   return(graphs)
@@ -392,7 +392,7 @@ lineMarks <- function(graphs,
                       vlinesAttributes = linesMarkDefaults(),
                       hlinesAttributes = linesMarkDefaults()){
   if (identical(vlines, NA) & (identical(hlines, NA))){
-    return(g)
+    return(graphs)
   }
   notList <- !is.Class(graphs, "list")
   if (notList){
@@ -497,8 +497,8 @@ areaMarks <- function(graphs,
   return(graphs)
 }
 
-#' to generate ggplot object (in form of a single item list) from a list of
-#'  data.frames of data
+#' function to generate ggplot object (in form of a single item list) from a
+#'  list of data.frames of data
 #' 
 #' @param tables list of data.frames from which to generate the graphs
 #'  Note: MUST be a list
@@ -510,7 +510,7 @@ areaMarks <- function(graphs,
 #'  x,y coordinates
 #' @param xLimits defines the range x coordinates c(minimum, maximum),
 #'  all coordinates outsude this range are not drawn
-#' @param yPercentage defines if y-axis maximum should be set to 100%
+#' @param yPercentage defines if y-axis maximum should be set to 100 percent
 #' @note due to the graphs parameter you can use:
 #'  graphCurves(tables) %>% graphAdjust() %>% lineMarks() and similar pipes
 #'
@@ -521,13 +521,13 @@ graphCurves <- function(tables, x, y, lineWidth = 0.5, xLimits = NA,
   tempList <- list()
   for (counter in 1:(length(tables))){
     if (!identical(xLimits,NA)){
-      tables[[counter]] <- tables[[counter]] %>% dplyr::filter(!!sym(x) >= xLimits[1] & !!sym(x) <= xLimits[2])
+      tables[[counter]] <- tables[[counter]] %>% dplyr::filter(!!dplyr::sym(x) >= xLimits[1] & !!dplyr::sym(x) <= xLimits[2])
     }
     if (yPercentage){
       tables[[counter]][y] <- (tables[[counter]][y]/max(tables[[counter]][y], na.rm = TRUE))*100
     }
     tempList[[counter]] <- tables[[counter]] %>%
-      ggplot(aes_string(x,y)) + ggplot2::geom_line(size = lineWidth)
+      ggplot2::ggplot(ggplot2::aes_string(x,y)) + ggplot2::geom_line(size = lineWidth)
   }
   return(tempList)
 }
@@ -545,7 +545,7 @@ graphCurves <- function(tables, x, y, lineWidth = 0.5, xLimits = NA,
 #'  x,y coordinates
 #' @param xLimits defines the range x coordinates c(minimum, maximum),
 #'  all coordinates outsude this range are not drawn
-#' @param yPercentage defines if y-axis maximum should be set to 100%
+#' @param yPercentage defines if y-axis maximum should be set to 100 percent
 #' @param combine if NA then all tables are combined into one, otherwise it
 #'  has to be a integer vector defining which tables from the 'tables' list
 #'  to combine eg c(1,2,4)
@@ -562,15 +562,15 @@ graphCurvesCombine <- function(tables, x, y, lineWidth = 0.5, xLimits = NA,
   if (!identical(combine, NA)){
     tables <- tables[combine]
   }
-  tempList[[1]] <- ggplot()
+  tempList[[1]] <- ggplot2::ggplot()
   for (counter in 1:(length(tables))){
     if (!identical(xLimits,NA)){
-      tables[[counter]] <- tables[[counter]] %>% dplyr::filter(!!sym(x) >= xLimits[1] & !!sym(x) <= xLimits[2])
+      tables[[counter]] <- tables[[counter]] %>% dplyr::filter(!!dplyr::sym(x) >= xLimits[1] & !!dplyr::sym(x) <= xLimits[2])
     }
     if (yPercentage){
       tables[[counter]][y] <- (tables[[counter]][y]/max(tables[[counter]][y], na.rm = TRUE))*100
     }
-    tempList[[1]] <- tempList[[1]] + ggplot2::geom_line(data = tables[[counter]], aes_string(x,y),
+    tempList[[1]] <- tempList[[1]] + ggplot2::geom_line(data = tables[[counter]], ggplot2::aes_string(x,y),
                                                size = ifelse(length(lineWidth)>1,lineWidth[counter], lineWidth),
                                                color = ifelse(length(colors)>1,colors[counter], colors))
   }
@@ -579,7 +579,15 @@ graphCurvesCombine <- function(tables, x, y, lineWidth = 0.5, xLimits = NA,
 
 #' helper function for the function customLegend():
 #'  generates a data.frame specifying the legend to be generated
-
+#' 
+#' @param labels labels of the elements of the legend (character vector)
+#' @param colors colors of the elements of the legend
+#' @param fills fill colors of the elements of the legend
+#' @param shapes shapes of the elements of the legend
+#' @param sizes sizes of the elements of the legend
+#' 
+#' @returns a data.frame
+#' @export
 legendDefinition <-function(labels = NA, colors = NA,
                           fills = NA, shapes = NA,
                           sizes = NA){

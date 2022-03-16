@@ -2,8 +2,8 @@
 % Please edit documentation in R/graphicR.R
 \name{graphCurves}
 \alias{graphCurves}
-\title{to generate ggplot object (in form of a single item list) from a list of
- data.frames of data}
+\title{function to generate ggplot object (in form of a single item list) from a
+ list of data.frames of data}
 \usage{
 graphCurves(tables, x, y, lineWidth = 0.5, xLimits = NA, yPercentage = FALSE)
 }
@@ -23,14 +23,14 @@ x,y coordinates}
 \item{xLimits}{defines the range x coordinates c(minimum, maximum),
 all coordinates outsude this range are not drawn}
 
-\item{yPercentage}{defines if y-axis maximum should be set to 100%}
+\item{yPercentage}{defines if y-axis maximum should be set to 100 percent}
 }
 \value{
 a (single element) list of ggplot objects
 }
 \description{
-to generate ggplot object (in form of a single item list) from a list of
- data.frames of data
+function to generate ggplot object (in form of a single item list) from a
+ list of data.frames of data
 }
 \note{
 due to the graphs parameter you can use:

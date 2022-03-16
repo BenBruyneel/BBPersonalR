@@ -26,15 +26,15 @@ volcanoPlot(
   yDefault = TRUE,
   xLimits = c(0, NA),
   yLimits = c(0, NA),
-  xExpand = expansion(mult = 0, add = 0),
-  yExpand = expansion(mult = 0, add = 0),
+  xExpand = ggplot2::expansion(mult = 0, add = 0),
+  yExpand = ggplot2::expansion(mult = 0, add = 0),
   xSymmetric = FALSE,
   xSymmetricExpand = 0.05,
   xCentered = FALSE,
   xMedian = FALSE,
   xDeviations = 4,
-  xLabelFormat = waiver(),
-  yLabelFormat = waiver(),
+  xLabelFormat = ggplot2::waiver(),
+  yLabelFormat = ggplot2::waiver(),
   vertical = FALSE,
   title = "",
   gridLines = TRUE,
@@ -102,7 +102,7 @@ see ?ggplot2::expansion for proper explanation}
 equal on both the left and the right side of the center (transformed x = 0)}
 
 \item{xSymmetricExpand}{allows for padding around data (x-axis), 0.05 means
-5% (pre-transformation) extra wide x-axis range}
+5 percent (pre-transformation) extra wide x-axis range}
 
 \item{xCentered}{if TRUE, the plot will be 'cemtered' around the either the
 mean or median x-value}

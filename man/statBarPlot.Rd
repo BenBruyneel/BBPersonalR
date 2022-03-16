@@ -86,7 +86,7 @@ value of the range of the y-Axis}
 
 \item{ySpace}{specifies how much space there should be between the maximum
 y-value in the barplot and the top of the plot. Value of 0 is no space, a
-value of 0.1 is equivalent to extending the y-range 10%}
+value of 0.1 is equivalent to extending the y-range 10 percent}
 
 \item{xLabel}{specifies the label on the x-axis}
 

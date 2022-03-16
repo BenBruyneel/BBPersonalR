@@ -67,7 +67,7 @@ must be a single word}
 
 \item{outlineColor}{defines the color of the line around the box}
 
-\item{fillColor}{defines the color of the boxes themselves. @Note: if the 
+\item{fillColor}{defines the color of the boxes themselves. Note: if the 
 number of colors does not match the number of columns then ggplot2 default
 colors will be used}
 

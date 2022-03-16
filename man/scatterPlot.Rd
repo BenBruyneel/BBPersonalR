@@ -121,7 +121,7 @@ used to define the exact range of the x-axis}
 equal on both the left and the right side of the center}
 
 \item{xSymmetricExpand}{allows for padding around data (x-axis), 0.05 means
-5% extra wide x-axis range}
+5 percent extra wide x-axis range}
 
 \item{xCentered}{if TRUE, the plot will be 'cemtered' around the either the
 mean or median x-value}
@@ -148,7 +148,7 @@ used to define the exact range of the y-axis}
 equal on both the left and the right side of the center}
 
 \item{ySymmetricExpand}{allows for padding around data (y-axis), 0.05 means
-5% extra wide y-axis range}
+5 percent extra wide y-axis range}
 
 \item{yCentered}{if TRUE, the plot will be 'cemtered' around the either the
 mean or median y-value}

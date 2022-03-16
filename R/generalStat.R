@@ -83,79 +83,79 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
     if (length(column) == 1){
       if (!statCount){
         if (removeNA){
-          g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x))
+          g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes_string("x"))
         } else {
-          g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x))
+          g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes_string("x"))
         }
         g <- g + ggplot2::geom_histogram(binwidth = binwidth, bins = bins,
                                 col = outlineColor,
-                                fill = fillColor) + theme_classic()
+                                fill = fillColor) + ggplot2::theme_classic()
       } else {
         if (removeNA){
-          g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x))
+          g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes_string("x"))
         } else {
-          g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x))
+          g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes_string("x"))
         }
         suppressWarnings(
           g <- g + ggplot2::geom_histogram(col = outlineColor, fill = fillColor,
-                                  stat = 'count') + theme_classic())
+                                  stat = 'count') + ggplot2::theme_classic())
       }
     } else {
       if (!statCount){
-        data <- as.data.frame(melt(as.data.table(data),
+        data <- as.data.frame(reshape2::melt(data.table::as.data.table(data),
                                    measure = 1:length(column),
                                    variable.name = variableName,
                                    value.name = "value"))
         if (removeNA){
-          g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes(value))
+          g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes_string("value"))
         } else {
-          g <- ggplot2::ggplot(data = data, ggplot2::aes(value))
+          g <- ggplot2::ggplot(data = data, ggplot2::aes_string("value"))
         }
         g <- g + ggplot2::geom_histogram(binwidth = binwidth, bins = bins,
                                 col = outlineColor,
                                 ggplot2::aes_string(fill = variableName))
         if (length(fillColor) == length(column)){
-          g <- g + scale_fill_manual(values = fillColor)
+          g <- g + ggplot2::scale_fill_manual(values = fillColor)
         }
-        g <- g + theme_classic()
+        g <- g + ggplot2::theme_classic()
       } else {
-        data <- as.data.frame(melt(as.data.table(data),
+        data <- as.data.frame(reshape2::melt(data.table::as.data.table(data),
                                    measure = 1:length(column),
                                    variable.name = variableName,
                                    value.name = "value"))
         if (removeNA){
-          g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes(value))
+          g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes_string("value"))
         } else {
-          g <- ggplot2::ggplot(data = data, ggplot2::aes(value))
+          g <- ggplot2::ggplot(data = data, ggplot2::aes_string("value"))
         }
         g <- g + ggplot2::geom_histogram(binwidth = binwidth, col = outlineColor,
                                 ggplot2::aes_string(fill = variableName),
                                 stat = 'count')
         if (length(fillColor) == length(column)){
-          g <- g + scale_fill_manual(values = fillColor)
+          g <- g + ggplot2::scale_fill_manual(values = fillColor)
         }
-        g <- g + theme_classic()
+        g <- g + ggplot2::theme_classic()
       }
     }
   } else {
     if (!statCount){
       if (removeNA){
-        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x))
+        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes_string("x"))
       } else {
-        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x))
+        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes_string("x"))
       }
       g <- g + ggplot2::geom_histogram(binwidth = binwidth, bins = bins,
                               col = outlineColor,
-                              fill = fillColor) + theme_classic()
+                              fill = fillColor) + ggplot2::theme_classic()
     } else {
       if (removeNA){
-        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x))
+        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes_string("x"))
       } else {
-        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x))
+        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes_string("x"))
       }
       suppressWarnings(
         g <- g + ggplot2::geom_histogram(col = outlineColor, fill = fillColor,
-                                stat = 'count') + theme_classic()
+                                stat = 'count') + ggplot2::theme_classic()
       )
     }
   }
@@ -175,11 +175,11 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
       xLimits <- c(-xLimits,xLimits)
     } else {
       if (xMedian){
-        mid <- median(data, na.rm = TRUE)
-        dev <- mad(data, na.rm = TRUE)
+        mid <- stats::median(data, na.rm = TRUE)
+        dev <- stats::mad(data, na.rm = TRUE)
       } else {
         mid <- mean(data, na.rm = TRUE)
-        dev <- sd(data, na.rm = TRUE)
+        dev <- stats::sd(data, na.rm = TRUE)
       }
       xLimits <- c(mid - (xDeviations*dev), mid + (xDeviations*dev))
     }
@@ -229,7 +229,7 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
 #' @param xSymmetric if TRUE then the range of x-axis will be adjusted to be
 #'  equal on both the left and the right side of the center (transformed x = 0)
 #' @param xSymmetricExpand allows for padding around data (x-axis), 0.05 means
-#'  5% (pre-transformation) extra wide x-axis range
+#'  5 percent (pre-transformation) extra wide x-axis range
 #' @param xCentered if TRUE, the plot will be 'cemtered' around the either the
 #'  mean or median x-value
 #' @param xMedian if TRUE then median and mean absolute deviation (mad) are
@@ -286,33 +286,33 @@ statDensity <- function(data, column = 1,
     data <- data[,column]
     if (length(column) == 1){
       if (removeNA){
-        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x))
+        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes_string("x"))
       } else {
-        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x))
+        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes_string("x"))
       }
       g <- g + ggplot2::geom_density(col = outlineColor, fill = fillColor,
-                            alpha = alpha) + theme_classic()
+                            alpha = alpha) + ggplot2::theme_classic()
     } else {
-      data <- as.data.frame(melt(as.data.table(data),
+      data <- as.data.frame(reshape2::melt(data.table::as.data.table(data),
                                  measure = 1:length(column),
                                  variable.name = variableName,
                                  value.name = "value"))
       if (removeNA){
-        g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes(value))
+        g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes_string("value"))
       } else {
-        g <- ggplot2::ggplot(data = data, ggplot2::aes(value))
+        g <- ggplot2::ggplot(data = data, ggplot2::aes_string("value"))
       }
       g <- g + ggplot2::geom_density(col = outlineColor, alpha = alpha,
                             ggplot2::aes_string(fill = variableName))
       if (length(fillColor) == length(column)){
-        g <- g + scale_fill_manual(values = fillColor)
+        g <- g + ggplot2::scale_fill_manual(values = fillColor)
       }
-      g <- g + theme_classic()
+      g <- g + ggplot2::theme_classic()
     }
   } else {
-    g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x)) +
+    g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes_string("x")) +
       ggplot2::geom_density(col = outlineColor,
-                   fill = fillColor, alpha = alpha) + theme_classic()
+                   fill = fillColor, alpha = alpha) + ggplot2::theme_classic()
   }
   if (xSymmetric){
     if (!xCentered){
@@ -327,11 +327,11 @@ statDensity <- function(data, column = 1,
       xLimits <- c(-xLimits,xLimits)
     } else {
       if (xMedian){
-        mid <- median(data, na.rm = TRUE)
-        dev <- mad(data, na.rm = TRUE)
+        mid <- stats::median(data, na.rm = TRUE)
+        dev <- stats::mad(data, na.rm = TRUE)
       } else {
         mid <- mean(data, na.rm = TRUE)
-        dev <- sd(data, na.rm = TRUE)
+        dev <- stats::sd(data, na.rm = TRUE)
       }
       xLimits <- c(mid - (xDeviations*dev), mid + (xDeviations*dev))
     }
@@ -451,7 +451,7 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
   if (!is.na(sampleSize)){
     data <- data[sample(1:nrow(data), sampleSize, replace = FALSE),]
   }
-  g <- ggplot2::ggplot(data = data, ggplot2::aes(x = 0, y = !!sym(whichColumn)))
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(x = 0, y = !!dplyr::sym(whichColumn)))
   g <- g + ggplot2::geom_violin(na.rm = removeNA,
                        fill = fillColor, col = outlineColor,
                        size = outLineSize, linetype = outlineType,
@@ -460,8 +460,8 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
   # g <- g + stat_boxplot(geom = "errorbar", width = whiskerWidth,
   #                       na.rm = removeNA)
   if (!identical(jitter,NA)){
-    g <- g + ggplot2::geom_jitter(ggplot2::aes(x = 0, y = !!sym(whichColumn)), na.rm = removeNA,
-                         position = position_jitter(jitter),
+    g <- g + ggplot2::geom_jitter(ggplot2::aes(x = 0, y = !!dplyr::sym(whichColumn)), na.rm = removeNA,
+                         position = ggplot2::position_jitter(jitter),
                          fill = fillColor, col = outlineColor, alpha = alpha,
                          size = size, shape = shape)
   }
@@ -557,7 +557,7 @@ statViolinPlotMultiple <- function(data, column = 1:ncol(data),
   } else {
     data <- data[,column]
   }
-  data <- as.data.frame(melt(as.data.table(data),
+  data <- as.data.frame(reshape2::melt(data.table::as.data.table(data),
                              measure = 1:length(column),
                              variable.name = variableName,
                              value.name = "value"))
@@ -573,12 +573,12 @@ statViolinPlotMultiple <- function(data, column = 1:ncol(data),
                        adjust = bandwidth, draw_quantiles = quantiles)
   if (!is.na(jitter)){
     g <- g + ggplot2::geom_jitter(ggplot2::aes_string(x = variableName, y = "value"),
-                         position = position_jitter(jitter),
+                         position = ggplot2::position_jitter(jitter),
                          fill = jitterFill, col = outlineColor,
                          alpha = alpha, size = size, shape = shape)
   }
   if (length(fillColor) == length(column)){
-    g <- g + scale_fill_manual(values = fillColor)
+    g <- g + ggplot2::scale_fill_manual(values = fillColor)
   }
   g <- graphsAdjust(list(g), vertical = vertical,
                     xDefault = TRUE,
@@ -686,15 +686,15 @@ statBoxPlotSingle <- function(data, column = 1, removeNA = TRUE,
   if (!is.na(sampleSize)){
     data <- data[sample(1:nrow(data), sampleSize, replace = FALSE),]
   }
-  g <- ggplot2::ggplot(data = data, ggplot2::aes(y = !!sym(whichColumn)))
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(y = !!dplyr::sym(whichColumn)))
   if (!is.na(jitter)){
     g <- g + ggplot2::geom_boxplot(na.rm = removeNA, outlier.shape = NA,
                           fill = fillColor, col = outlineColor,
                           width = boxWidth)
     g <- g + ggplot2::stat_boxplot(geom = "errorbar", width = whiskerWidth,
                           na.rm = removeNA)
-    g <- g + ggplot2::geom_jitter(ggplot2::aes(x = 0, y = !!sym(whichColumn)), na.rm = removeNA,
-                         position = position_jitter(jitter), 
+    g <- g + ggplot2::geom_jitter(ggplot2::aes(x = 0, y = !!dplyr::sym(whichColumn)), na.rm = removeNA,
+                         position = ggplot2::position_jitter(jitter), 
                          fill = fillColor, col = outlineColor, alpha = alpha,
                          size = size, shape = shape)
   } else {
@@ -818,12 +818,12 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
     } else {
       data <- data[,column]
     }
-    data <- as.data.frame(melt(as.data.table(data),
+    data <- as.data.frame(reshape2::melt(data.table::as.data.table(data),
                                measure = 1:length(column),
                                variable.name = variableName,
                                value.name = "value"))
   } else {
-    data <- data %>% dplyr::select(all_of(varColumn), all_of(column))
+    data <- data %>% dplyr::select(dplyr::all_of(varColumn), dplyr::all_of(column))
     colnames(data) <- c(variableName,"value")
   }
   if (removeNA){
@@ -837,7 +837,7 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
                                                        fill = variableName))
     g <- g + ggplot2::stat_boxplot(geom = "errorbar", width = whiskerWidth, ggplot2::aes_string(group = variableName))
     g <- g + ggplot2::geom_jitter(ggplot2::aes_string(x = variableName, y = "value"),
-                         position = position_jitter(jitter),
+                         position = ggplot2::position_jitter(jitter),
                          fill = jitterFill, col = outlineColor, alpha = alpha, size = size, shape = shape)
   } else {
     g <- g + ggplot2::geom_boxplot(na.rm = removeNA, col = outlineColor, 
@@ -848,9 +848,10 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
     g <- g + ggplot2::stat_boxplot(geom = "errorbar", width = whiskerWidth, ggplot2::aes_string(group = variableName))
   }
   if (showMean){
+    value = NULL  # for work around purposes only
     means <- data %>%
-      group_by(!!sym(variableName)) %>%
-      summarize(theMean = mean(value, na.rm = removeNA))
+      dplyr::group_by(!!dplyr::sym(variableName)) %>%
+      dplyr::summarize(theMean = mean(value, na.rm = removeNA))
     g <- g + ggplot2::geom_jitter(data = means, ggplot2::aes_string(x = variableName, y = "theMean"),
                          shape = meanShape, size = meanSize, col = meanColor, fill = meanFill,
                          width = 0, height = 0)
@@ -858,11 +859,11 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
   if (!identical(fillColor,NA)){
     if (!melted){
       if (length(fillColor) == length(column)){
-        g <- g + scale_fill_manual(values = fillColor)
+        g <- g + ggplot2::scale_fill_manual(values = fillColor)
       }
     } else {
       if (length(fillColor) == length(levels(factor(data$variable)))){
-        g <- g + scale_fill_manual(values = fillColor)
+        g <- g + ggplot2::scale_fill_manual(values = fillColor)
       }
     }
   }
@@ -879,7 +880,7 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
   if (identical(legend.title,NA)){
     return(g)
   } else {
-    return(g + scale_fill_discrete(name = legend.title))
+    return(g + ggplot2::scale_fill_discrete(name = legend.title))
   }
 }
 
@@ -1022,16 +1023,16 @@ statBoxPlotMultipleVar <- function(data, column = 1,
   if (!is.na(sampleSize)){
     if (isVarNumeric){
       data <- data[sample(1:nrow(data), sampleSize, replace = FALSE),] %>%
-        dplyr::select(all_of(whichColumn), all_of(varColumn),all_of("cut"))
+        dplyr::select(dplyr::all_of(whichColumn), dplyr::all_of(varColumn),dplyr::all_of("cut"))
     } else {
       data <- data[sample(1:nrow(data), sampleSize, replace = FALSE),] %>%
-        dplyr::select(all_of(whichColumn), all_of(varColumn))
+        dplyr::select(dplyr::all_of(whichColumn), dplyr::all_of(varColumn))
     }
   } else {
     if (isVarNumeric){
-      data <- data %>% dplyr::select(all_of(whichColumn), all_of(varColumn),all_of("cut"))
+      data <- data %>% dplyr::select(dplyr::all_of(whichColumn), dplyr::all_of(varColumn),dplyr::all_of("cut"))
     } else {
-      data <- data %>% dplyr::select(all_of(whichColumn), all_of(varColumn))
+      data <- data %>% dplyr::select(dplyr::all_of(whichColumn), dplyr::all_of(varColumn))
     }
   }
   if (removeNA){
@@ -1073,16 +1074,16 @@ statBoxPlotMultipleVar <- function(data, column = 1,
                                                "cut",
                                                varColumn),
                                     y = whichColumn), na.rm = removeNA,
-                         position = position_jitter(jitter), 
+                         position = ggplot2::position_jitter(jitter), 
                          fill = jitterFill, col = outlineColor, alpha = alpha,
                          size = size, shape = shape)
   }
   if (showMean){
     means <- data %>%
-      group_by(across(all_of(ifelse(isVarNumeric,
+      dplyr::group_by(dplyr::across(dplyr::all_of(ifelse(isVarNumeric,
                                     "cut",
                                     varColumn)))) %>%
-      summarize(theMean = mean(!!sym(whichColumn), na.rm = removeNA))
+      dplyr::summarize(theMean = mean(!!dplyr::sym(whichColumn), na.rm = removeNA))
     g <- g + ggplot2::geom_jitter(data = means, ggplot2::aes_string(x = ifelse(isVarNumeric,
                                                              "cut",
                                                              varColumn),
@@ -1094,10 +1095,10 @@ statBoxPlotMultipleVar <- function(data, column = 1,
   if (!identical(fillColor,NA)){
     if (length(varBreaks) == 1){
       if (length(fillColor) == varBreaks){
-        g <- g + scale_fill_manual(values = fillColor)
+        g <- g + ggplot2::scale_fill_manual(values = fillColor)
       }
     } else {
-      g <- g + scale_fill_manual(values = fillColor)
+      g <- g + ggplot2::scale_fill_manual(values = fillColor)
     }
   }
   g <- graphsAdjust(list(g), vertical = vertical,
@@ -1112,7 +1113,7 @@ statBoxPlotMultipleVar <- function(data, column = 1,
                     ...)[[1]]
   if (!identical(varLabels, NA)){
     if (forceLabels){
-      g <- g + scale_x_discrete(limits = varLabels)
+      g <- g + ggplot2::scale_x_discrete(limits = varLabels)
     }
   }
   if (returnData){
@@ -1143,7 +1144,7 @@ statBoxPlotMultipleVar <- function(data, column = 1,
 #' @param variableName sets the 'combined' name of the columns, 
 #'  must be a single word
 #' @param outlineColor defines the color of the line around the box
-#' @param fillColor defines the color of the boxes themselves. @Note: if the 
+#' @param fillColor defines the color of the boxes themselves. Note: if the 
 #'  number of colors does not match the number of columns then ggplot2 default
 #'  colors will be used
 #' @param jitter if NA, then the data points will not be shown (only outliers!),
@@ -1226,9 +1227,9 @@ statBoxPlotMultiTable <- function(data, idColumn = 1, varColumn = 2,
     })
   }
   data <- lapply(data, function(x){
-    bind_cols(x %>% dplyr::select(all_of(idColumn)),
-              x %>% dplyr::select(-all_of(idColumn)) %>%
-                mutate(across(where(is.character),~as.numeric(.x))))
+    dplyr::bind_cols(x %>% dplyr::select(dplyr::all_of(idColumn)),
+              x %>% dplyr::select(-dplyr::all_of(idColumn)) %>%    # cannot export where() normally from tidyselect 
+                dplyr::mutate(dplyr::across(tidyselect::vars_select_helpers$where(is.character),~as.numeric(.x))))
   })
   if (!is.character(varColumn)){
     varColumn = colnames(data[[1]])[varColumn]
@@ -1239,11 +1240,11 @@ statBoxPlotMultiTable <- function(data, idColumn = 1, varColumn = 2,
   if (sortIDs){
     if (sortDescending){
       data <- lapply(data, function(x){
-        x <- x %>% dplyr::arrange(desc(across(all_of(idColumn))))
+        x <- x %>% dplyr::arrange(dplyr::desc(dplyr::across(dplyr::all_of(idColumn))))
       })
     } else {
       data <- lapply(data, function(x){
-        x <- x %>% dplyr::arrange(across(all_of(idColumn)))
+        x <- x %>% dplyr::arrange(dplyr::across(dplyr::all_of(idColumn)))
       })
     }
     xTickLabels <- as.character(data[[1]][,1])
@@ -1251,14 +1252,14 @@ statBoxPlotMultiTable <- function(data, idColumn = 1, varColumn = 2,
     xTickLabels <- NA
   }
   suppressMessages(
-  data <- bind_rows(lapply(lapply(data,t), function(x){
+  data <- dplyr::bind_rows(lapply(lapply(data,t), function(x){
     x <- as.data.frame(x)
     colnames(x) <- as.character(x[1,])
     row.names(x) <- NULL
     x <- x[-1,]
     return(x)
   })))
-  data <- data %>% mutate(across(where(is.character),~as.numeric(.x)))
+  data <- data %>% dplyr::mutate(dplyr::across(tidyselect::vars_select_helpers$where(is.character),~as.numeric(.x)))
   g <- statBoxPlotMultiple(data = data, column = 1:ncol(data),
                            sampleSize = NA, removeNA = removeNA,
                            variableName = variableName,
@@ -1277,7 +1278,7 @@ statBoxPlotMultiTable <- function(data, idColumn = 1, varColumn = 2,
                            meanColor = meanColor, meanFill = meanFill,
                            meanSize = meanSize, showLegend = FALSE, ...)
   if (!identical(xTickLabels, NA)){
-    g <- g + scale_x_discrete(labels=xTickLabels)
+    g <- g + ggplot2::scale_x_discrete(labels=xTickLabels)
   }
   if (!returnData){
     return(g)
@@ -1321,7 +1322,7 @@ statBoxPlotMultiTable <- function(data, idColumn = 1, varColumn = 2,
 #'  value of the range of the y-Axis
 #' @param ySpace specifies how much space there should be between the maximum
 #'  y-value in the barplot and the top of the plot. Value of 0 is no space, a
-#'  value of 0.1 is equivalent to extending the y-range 10%
+#'  value of 0.1 is equivalent to extending the y-range 10 percent
 #' @param xLabel specifies the label on the x-axis
 #' @param yLabel specifies the label on the y-axis
 #' @param title specifies the title of the barplot
@@ -1404,10 +1405,10 @@ statBarPlot <- function(data, idColumn = 1,
                                                      ...),
                     ...)[[1]]
   if (!identical(fillColors,NA)){
-    g <- g + scale_fill_manual(values = fillColors)
+    g <- g + ggplot2::scale_fill_manual(values = fillColors)
   } else {
     if (!identical(fillPalette,NA)){
-      g <- g + scale_fill_brewer(palette = fillPalette)
+      g <- g + ggplot2::scale_fill_brewer(palette = fillPalette)
     }
   }
   if (!returnData){
@@ -1427,7 +1428,7 @@ statBarPlot <- function(data, idColumn = 1,
 #' @param sampleSize allows to the use of a sample of the data to be used for
 #'  the boxplot. By default sampleSize = NA, in which case all data is used
 #' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
-#'  to plotting. @note this will remove warning messages and errors
+#'  to plotting. Note: this will remove warning messages and errors
 #' @param pointColor defines the color of the border of the data points
 #' @param pointfill defines the color of the data points themselves
 #' @param pointsAlpha alpha ('see through' value) of the data points
@@ -1475,14 +1476,14 @@ normalQuantilePlot <- function(data, column, removeNA = TRUE, sampleSize = NA,
   if (!is.na(sampleSize)){
     data <- data[sample(1:length(data), sampleSize, replace = FALSE)]
   }
-  qpoints <- ppoints(length(data))
-  theoryQuantiles <- qnorm(qpoints, mean = 0, sd = 1)
+  qpoints <- stats::ppoints(length(data))
+  theoryQuantiles <- stats::qnorm(qpoints, mean = 0, sd = 1)
   theoryQuantiles <- ((theoryQuantiles - mean(theoryQuantiles))/((max(theoryQuantiles) - min(theoryQuantiles)))) + 0.5
   data <- data.frame(Sample = data %>% sort(), Theoretical = theoryQuantiles)
-  g <- ggplot2::ggplot(data = data, ggplot2::aes(Theoretical,Sample))
+  g <- ggplot2::ggplot(data = data, ggplot2::aes_string("Theoretical","Sample"))
   g <- g + ggplot2::geom_point(col = pointColor, fill = pointFill, shape = pointShape, size = pointSize, alpha = pointAlpha)
-  qlm <- lm(data = data, Sample~Theoretical)
-  g <- g + ggplot2::geom_abline(slope = coef(qlm)[2], intercept = coef(qlm)[1],
+  qlm <-stats::lm(data = data, Sample~Theoretical)
+  g <- g + ggplot2::geom_abline(slope = stats::coef(qlm)[2], intercept = stats::coef(qlm)[1],
                        col = lineColor, linetype = lineType, size = lineWidth, alpha = lineAlpha)
   g <- graphsAdjust(list(g), vertical = vertical, titles = title,
                     xDefault = xDefault, xLimits = xLimits,
@@ -1559,7 +1560,7 @@ normalQQPlot <- function(data, column, removeNA = TRUE,
   if (!is.na(sampleSize)){
     data <- data[sample(1:length(data), sampleSize, replace = FALSE)]
   }
-  g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(sample = x))
+  g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes_string(sample = "x"))
   g <- g + qqplotr::geom_qq_band(bandType = bandType, alpha = bandAlpha, fill = bandFill)
   g <- g + qqplotr::stat_qq_point(col = pointColor, fill = pointFill,
                          shape = pointShape, size = pointSize,
@@ -1577,19 +1578,20 @@ normalQQPlot <- function(data, column, removeNA = TRUE,
 #' Creates a data.frame with the values provided to be used in the controlChart
 #'  function as controlLines
 #'  
-#'  @param yValues a numeric vector specifying the 'heights' or y-axis values
-#'   where a horizontal line is needed
-#'  @param type linetype of the horizontal lines needed, either a single value
-#'   or a vector of same length as yValues
-#'  @param color color of the horizontal lines needed, either a single value
-#'   or a vector of same length as yValues
-#'  @param width width of the horizontal lines needed, either a single value
-#'   or a vector of same length as yValues
-#'  @param alpha alpha ('see through' value) of the horizontal lines needed,
-#'   either a single value or a vector of same length as yValues
+#' @param yValues a numeric vector specifying the 'heights' or y-axis values
+#'  where a horizontal line is needed
+#' @param type linetype of the horizontal lines needed, either a single value
+#'  or a vector of same length as yValues
+#' @param color color of the horizontal lines needed, either a single value
+#'  or a vector of same length as yValues
+#' @param width width of the horizontal lines needed, either a single value
+#'  or a vector of same length as yValues
+#' @param alpha alpha ('see through' value) of the horizontal lines needed,
+#'  either a single value or a vector of same length as yValues
+#'   
+#' @note if yValues == NA or empty then the function returns NA
 #'   
 #'  @returns a data.frame with columns: yValues, type, color, width, alpha
-#'  @note if yValues == NA or empty then the function returns NA
 #'  @export
 controlChartMarkerLines <- function(yValues = NA,
                                     type = "dashed",
@@ -1630,7 +1632,7 @@ controlChartMarkerLines <- function(yValues = NA,
 #'  drawn
 #' @param lineColor color of the line
 #' @param lineType type of the line
-#' @param lineWidh width of the nline
+#' @param lineWidth width of the line
 #' @param lineAlpha alpha ('see through' value) of the line
 #' @param controlLines either NA (no horizontal lines) or a data.frame with
 #'  columns yValues, type, color, width, alpha. yValues defines at which
@@ -1802,7 +1804,7 @@ volcanoMarkerAttributesDefaults <- function(){
 #' @param xSymmetric if TRUE then the range of x-axis will be adjusted to be
 #'  equal on both the left and the right side of the center (transformed x = 0)
 #' @param xSymmetricExpand allows for padding around data (x-axis), 0.05 means
-#'  5% (pre-transformation) extra wide x-axis range
+#'  5 percent (pre-transformation) extra wide x-axis range
 #' @param xCentered if TRUE, the plot will be 'cemtered' around the either the
 #'  mean or median x-value
 #' @param xMedian if TRUE then median and mean absolute deviation (mad) are
@@ -1849,11 +1851,11 @@ volcanoPlot <- function(data, quantColumn = 1, statColumn = 2,
                         pointShape = 21, pointSize = 3, pointAlpha = 0.75,
                         xDefault = TRUE, yDefault = TRUE,
                         xLimits = c(0,NA), yLimits = c(0,NA),
-                        xExpand = expansion(mult = 0, add = 0),
-                        yExpand = expansion(mult = 0, add = 0),
+                        xExpand = ggplot2::expansion(mult = 0, add = 0),
+                        yExpand = ggplot2::expansion(mult = 0, add = 0),
                         xSymmetric = FALSE, xSymmetricExpand = 0.05,
                         xCentered = FALSE, xMedian = FALSE, xDeviations = 4,
-                        xLabelFormat = waiver(), yLabelFormat = waiver(),
+                        xLabelFormat = ggplot2::waiver(), yLabelFormat = ggplot2::waiver(),
                         vertical = FALSE,
                         title ="",
                         gridLines = TRUE,
@@ -1872,14 +1874,14 @@ volcanoPlot <- function(data, quantColumn = 1, statColumn = 2,
   }
   if (identical(identifierColumn,NA)){
     data <- data %>%
-      dplyr::select(all_of(xColumn), all_of(yColumn)) %>%
+      dplyr::select(dplyr::all_of(xColumn), dplyr::all_of(yColumn)) %>%
       stats::na.omit()
   } else {
     if (!is.character(identifierColumn)){
       identifierColumn <- colnames(data)[identifierColumn]
     }
     data <- data %>%
-      dplyr::select(all_of(identifierColumn), all_of(xColumn), all_of(yColumn)) %>%
+      dplyr::select(dplyr::all_of(identifierColumn), dplyr::all_of(xColumn), dplyr::all_of(yColumn)) %>%
       stats::na.omit()
   }
   data$col <- "1"
@@ -1890,18 +1892,18 @@ volcanoPlot <- function(data, quantColumn = 1, statColumn = 2,
   }
   data$x <- quantTransform(data[,xColumn])
   data$y <- statTransform(data[,yColumn])
-  g <- ggplot2::ggplot(data = data, ggplot2::aes(x = x, y = y, color = col, fill = col))
+  g <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = "x", y = "y", color = "col", fill = "col"))
   g <- g + ggplot2::geom_point(shape = pointShape, size = pointSize, alpha = pointAlpha)
   if (length(unique(data$col)) > 1){
-    g <- g + scale_color_manual(values = c(pointColor, significantPointColor))
-    g <- g + scale_fill_manual(values = c(pointColor, significantPointColor))
+    g <- g + ggplot2::scale_color_manual(values = c(pointColor, significantPointColor))
+    g <- g + ggplot2::scale_fill_manual(values = c(pointColor, significantPointColor))
   } else {
     if (data$col[1] == "1"){
-      g <- g + scale_color_manual(values = pointColor)
-      g <- g + scale_fill_manual(values = pointColor)
+      g <- g + ggplot2::scale_color_manual(values = pointColor)
+      g <- g + ggplot2::scale_fill_manual(values = pointColor)
     } else {
-      g <- g + scale_color_manual(values = significantPointColor)
-      g <- g + scale_fill_manual(values = significantPointColor)
+      g <- g + ggplot2::scale_color_manual(values = significantPointColor)
+      g <- g + ggplot2::scale_fill_manual(values = significantPointColor)
     }
   }
   if (xSymmetric){
@@ -1917,11 +1919,11 @@ volcanoPlot <- function(data, quantColumn = 1, statColumn = 2,
       xLimits <- c(-xLimits,xLimits)
     } else {
       if (xMedian){
-        mid <- median(data$x, na.rm = TRUE)
-        dev <- mad(data$x, na.rm = TRUE)
+        mid <- stats::median(data$x, na.rm = TRUE)
+        dev <- stats::mad(data$x, na.rm = TRUE)
       } else {
         mid <- mean(data$x, na.rm = TRUE)
-        dev <- sd(data$x, na.rm = TRUE)
+        dev <- stats::sd(data$x, na.rm = TRUE)
       }
       xLimits <- c(mid - (xDeviations*dev), mid + (xDeviations*dev))
     }
@@ -1961,8 +1963,9 @@ volcanoPlot <- function(data, quantColumn = 1, statColumn = 2,
                   (data[,yColumn] < yCutoff),]) > 0){
       data[(data[,xColumn] <= xCutoffs[1] | data[,xColumn] >= xCutoffs[2]) &
              (data[,yColumn] < yCutoff),]$significant <- TRUE
-      data <- data %>% dplyr::select(-c(col, x, y))
+      data <- data %>% dplyr::select(-c(col, "x", "y"))
     }
+    significant = NULL # solely for the purpose of package
     if (removeNonSignificantData){
       data <- data %>% dplyr::filter(significant)
     }
@@ -2088,8 +2091,8 @@ volcanoPlotPlus <- function(data, quantColumn = 1, statColumn = 2,
                                  lineType = "solid",
                                  lineAlpha = 0.5,
                                  xAxis = FALSE, yAxis = FALSE) 
-  aligned <- align_plots(result[[1]], densityPlotX, align = "v")
-  aligned2 <- align_plots(densityPlotY, result[[1]], align = "h")
+  aligned <- cowplot::align_plots(result[[1]], densityPlotX, align = "v")
+  aligned2 <- cowplot::align_plots(densityPlotY, result[[1]], align = "h")
   if (showQQPlot){
     result[[1]] <- gridExtra::arrangeGrob(grobs = list(aligned2[[1]],
                                              aligned2[[2]],
@@ -2100,7 +2103,7 @@ volcanoPlotPlus <- function(data, quantColumn = 1, statColumn = 2,
   } else {
     result[[1]] <- gridExtra::arrangeGrob(grobs = list(aligned2[[1]],
                                              aligned2[[2]],
-                                             ggplot() + theme_minimal(),
+                                             ggplot2::ggplot() + ggplot2::theme_minimal(),
                                              aligned[[2]]),
                                 ncol = 2, nrow = 2,
                                 widths = widths, heights = heights)
@@ -2163,7 +2166,7 @@ clearPlot <- function(){
 #' @param xSymmetric if TRUE then the range of x-axis will be adjusted to be
 #'  equal on both the left and the right side of the center
 #' @param xSymmetricExpand allows for padding around data (x-axis), 0.05 means
-#'  5% extra wide x-axis range
+#'  5 percent extra wide x-axis range
 #' @param xCentered if TRUE, the plot will be 'cemtered' around the either the
 #'  mean or median x-value
 #' @param xMedian if TRUE then median and mean absolute deviation (mad) are
@@ -2181,7 +2184,7 @@ clearPlot <- function(){
 #' @param ySymmetric if TRUE then the range of y-axis will be adjusted to be
 #'  equal on both the left and the right side of the center
 #' @param ySymmetricExpand allows for padding around data (y-axis), 0.05 means
-#'  5% extra wide y-axis range
+#'  5 percent extra wide y-axis range
 #' @param yCentered if TRUE, the plot will be 'cemtered' around the either the
 #'  mean or median y-value
 #' @param yMedian if TRUE then median and mean absolute deviation (mad) are
@@ -2239,7 +2242,7 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
     yColumn <- colnames(data)[yColumn]
   }
   data <- data %>%
-    dplyr::select(all_of(xColumn), all_of(yColumn))
+    dplyr::select(dplyr::all_of(xColumn), dplyr::all_of(yColumn))
   if (removeNA){
     data <- data %>% stats::na.omit()
   }
@@ -2249,7 +2252,7 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
   if (!identical(yTransform, NA)){
     data[,yColumn] <- yTransform(data[,yColumn])
   }
-  g <- ggplot2::ggplot(data = data, (ggplot2::aes(x = !!sym(xColumn), y = !!sym(yColumn)))) +
+  g <- ggplot2::ggplot(data = data, (ggplot2::aes(x = !!dplyr::sym(xColumn), y = !!dplyr::sym(yColumn)))) +
     ggplot2::geom_point(alpha = pointAlpha, color = pointColor,
                fill = pointFill, shape = pointShape,
                size = pointSize)
@@ -2276,11 +2279,11 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
       xLimits <- c(-xLimits,xLimits)
     } else {
       if (xMedian){
-        mid <- median(data[, xColumn], na.rm = TRUE)
-        dev <- mad(data[,xColumn], na.rm = TRUE)
+        mid <- stats::median(data[, xColumn], na.rm = TRUE)
+        dev <- stats::mad(data[,xColumn], na.rm = TRUE)
       } else {
         mid <- mean(data[, xColumn], na.rm = TRUE)
-        dev <- sd(data[,xColumn], na.rm = TRUE)
+        dev <- stats::sd(data[,xColumn], na.rm = TRUE)
       }
       xLimits <- c(mid - (xDeviations*dev), mid + (xDeviations*dev))
     }
@@ -2299,11 +2302,11 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
       yLimits <- c(-yLimits,yLimits)
     } else {
       if (yMedian){
-        mid <- median(data[,yColumn], na.rm = TRUE)
-        dev <- mad(data[,yColumn], na.rm = TRUE)
+        mid <- stats::median(data[,yColumn], na.rm = TRUE)
+        dev <- stats::mad(data[,yColumn], na.rm = TRUE)
       } else {
         mid <- mean(data[,yColumn], na.rm = TRUE)
-        dev <- sd(data[,yColumn], na.rm = TRUE)
+        dev <- stats::sd(data[,yColumn], na.rm = TRUE)
       }
       yLimits <- c(mid - (yDeviations*dev), mid + (yDeviations*dev))
     }
@@ -2327,8 +2330,6 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
 
 #' generates a variant of the scatterplot when one needs to compare two sets
 #'  of data (x & y): Bland-Altman / Tukey mean-difference plot
-#'  https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4470095/pdf/bm-25-141.pdf
-#'  https://en.wikipedia.org/wiki/Bland%E2%80%93Altman_plot
 #'  
 #' @param data the data tp be plotted, data.frame or similar
 #' @param xColumn specifies which column in the data argument contains the
@@ -2376,7 +2377,7 @@ scatterBlandAltman <- function(data, xColumn = 1, yColumn = 2,
     data <- data %>% stats::na.omit()
   }
   data <- data %>%
-    dplyr::select(all_of(xColumn), all_of(yColumn))
+    dplyr::select(dplyr::all_of(xColumn), dplyr::all_of(yColumn))
   data2 <- data
   if (!logTransform){
     data[,xColumn] <- (data2[,xColumn] + data2[,yColumn])/2 # average
@@ -2422,8 +2423,8 @@ plotPlusMatrix <- function(sPlot,
                            yPlot = clearPlot(),
                            crossPlot = clearPlot(),
                            widths = c(125,875), heights = c(875,125)){
-  aligned <- align_plots(sPlot, xPlot, align = "v")
-  aligned2 <- align_plots(yPlot, sPlot, align = "h")
+  aligned <- cowplot::align_plots(sPlot, xPlot, align = "v")
+  aligned2 <- cowplot::align_plots(yPlot, sPlot, align = "h")
   result <- gridExtra::arrangeGrob(grobs = list(aligned2[[1]],
                                                 aligned2[[2]],
                                                 crossPlot,
@@ -2453,8 +2454,8 @@ scatterPlotPlusH3 <- function(sPlot,
                               yLeft = clearPlot(),
                               yRight = clearPlot(),
                               widths = c(150,500,350)){
-  aligned <- align_plots(yLeft, sPlot, align = "h")
-  aligned2 <- align_plots(sPlot, yRight, align = "h")
+  aligned <- cowplot::align_plots(yLeft, sPlot, align = "h")
+  aligned2 <- cowplot::align_plots(sPlot, yRight, align = "h")
   result <- gridExtra::arrangeGrob(grobs = list(aligned[[1]],
                                                 aligned[[2]],
                                                 aligned2[[2]]),

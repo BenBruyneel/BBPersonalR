@@ -32,7 +32,7 @@ x,y coordinates}
 \item{xLimits}{defines the range x coordinates c(minimum, maximum),
 all coordinates outsude this range are not drawn}
 
-\item{yPercentage}{defines if y-axis maximum should be set to 100%}
+\item{yPercentage}{defines if y-axis maximum should be set to 100 percent}
 
 \item{combine}{if NA then all tables are combined into one, otherwise it
 has to be a integer vector defining which tables from the 'tables' list

@@ -38,7 +38,7 @@ argument defines which column is to be used}
 Can be integer or character (column name)}
 
 \item{removeNA}{if TRUE, the NA 'values' in the vector will be removed prior
-to plotting. @note this will remove warning messages and errors}
+to plotting. Note: this will remove warning messages and errors}
 
 \item{sampleSize}{allows to the use of a sample of the data to be used for
 the boxplot. By default sampleSize = NA, in which case all data is used}

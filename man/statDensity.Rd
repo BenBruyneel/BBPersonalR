@@ -85,7 +85,7 @@ used to define the exact range of the Y-axis}
 equal on both the left and the right side of the center (transformed x = 0)}
 
 \item{xSymmetricExpand}{allows for padding around data (x-axis), 0.05 means
-5% (pre-transformation) extra wide x-axis range}
+5 percent (pre-transformation) extra wide x-axis range}
 
 \item{xCentered}{if TRUE, the plot will be 'cemtered' around the either the
 mean or median x-value}

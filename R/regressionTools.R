@@ -45,7 +45,7 @@ weightsFromResidualsVector <- function(fit){
 #'  (column name)
 #' @param responseColumn can be integer (column number) or character
 #'  (column name)
-#' @param weight default = NULL, otherwise must be integer to give weights to
+#' @param weights default = NULL, otherwise must be integer to give weights to
 #'  the predictor values (see also function weightsVector) or a numeric
 #'  vector with length = number of rows in calibrationTable
 #'  
@@ -165,24 +165,26 @@ toNumeric <- function(chrs = "N/A"){
 #' @param title title for the graph, character vector
 #' @param figureNo number of the figure, used for the caption ("Figure ..." )
 #' @param caption caption for the graph, character vector
-#' @param autoScaleX if TRUE then default autoscaling of the x-axis takes place,
-#'  most other settings delaing with scaling of the x-axis the are then ignored
-#' @param autoScaleY if TRUE then default autoscaling of the y-axis takes place,
-#'  most other settings delaing with scaling of the y-axis the are then ignored
-#' @param xLimits 2 element numeric vector with the minimum and maximum value
+#' @param autoScalePredictor if TRUE then default autoscaling of the x-axis
+#'  takes place, most other settings delaing with scaling of the x-axis the are
+#'  then ignored
+#' @param autoScalePredictor if TRUE then default autoscaling of the y-axis
+#'  takes place,most other settings delaing with scaling of the y-axis the are
+#'  then ignored
+#' @param predictorLimits 2 element numeric vector with the minimum and maximum value
 #'  for the x-axis. If an element is a character vector or something that
 #'  cannot be converted to a numeric value, then NA is used which leads to
 #'  minimum/maximum value
-#' @param yLimits 2 element numeric vector with the minimum and maximum value
+#' @param responseLimits 2 element numeric vector with the minimum and maximum value
 #'  for the y-axis. If an element is a character vector or something that
 #'  cannot be converted to a numeric value, then NA is used which leads to
 #'  minimum/maximum value
-#' @param xLabel name of the x-axis, character vector
-#' @param yLabel name of the y-axis, character vector
-#' @param xOob integer vector, indicating how to deal with out of bounds
+#' @param predictorLabel name of the x-axis, character vector
+#' @param responseLabel name of the y-axis, character vector
+#' @param predictorOob integer vector, indicating how to deal with out of bounds
 #'  datapoints. 1 = censor scales::oob_censor is used, 2 = infinite,
 #'  scales::oob_squish_infinite is used. Note: x-axis only
-#' @param yOob integer vector, indicating how to deal with out of bounds
+#' @param respomseOob integer vector, indicating how to deal with out of bounds
 #'  datapoints. 1 = censor scales::oob_censor is used, 2 = infinite,
 #'  scales::oob_squish_infinite is used. Note: y-axis only
 #' @param regressionColor color of the regression line
@@ -208,9 +210,9 @@ toNumeric <- function(chrs = "N/A"){
 #' @param predictionAlpha alpha ('seethrough' value) of the prediction 'area'
 #' @param rotateGraph if TRUE, then x-axis and y-axis are swapped, essentially
 #'  resulting in a graph rotated 90 degrees
-#' @param xOptions x-axis options character vector, "1" normal scale,
+#' @param predictorOptions x-axis options character vector, "1" normal scale,
 #'  "2" reversed scale, "3" logarithmic scale (log10)
-#' @param xOptions y-axis options character vector, "1" normal scale,
+#' @param responseOptions y-axis options character vector, "1" normal scale,
 #'  "2" reversed scale,"3" logarithmic scale (log10)
 #'  
 #' @returns ggplot object
@@ -306,7 +308,7 @@ fitPlot <- function(fitTable,
                            ggplot2::aes(ymin = yC$lwr, ymax = yC$upr),
                            fill = confidenceColor, alpha = confidenceAlpha)
     }
-    g <- g + ggplot2::geom_line(data = data.frame(x = x2 ,y=yC$fit), ggplot2::aes(x=x,y=y),
+    g <- g + ggplot2::geom_line(data = data.frame(x = x2 ,y=yC$fit), ggplot2::aes_string(x="x",y="y"),
                        color = regressionColor,
                        linetype = regressionLineType,
                        size = regressionWidth,
@@ -322,38 +324,38 @@ fitPlot <- function(fitTable,
   if (is.null(responseLabel)){
     responseLabel <- responseColumn
   }
-  g <- g + ylab(responseLabel) + xlab(predictorLabel)
+  g <- g + ggplot2::ylab(responseLabel) + ggplot2::xlab(predictorLabel)
   if (!autoScalePredictor){
-    g <- g + scale_x_continuous(expand = c(0,0), limits = toNumeric(predictorLimits),
+    g <- g + ggplot2::scale_x_continuous(expand = c(0,0), limits = toNumeric(predictorLimits),
                                 oob = switch(predictorOob,
                                              "1" = scales::oob_censor,
                                              "2" = scales::oob_squish_infinite))
   }
   if (!autoScaleResponse){
-    g <- g + scale_y_continuous(expand = c(0,0), limits = toNumeric(responseLimits),
+    g <- g + ggplot2::scale_y_continuous(expand = c(0,0), limits = toNumeric(responseLimits),
                                 oob = switch(responseOob,
                                              "1" = scales::oob_censor,
                                              "2" = scales::oob_squish_infinite))
   }
-  g <- g + ggtitle(title)
-  g <- g + labs(caption = caption)
+  g <- g + ggplot2::ggtitle(title)
+  g <- g + ggplot2::labs(caption = caption)
   
-  g <- g + theme_light()
+  g <- g + ggplot2::theme_light()
   
-  g <- g + theme(plot.caption = element_text(hjust = 0, size = 13,
+  g <- g + ggplot2::theme(plot.caption = ggplot2::element_text(hjust = 0, size = 13,
                                              face = "italic"))
   
   if (rotateGraph){
-    g <- g + coord_flip()
+    g <- g + ggplot2::coord_flip()
   }
   g <- switch(predictorOptions,
               "1" = g,
-              "2" = g + scale_x_reverse(),
-              "3" = g + scale_x_log10())
+              "2" = g + ggplot2::scale_x_reverse(),
+              "3" = g + ggplot2::scale_x_log10())
   g <- switch(responseOptions,
               "1" = g,
-              "2" = g + scale_y_reverse(),
-              "3" = g + scale_y_log10())
+              "2" = g + ggplot2::scale_y_reverse(),
+              "3" = g + ggplot2::scale_y_log10())
   g
 }
 
@@ -489,14 +491,14 @@ residualPlot <- function(fitTable,
                          rotateGraph = FALSE,
                          xOptions = "1", yOptions = "1"){
   if (standardized){
-    resStd <- stdres(fit)
+    resStd <- MASS::stdres(fit)
   } else {
     resStd <- fit$residuals
   }
   if (!usePredictor){
-    l <- ggplot2::ggplot(data.frame(x=fit$model$y,y=resStd),ggplot2::aes(x,y))
+    l <- ggplot2::ggplot(data.frame(x=fit$model$y,y=resStd),ggplot2::aes_string("x","y"))
   } else {
-    l <- ggplot2::ggplot(data.frame(x=fit$model$x,y=resStd),ggplot2::aes(x,y))
+    l <- ggplot2::ggplot(data.frame(x=fit$model$x,y=resStd),ggplot2::aes_string("x","y"))
   }
   l <- l + ggplot2::stat_smooth(geom = "line",
                        color = fitColor,
@@ -507,7 +509,7 @@ residualPlot <- function(fitTable,
                       size = pointsSize,
                       col = pointsColor, fill = pointsFill,
                       alpha = pointsAlpha)
-  l <- l + ylab(ifelse(useYLabel,
+  l <- l + ggplot2::ylab(ifelse(useYLabel,
                        ifelse(standardized,"Standardized Residuals","Residuals"),
                        "")
   )
@@ -522,11 +524,11 @@ residualPlot <- function(fitTable,
   } else {
     rsColumn <- responseColumn 
   }
-  l <- l + xlab(ifelse(usePredictor,
+  l <- l + ggplot2::xlab(ifelse(usePredictor,
                        prColumn,
                        rsColumn))
-  l <- l + ggtitle(title)
-  l <- l + labs(caption = caption)
+  l <- l + ggplot2::ggtitle(title)
+  l <- l + ggplot2::labs(caption = caption)
   if (showLimits){
     if (!identical(limits,NA)){
       for (counter in 1:nrow(limits)){
@@ -539,28 +541,28 @@ residualPlot <- function(fitTable,
     }
   }
   if (!autoScaleX){
-    l <- l + scale_x_continuous(expand = c(0,0), limits = toNumeric(xLimits), oob = switch(xOob,
+    l <- l + ggplot2::scale_x_continuous(expand = c(0,0), limits = toNumeric(xLimits), oob = switch(xOob,
                                                                                            "1" = scales::oob_censor,
                                                                                            "2" = scales::oob_squish_infinite))
   }
   if (!autoScaleY){
-    l <- l + scale_y_continuous(expand = c(0,0), limits = toNumeric(yLimits), oob = switch(yOob,
+    l <- l + ggplot2::scale_y_continuous(expand = c(0,0), limits = toNumeric(yLimits), oob = switch(yOob,
                                                                                            "1" = scales::oob_censor,
                                                                                            "2" = scales::oob_squish_infinite))
   }
-  l <- l + theme_classic()
-  l <- l + theme(plot.caption = element_text(hjust = 0, size = 13, face = "italic"))
+  l <- l + ggplot2::theme_classic()
+  l <- l + ggplot2::theme(plot.caption = ggplot2::element_text(hjust = 0, size = 13, face = "italic"))
   if (rotateGraph){
-    l <- l + coord_flip()
+    l <- l + ggplot2::coord_flip()
   }
   l <- switch(xOptions,
               "1" = l,
-              "2" = l + scale_x_reverse(),
-              "3" = l + scale_x_log10())
+              "2" = l + ggplot2::scale_x_reverse(),
+              "3" = l + ggplot2::scale_x_log10())
   l <- switch(yOptions,
               "1" = l,
-              "2" = l + scale_y_reverse(),
-              "3" = l + scale_y_log10())
+              "2" = l + ggplot2::scale_y_reverse(),
+              "3" = l + ggplot2::scale_y_log10())
   l
 }
 
@@ -668,10 +670,10 @@ recoveryPlot <- function(fitTable,
                     weights = weights)
   if (!usePredictor){
     l <- ggplot2::ggplot(data.frame(x=fitTable[,responseColumn],
-                           y= fitTable$recovery),ggplot2::aes(x,y))
+                           y= fitTable$recovery),ggplot2::aes_string("x","y"))
   } else {
     l <- ggplot2::ggplot(data.frame(x=fitTable[,predictorColumn],
-                           y=fitTable$recovery),ggplot2::aes(x,y))
+                           y=fitTable$recovery),ggplot2::aes_string("x","y"))
   }
   l <- l + ggplot2::stat_smooth(geom = "line",
                        color = fitColor,
@@ -694,10 +696,10 @@ recoveryPlot <- function(fitTable,
   } else {
     rsColumn <- responseColumn 
   }
-  l <- l + xlab(ifelse(usePredictor,prColumn,rsColumn))
-  l <- l + ylab(ifelse(useYLabel,"Recovery (%)",""))
-  l <- l + ggtitle(title)
-  l <- l + labs(caption = caption)
+  l <- l + ggplot2::xlab(ifelse(usePredictor,prColumn,rsColumn))
+  l <- l + ggplot2::ylab(ifelse(useYLabel,"Recovery (%)",""))
+  l <- l + ggplot2::ggtitle(title)
+  l <- l + ggplot2::labs(caption = caption)
   if (showLimits){
     if (!identical(limits,NA)){
       for (counter in 1:nrow(limits)){
@@ -710,32 +712,32 @@ recoveryPlot <- function(fitTable,
     }
   }
   if (!autoScaleX){
-    l <- l + scale_x_continuous(expand = c(0,0), limits = toNumeric(xLimits),
+    l <- l + ggplot2::scale_x_continuous(expand = c(0,0), limits = toNumeric(xLimits),
                                 oob = switch(xOob,
                                              "1" = scales::oob_censor,
                                              "2" = scales::oob_squish_infinite))
   }
   if (!autoScaleY){
-    l <- l + scale_y_continuous(expand = c(0,0), limits = toNumeric(yLimits),
+    l <- l + ggplot2::scale_y_continuous(expand = c(0,0), limits = toNumeric(yLimits),
                                 oob = switch(yOob,
                                              "1" = scales::oob_censor,
                                              "2" = scales::oob_squish_infinite))
   }
-  l <- l + theme_classic()
-  l <- l + theme(plot.caption = element_text(hjust = 0,
+  l <- l + ggplot2::theme_classic()
+  l <- l + ggplot2::theme(plot.caption = ggplot2::element_text(hjust = 0,
                                              size = 13, face = "italic"))
   
   if (rotateGraph){
-    l <- l + coord_flip()
+    l <- l + ggplot2::coord_flip()
   }
   l <- switch(xOptions,
               "1" = l,
-              "2" = l + scale_x_reverse(),
-              "3" = l + scale_x_log10())
+              "2" = l + ggplot2::scale_x_reverse(),
+              "3" = l + ggplot2::scale_x_log10())
   l <- switch(yOptions,
               "1" = l,
-              "2" = l + scale_y_reverse(),
-              "3" = l + scale_y_log10())
+              "2" = l + ggplot2::scale_y_reverse(),
+              "3" = l + ggplot2::scale_y_log10())
   l
 }
 

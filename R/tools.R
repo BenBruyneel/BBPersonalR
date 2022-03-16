@@ -179,5 +179,5 @@ booleanToCharacter <- function(booleans){
 #'
 #' @return a data.frame
 joinNamedDFList <- function(listData){
-  bind_rows(map2(listData, names(listData), ~bind_cols(data.frame(node = .y), .x)))
+  dplyr::bind_rows(purrr::map2(listData, names(listData), ~bind_cols(data.frame(node = .y), .x)))
 }

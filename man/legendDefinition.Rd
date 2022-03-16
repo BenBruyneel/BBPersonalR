@@ -7,6 +7,20 @@
 \usage{
 legendDefinition(labels = NA, colors = NA, fills = NA, shapes = NA, sizes = NA)
 }
+\arguments{
+\item{labels}{labels of the elements of the legend (character vector)}
+
+\item{colors}{colors of the elements of the legend}
+
+\item{fills}{fill colors of the elements of the legend}
+
+\item{shapes}{shapes of the elements of the legend}
+
+\item{sizes}{sizes of the elements of the legend}
+}
+\value{
+a data.frame
+}
 \description{
 helper function for the function customLegend():
  generates a data.frame specifying the legend to be generated

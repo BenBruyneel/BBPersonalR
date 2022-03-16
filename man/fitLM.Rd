@@ -15,7 +15,7 @@ fitLM(fitTable, predictorColumn = 1, responseColumn = 2, weights = NULL)
 \item{responseColumn}{can be integer (column number) or character
 (column name)}
 
-\item{weight}{default = NULL, otherwise must be integer to give weights to
+\item{weights}{default = NULL, otherwise must be integer to give weights to
 the predictor values (see also function weightsVector) or a numeric
 vector with length = number of rows in calibrationTable
 

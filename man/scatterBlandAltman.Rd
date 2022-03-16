@@ -3,9 +3,7 @@
 \name{scatterBlandAltman}
 \alias{scatterBlandAltman}
 \title{generates a variant of the scatterplot when one needs to compare two sets
- of data (x & y): Bland-Altman / Tukey mean-difference plot
- https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4470095/pdf/bm-25-141.pdf
- https://en.wikipedia.org/wiki/Bland%E2%80%93Altman_plot}
+ of data (x & y): Bland-Altman / Tukey mean-difference plot}
 \usage{
 scatterBlandAltman(
   data,
@@ -53,8 +51,6 @@ a ggplot object
 \description{
 generates a variant of the scatterplot when one needs to compare two sets
  of data (x & y): Bland-Altman / Tukey mean-difference plot
- https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4470095/pdf/bm-25-141.pdf
- https://en.wikipedia.org/wiki/Bland%E2%80%93Altman_plot
 }
 \note{
 work in progress...

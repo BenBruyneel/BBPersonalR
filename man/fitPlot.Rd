@@ -67,6 +67,28 @@ x- & y-axis is not possible}
 
 \item{caption}{caption for the graph, character vector}
 
+\item{autoScalePredictor}{if TRUE then default autoscaling of the y-axis
+takes place,most other settings delaing with scaling of the y-axis the are
+then ignored}
+
+\item{predictorLimits}{2 element numeric vector with the minimum and maximum value
+for the x-axis. If an element is a character vector or something that
+cannot be converted to a numeric value, then NA is used which leads to
+minimum/maximum value}
+
+\item{predictorLabel}{name of the x-axis, character vector}
+
+\item{predictorOob}{integer vector, indicating how to deal with out of bounds
+datapoints. 1 = censor scales::oob_censor is used, 2 = infinite,
+scales::oob_squish_infinite is used. Note: x-axis only}
+
+\item{responseLimits}{2 element numeric vector with the minimum and maximum value
+for the y-axis. If an element is a character vector or something that
+cannot be converted to a numeric value, then NA is used which leads to
+minimum/maximum value}
+
+\item{responseLabel}{name of the y-axis, character vector}
+
 \item{regressionColor}{color of the regression line}
 
 \item{regressionLineType}{appearance of the regression line: 0 = blank,
@@ -108,36 +130,15 @@ ggplot2::ggplot2-specs}
 \item{rotateGraph}{if TRUE, then x-axis and y-axis are swapped, essentially
 resulting in a graph rotated 90 degrees}
 
-\item{autoScaleX}{if TRUE then default autoscaling of the x-axis takes place,
-most other settings delaing with scaling of the x-axis the are then ignored}
+\item{predictorOptions}{x-axis options character vector, "1" normal scale,
+"2" reversed scale, "3" logarithmic scale (log10)}
 
-\item{autoScaleY}{if TRUE then default autoscaling of the y-axis takes place,
-most other settings delaing with scaling of the y-axis the are then ignored}
+\item{responseOptions}{y-axis options character vector, "1" normal scale,
+"2" reversed scale,"3" logarithmic scale (log10)}
 
-\item{xLimits}{2 element numeric vector with the minimum and maximum value
-for the x-axis. If an element is a character vector or something that
-cannot be converted to a numeric value, then NA is used which leads to
-minimum/maximum value}
-
-\item{yLimits}{2 element numeric vector with the minimum and maximum value
-for the y-axis. If an element is a character vector or something that
-cannot be converted to a numeric value, then NA is used which leads to
-minimum/maximum value}
-
-\item{xLabel}{name of the x-axis, character vector}
-
-\item{yLabel}{name of the y-axis, character vector}
-
-\item{xOob}{integer vector, indicating how to deal with out of bounds
-datapoints. 1 = censor scales::oob_censor is used, 2 = infinite,
-scales::oob_squish_infinite is used. Note: x-axis only}
-
-\item{yOob}{integer vector, indicating how to deal with out of bounds
+\item{respomseOob}{integer vector, indicating how to deal with out of bounds
 datapoints. 1 = censor scales::oob_censor is used, 2 = infinite,
 scales::oob_squish_infinite is used. Note: y-axis only}
-
-\item{xOptions}{y-axis options character vector, "1" normal scale,
-"2" reversed scale,"3" logarithmic scale (log10)}
 }
 \value{
 ggplot object

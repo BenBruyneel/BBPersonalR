@@ -71,6 +71,8 @@ drawn}
 
 \item{lineType}{type of the line}
 
+\item{lineWidth}{width of the line}
+
 \item{lineAlpha}{alpha ('see through' value) of the line}
 
 \item{controlLines}{either NA (no horizontal lines) or a data.frame with
@@ -105,8 +107,6 @@ used to define the exact range of the Y-axis}
 
 \item{...}{can be used to pass on other arguments to graphAdjust()
 (like xLimits, xExpand, etc)}
-
-\item{lineWidh}{width of the nline}
 }
 \value{
 a ggplot object
