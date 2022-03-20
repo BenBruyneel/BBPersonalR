@@ -1,28 +1,3 @@
-#' ifelse replacement for properly returning all datatypes.
-#'  local to this package, not exported
-#' @param logicValue variable or expression resulting in TRUE or FALSE,
-#'  if missing or not logical then the function will return NULL.
-#' @param ifTrue variable or expression to be returned when logicValue == TRUE
-#' @param ifFalse variable or expression to be returned when logicValue == FALSE
-#'
-#' @returns depending on logicValue, ifTrue ir ifFalse.
-#' @note not vectorized
-ifelseProper <- function(logicValue = NULL, ifTrue = NULL, ifFalse = NULL){
-  if (missing(logicValue)){
-    return(NULL)
-  } else {
-    if (!is.logical(logicValue)){
-      return(NULL)
-    } else {
-      if (logicValue){
-        return(ifTrue)
-      } else {
-        return(ifFalse)
-      }
-    }
-  }
-}
-
 #' converts integer date format as used by eg SQLite to R's Date format
 #'
 #' @param aDate days since origin, integer numbers to be converted Date format
