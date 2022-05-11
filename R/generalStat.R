@@ -2408,7 +2408,6 @@ scatterBlandAltman <- function(data, xColumn = 1, yColumn = 2,
     yColumn <- paste0(yColumn,"__")
     colnames(data) <- c(xColumn, yColumn)
   }
-  browser()
   data2 <- data
   if (!logTransform){
     data[,xColumn] <- (data2[,xColumn] + data2[,yColumn])/2 # average
