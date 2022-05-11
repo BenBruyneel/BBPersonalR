@@ -2390,7 +2390,7 @@ scatterBlandAltman <- function(data, xColumn = 1, yColumn = 2,
                                                "Difference of c(x,y)"),
                                title = paste(c("Bland-Altman plot/Tukey mean-difference plot: ", yLabel, " vs ", xLabel),
                                              collapse = ""),
-                               ...){
+                              ...){
   if (!is.character(xColumn)){
     xColumn <- colnames(data)[xColumn]
   }
@@ -2400,8 +2400,15 @@ scatterBlandAltman <- function(data, xColumn = 1, yColumn = 2,
   if (removeNA){
     data <- data %>% stats::na.omit()
   }
-  data <- data %>%
-    dplyr::select(dplyr::all_of(xColumn), dplyr::all_of(yColumn))
+  if (xColumn != yColumn){
+    data <- data %>%
+      dplyr::select(dplyr::all_of(xColumn), dplyr::all_of(yColumn))
+  } else {
+    data <- data.frame(x = data[, xColumn], y = data[, xColumn])
+    yColumn <- paste0(yColumn,"__")
+    colnames(data) <- c(xColumn, yColumn)
+  }
+  browser()
   data2 <- data
   if (!logTransform){
     data[,xColumn] <- (data2[,xColumn] + data2[,yColumn])/2 # average
@@ -2419,7 +2426,6 @@ scatterBlandAltman <- function(data, xColumn = 1, yColumn = 2,
               removeNA = removeNA,
               xLabel = xLabel, yLabel = yLabel, title = title, ...)
 }
-
 
 #' function to generate an aligned set of (maximum 4) plots as a 2x2 matrix
 #'  (2 columns, 2 rows)
