@@ -754,6 +754,11 @@ statBoxPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #'  to plotting. @note this will remove warning messages and errors
 #' @param variableName sets the 'combined' name of the columns, 
 #'  must be a single word
+#' @param newNames redefines the names of the different data columns. In
+#'  principle this could be done before this function is called, but using this
+#'  argument circumvents some issues with column names. Note that the length
+#'  of this argument (character vector) should be the same as the number of
+#'  columns, otherwise it will be ignored
 #' @param outlineColor defines the color of the line around the box
 #' @param fillColor defines the color of the boxes themselves. @Note: if the 
 #'  number of colors does not match the number of columns then ggplot2 default
@@ -802,6 +807,7 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
                                 melted = FALSE, varColumn = NA,
                                 sampleSize = NA, removeNA = TRUE,
                                 variableName = "variable",
+                                newNames = NA,
                                 outlineColor = "black", fillColor = NA,
                                 jitter = 0.05, alpha = 0.5, size = 3,
                                 shape = 16, jitterFill = "black",
@@ -842,6 +848,11 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
   } else {
     data <- data %>% dplyr::select(dplyr::all_of(varColumn), dplyr::all_of(column))
     colnames(data) <- c(variableName,"value")
+  }
+  if (!identical(newNames,NA)){
+    if (length(levels(data[,variableName])) == length(newNames)){
+      levels(data[,variableName]) <- newNames
+    }
   }
   if (removeNA){
     data <- data %>% stats::na.omit()

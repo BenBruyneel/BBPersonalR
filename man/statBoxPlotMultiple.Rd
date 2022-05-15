@@ -12,6 +12,7 @@ statBoxPlotMultiple(
   sampleSize = NA,
   removeNA = TRUE,
   variableName = "variable",
+  newNames = NA,
   outlineColor = "black",
   fillColor = NA,
   jitter = 0.05,
@@ -66,6 +67,12 @@ to plotting. @note this will remove warning messages and errors}
 
 \item{variableName}{sets the 'combined' name of the columns, 
 must be a single word}
+
+\item{newNames}{redefines the names of the different data columns. In
+principle this could be done before this function is called, but using this
+argument circumvents some issues with column names. Note that the length
+of this argument (character vector) should be the same as the number of
+columns, otherwise it will be ignored}
 
 \item{outlineColor}{defines the color of the line around the box}
 
