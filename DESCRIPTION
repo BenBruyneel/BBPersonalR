@@ -6,7 +6,7 @@ Version: 0.1.3
 Author: Ben Bruyneel <benbruyneel@gmail.com>
 Maintainer: Ben Bruyneel <benbruyneel@gmail.com>
 Description: Provides a number of routines I developed and found useful
-License: GPL (>= 2)
+License: GPL (>= 3)
 Encoding: UTF-8
 URL: https://github.com/BenBruyneel/BBPersonalR
 LazyData: true
