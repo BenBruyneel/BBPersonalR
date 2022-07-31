@@ -1,9 +1,3 @@
-library(MASS)
-library(dplyr)
-library(tidyselect)
-library(ggplot2)
-library(flextable)
-
 #' generates vector of weighted values
 #' 
 #' @param weight default = NULL, no weights, function will simply return NULL

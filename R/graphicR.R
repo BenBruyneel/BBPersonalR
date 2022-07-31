@@ -1,12 +1,3 @@
-library(dplyr)
-library(purrr)
-library(ggplot2)
-library(ggforce)
-library(scales)
-library(grid)
-library(gridExtra)
-library(rlang)
-
 #' to be able to use the theme theme_minimal with some adjustments
 #' 
 #' @param base_size size of the lettering  of axis, title etc

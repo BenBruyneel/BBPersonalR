@@ -1,6 +1,3 @@
-library(dplyr)
-library(tolerance)
-
 #' returns a data.frame with the specified quantile limits of data
 #' 
 #' @param data the data to be used, can be a numeric/character/etc vector or

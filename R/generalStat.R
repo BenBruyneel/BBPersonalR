@@ -1,13 +1,3 @@
-library(dplyr)
-library(ggplot2)
-library(qqplotr)
-library(grid)
-library(gridExtra)
-library(cowplot)
-library(tolerance)
-library(scales)
-library(data.table)
-
 #' creates a ggplot object showing a histogram
 #' 
 #' @param data the data tp be plotted, can be a numeric/character/etc vector or
