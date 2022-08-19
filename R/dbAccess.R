@@ -210,8 +210,10 @@ convertDFToDB <- function(dfData, columnNames = colnames(dfData[[1]]),
 #'  argument are to be put in the converted data.frame(s)
 #' @param collapseChar the character to be used as seperator
 #' @param vectorClass class of the seperate elements, default = "integer".
-#'   Other tested options are "numeric" and "character". Note: all columns need
-#'   to be same type at this moment.
+#'  Other tested options are "numeric" and "character". Note: all columns are
+#'  the same class when vectorClass is a single element vector. The argument
+#'  can be different types, but then all column types need to be specified, eg
+#'  c("numeric", "integer")
 #' @param fromBlob is the data raw datatype or not
 #' @param type character string, the type of compression. See ?memCompress for
 #'  details
@@ -225,6 +227,13 @@ convertDBtoDF <- function(df, columnNames = colnames(df),
   if (identical(columnNames,NA)){
     stop("Error : no column names defined")
   }
+  if (length(vectorClass) == 1){
+    vectorClass <- rep(vectorClass, length(columnNames))
+  } else {
+    if (length(vectorClass) != length(columnNames)){
+      stop("Error : length vectorClass argument != length columnNames")
+    }
+  }
   dfData <- list()
   for (counter in 1:(nrow(df))){
     dfData[[counter]] <- data.frame(
@@ -233,15 +242,13 @@ convertDBtoDF <- function(df, columnNames = colnames(df),
         blobToVector(blobData = unlist(as.data.frame(df)[counter,
                                                          columnNames[1]]),
                      collapseChar = collapseChar,
-                     vectorClass = vectorClass,
+                     vectorClass = vectorClass[[1]],
                      type = "gzip"),
         DBtoVector(dbData = as.data.frame(df)[counter,columnNames[1]],
-                   collapseChar = collapseChar,
+                   collapseChar = collapseChar[[1]],
                    vectorClass = vectorClass)
       )
     )
-    # as.numeric(unlist(strsplit(as.data.frame(df)[counter,columnNames[1]],
-    #                            split = collapseChar))))
     if (length(columnNames)>1){
       for (counter2 in 2:(length(columnNames))){
         suppressMessages(
@@ -251,13 +258,13 @@ convertDBtoDF <- function(df, columnNames = colnames(df),
                                                   blobToVector(blobData = unlist(as.data.frame(df)[counter,
                                                                                                    columnNames[counter2]]),
                                                                collapseChar = collapseChar,
-                                                               vectorClass = vectorClass,
+                                                               vectorClass = vectorClass[[counter2]],
                                                                type = "gzip")
                                                 ),
                                                 data.frame(
                                                   DBtoVector(dbData = as.data.frame(df)[counter,columnNames[counter2]],
                                                              collapseChar = collapseChar,
-                                                             vectorClass = vectorClass)
+                                                             vectorClass = vectorClass[[counter2]])
                                                 )
                                          )
           )

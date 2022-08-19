@@ -24,8 +24,10 @@ argument are to be put in the converted data.frame(s)}
 \item{collapseChar}{the character to be used as seperator}
 
 \item{vectorClass}{class of the seperate elements, default = "integer".
-Other tested options are "numeric" and "character". Note: all columns need
-to be same type at this moment.}
+Other tested options are "numeric" and "character". Note: all columns are
+the same class when vectorClass is a single element vector. The argument
+can be different types, but then all column types need to be specified, eg
+c("numeric", "integer")}
 
 \item{fromBlob}{is the data raw datatype or not}
 
