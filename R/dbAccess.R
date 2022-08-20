@@ -397,8 +397,19 @@ db_tbl_def <- function(db){
 
 #' 'global' variable: default primary key name
 #'
+#' @note in future: remove from export 
+#' 
 #' @export
 defaultPrimaryKeyName <- "id_"
+
+
+#' returns the default primary key name
+#'
+#' @return character vector
+#' @export
+defaultPrimaryKey <- function(){
+  return("id_")
+}
 
 #' write a data to a table in an (open) database
 #'
@@ -433,7 +444,7 @@ defaultPrimaryKeyName <- "id_"
 #'
 #' @export
 db_writeTable <- function(db, tableName, theTable,
-                          primaryKeyName = defaultPrimaryKeyName,
+                          primaryKeyName = defaultPrimaryKey(),
                           overwrite = FALSE, append = !overwrite,
                           doNotChangePool = FALSE, row.names = FALSE){
   compareColNames <- pool::dbListFields(db, tableName)
@@ -490,7 +501,7 @@ db_writeTable <- function(db, tableName, theTable,
 db_createTable <- function(db, tableName, dataframe = NA,
                            foreignKeys = NA,
                            addPrimary = TRUE, uniqueConstraints = NA,
-                           primaryKeyName = defaultPrimaryKeyName,
+                           primaryKeyName = defaultPrimaryKey(),
                            dbType = "SQLite",
                            columnDefinitions = ifelseProper(
                              identical(dataframe, NA),
@@ -876,11 +887,11 @@ db_updateRow <- function(db, tableName, values, where = NA){
 #' @returns nothing
 #' @export
 db_createLinkTable <- function(db, tableName = NA,
-                               leftTableName, leftID = defaultPrimaryKeyName,
-                               rightTableName, rightID = defaultPrimaryKeyName,
+                               leftTableName, leftID = defaultPrimaryKey(),
+                               rightTableName, rightID = defaultPrimaryKey(),
                                addPrimary = FALSE,
                                includeUniqueConstraint = TRUE,
-                               primaryKeyName = defaultPrimaryKeyName,
+                               primaryKeyName = defaultPrimaryKey(),
                                dbType = "SQLite"){
   tableLeftID <- paste(leftTableName, leftID, sep = "_")
   tableRightID <- paste(rightTableName, rightID, sep = "_")
@@ -997,7 +1008,7 @@ db_getLinkIDs <- function(db, linkedTableName,
 #' @export
 db_getLinkColumns <- function(db, linkedTableName, hasPrimaryKey = FALSE,
                               tableName, columns = NA,
-                              primaryKey = defaultPrimaryKeyName,
+                              primaryKey = defaultPrimaryKey(),
                               left = TRUE, leftID = NA, rightID = NA,
                               IDs = NA){
   fieldNames <- sum(c(identical(leftID,NA), identical(rightID,NA)))

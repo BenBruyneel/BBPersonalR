@@ -2,7 +2,7 @@ Package: BBPersonalR
 Type: Package
 Imports: stats, DBI, RSQLite, magrittr, pool, dplyr, stringr, purrr, tibble, PKI, wkb, ggplot2, qqplotr, grid, gridExtra, cowplot, tolerance, scales, data.table, ggforce, MASS, tidyselect, flextable, reshape2
 Title: BBPersonalR
-Version: 0.1.4
+Version: 0.1.5
 Author: Ben Bruyneel <benbruyneel@gmail.com>
 Maintainer: Ben Bruyneel <benbruyneel@gmail.com>
 Description: Provides a number of routines I developed and found useful

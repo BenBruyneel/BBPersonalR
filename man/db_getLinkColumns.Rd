@@ -12,7 +12,7 @@ db_getLinkColumns(
   hasPrimaryKey = FALSE,
   tableName,
   columns = NA,
-  primaryKey = defaultPrimaryKeyName,
+  primaryKey = defaultPrimaryKey(),
   left = TRUE,
   leftID = NA,
   rightID = NA,

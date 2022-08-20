@@ -8,7 +8,7 @@ db_writeTable(
   db,
   tableName,
   theTable,
-  primaryKeyName = defaultPrimaryKeyName,
+  primaryKeyName = defaultPrimaryKey(),
   overwrite = FALSE,
   append = !overwrite,
   doNotChangePool = FALSE,

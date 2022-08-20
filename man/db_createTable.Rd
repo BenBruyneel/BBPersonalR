@@ -11,7 +11,7 @@ db_createTable(
   foreignKeys = NA,
   addPrimary = TRUE,
   uniqueConstraints = NA,
-  primaryKeyName = defaultPrimaryKeyName,
+  primaryKeyName = defaultPrimaryKey(),
   dbType = "SQLite",
   columnDefinitions = ifelseProper(identical(dataframe, NA), NA,
     db_createColumnDefinitions(dataframe, dbType = dbType))

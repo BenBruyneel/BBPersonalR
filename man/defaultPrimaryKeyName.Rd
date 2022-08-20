@@ -13,4 +13,7 @@ defaultPrimaryKeyName
 \description{
 'global' variable: default primary key name
 }
+\note{
+in future: remove from export
+}
 \keyword{datasets}

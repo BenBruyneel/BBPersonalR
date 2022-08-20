@@ -8,12 +8,12 @@ db_createLinkTable(
   db,
   tableName = NA,
   leftTableName,
-  leftID = defaultPrimaryKeyName,
+  leftID = defaultPrimaryKey(),
   rightTableName,
-  rightID = defaultPrimaryKeyName,
+  rightID = defaultPrimaryKey(),
   addPrimary = FALSE,
   includeUniqueConstraint = TRUE,
-  primaryKeyName = defaultPrimaryKeyName,
+  primaryKeyName = defaultPrimaryKey(),
   dbType = "SQLite"
 )
 }
