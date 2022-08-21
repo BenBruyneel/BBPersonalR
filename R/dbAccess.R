@@ -105,7 +105,7 @@ vectorToBlob <- function(dataVector = NA, collapseChar = ";",
                                     formatNumbers = formatNumbers,
                                     ...),
                          type = type)
-  tempRaw <- paste(PKI::raw2hex(tempRaw), collapse = "")
+  tempRaw <- paste(sf::rawToHex(tempRaw), collapse = "")
   return(tempRaw)
 }
 
