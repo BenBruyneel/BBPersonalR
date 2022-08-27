@@ -23,8 +23,8 @@ dateToInteger <- function(aDate, origin = as.Date("1970-01-01")){
 #' Converts a numeric, integer or character vector (multiple elements) to a
 #'  single element character vector (a string)
 #'
-#' @param dataVector the data to be converted: integer, numeric or character.
-#'  Other data types have not been testedd
+#' @param dataVector the data to be converted: integer, numeric, character or
+#'  logical. Other data types have not been tested
 #' @param collapseChar the character to be used as seperator in the end result.
 #'  Note: this seperator should not be present in the dataVector (especially
 #'  after transformation) as it will give problems when using the DBToVector
@@ -40,18 +40,14 @@ dateToInteger <- function(aDate, origin = as.Date("1970-01-01")){
 #' @export
 vectorToDB <- function(dataVector = NA, collapseChar = ";",
                        formatNumbers = FALSE, removeNA = FALSE, ...){
-  if (identical(dataVector, NA)){
-    return("")
+  if (removeNA){
+    dataVector <- dataVector[!is.na(dataVector)]
+  }
+  if (!formatNumbers){
+    return(paste(dataVector,collapse = collapseChar))
   } else {
-    if (removeNA){
-      dataVector <- dataVector[!is.na(dataVector)]
-    }
-    if (!formatNumbers){
-      return(paste(dataVector,collapse = collapseChar))
-    } else {
-      return(paste(format(dataVector, ...),
-                   collapse = collapseChar))
-    }
+    return(paste(format(dataVector, ...),
+                 collapse = collapseChar))
   }
 }
 

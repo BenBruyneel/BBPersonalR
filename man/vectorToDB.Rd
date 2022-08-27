@@ -14,8 +14,8 @@ vectorToDB(
 )
 }
 \arguments{
-\item{dataVector}{the data to be converted: integer, numeric or character.
-Other data types have not been testedd}
+\item{dataVector}{the data to be converted: integer, numeric, character or
+logical. Other data types have not been tested}
 
 \item{collapseChar}{the character to be used as seperator in the end result.
 Note: this seperator should not be present in the dataVector (especially
