@@ -246,7 +246,7 @@ graphsAdjust <- function(graphs, vertical = FALSE,
     } else {
       if (!xDefault){
         graphs[[counter]] <- graphs[[counter]] +
-          ggplot2::scale_x_date(limits = xLimits,
+          ggplot2::scale_x_datetime(limits = xLimits,
                        labels = xLabelFormat)#, trans = xReverse)  -- do not know if works
       }
     }
@@ -297,8 +297,8 @@ graphsAdjust <- function(graphs, vertical = FALSE,
     } else {
       if (!yDefault){
         graphs[[counter]] <- graphs[[counter]] +
-          ggplot2::scale_y_date(limits = yLimits,
-                       labels = yLabelFormat, trans = yReverse)
+          ggplot2::scale_y_datetime(limits = yLimits,
+                                    labels = yLabelFormat)#, trans = xReverse)  -- do not know if works
       }
     }
     # swap x & y

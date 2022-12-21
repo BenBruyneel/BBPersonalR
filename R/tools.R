@@ -172,6 +172,100 @@ booleanToCharacter <- function(booleans){
   paste(purrr::map_chr(booleans, ~substr(as.character(.x), start = 1, stop = 1)), collapse = "")
 }
 
+#' takes an integer and converts it to a date vector.
+#'  Orginally meant to convert integer date format as used by eg SQLite to R's
+#'  Date format
+#'
+#' @param aDate days since origin, integer numbers to be converted Date format
+#' @param origin character vector specifying the origin date
+#'
+#' @returns converted dates in Date format
+#' @export 
+integerToDate <- function(aDate, origin = "1970-01-01"){
+  return(as.Date(aDate, origin = origin))
+}
+
+#' converts date format to integer numbers
+#'
+#' @param aDate Date formatted dates to be converted integer
+#' @param origin date vector specifying the origin date
+#'
+#' @returns converted dates in integer format
+#' @export
+dateToInteger <- function(aDate, origin = as.Date("1970-01-01")){
+  return(as.integer(julian(aDate, origin = origin)))
+}
+
+#' takes a 'Date' object or an integer and converts it to a character vector of
+#'  a specified format. Also changes NA's into a specified alternative
+#'
+#' @param aDate date vector or integer vector (days since origin)
+#' @param formatString defines the formatting of the date vector, internally the
+#'  base::as.Date function is used (via integerToDate)
+#' @param origin character vector specifying the origin date (only used if aDate
+#'  argument is an integer)
+#' @param na.alternative specifies what to use for NA elements in the aDate
+#'  argument
+#'
+#' transformData(transformationFormula = "transformToDate(data, na.alternative = '-')")
+#' transformToDate(c(Sys.Date(),NA, Sys.Date()+1))
+#' transformToDate(c(Sys.Date(),NA, Sys.Date()+1), na.alternative = "-")
+#' 
+#'
+#' @return character vector
+#' @export
+transformToDateString <- function(aDate, formatString = "%d/%m/%Y",
+                                  origin = "1970-01-01",
+                                  na.alternative = NA){
+  if (is.na(na.alternative)){
+    return(format(integerToDate(aDate, origin = origin), formatString))
+  } else {
+    return(tidyr::replace_na(format(integerToDate(aDate, origin = origin),
+                                    formatString),
+                             na.alternative))
+  }
+}
+
+
+#' Replaces all NA's in data (data.frame, list, etc) with an alternative
+#'
+#' @param data data.frame, list or ... that contains NA's which need to be
+#'  replaced
+#' @param na.alternative the object with which NA's need to be replace. Be aware
+#'  that a list or column of a data.frame may change class when taking this
+#'  action!
+#'
+#' @return data with replaced NA's
+#' @export
+transformNA <- function(data, na.alternative = "-"){
+  data[is.na(data)] <- na.alternative
+  return(data)
+}
+
+#' takes logical data and replaces it with an alternative, eg "Yes" and "No"
+#'
+#' @param data data to be transformed, should be logicalm but can be 1's and 0's
+#'  (internally these will be transformed into TRUE's and FALSE's respectively)
+#' @param alternative specifies what to transform TRUE (element 2) or FALSE
+#'  (element 1) into
+#' @param na.alternative specifies what to use if NA is encountered
+#'
+#'  transform01Logical(c(T,F,F,T))
+#'  transform01Logical(c(1,0,0,1))
+#'  
+#' @return data with alternatives in stead of TRUE/FALSE
+#' @export
+transform01Logical <- function(data, alternative = c("No","Yes"), na.alternative = " "){
+  data <- as.logical(data) # simple type casting, meant for 0,1
+  if (!identical(alternative, NA)){ # first of alternative is meant for 0/FALSE, second is meant for 1/TRUE 
+    data <- alternative[data+1]
+  } 
+  if (!is.na(na.alternative)){
+    data[is.na(data)] <- na.alternative
+  }
+  return(data)
+}
+
 #' joins together a named list of data.frame's with exact same columns. Adds
 #'  a column to each data.frame in the list with the name of the list element
 #'
@@ -181,3 +275,91 @@ booleanToCharacter <- function(booleans){
 joinNamedDFList <- function(listData){
   dplyr::bind_rows(purrr::map2(listData, names(listData), ~bind_cols(data.frame(node = .y), .x)))
 }
+
+#' A which for multidimensional arrays
+#'
+#' @param A Array of booleans 
+#'
+#' @note Mark van der Loo 16.09.2011
+#' @note https://www.r-bloggers.com/2011/09/a-multidimensional-which-function/
+#' 
+#' example code
+#' set.seed(83)
+#' ar3 <- array(rbinom(20,1,0.5), dim = c(4,5))
+#' ar3
+#' 
+#' ar3[1,1] <- 2
+#' ar3[2,1] <- 2
+#' ar3[1,2] <- 2
+#' ar3[3,4] <- 2
+#' ar3[2,5] <- 2
+#' ar3[4,5] <- 2
+#' 
+#' ar3
+#' 
+#' which(ar3 == 2)
+#' multi.which(ar3 == 2)
+#'
+#' @return sum(A) x length(dim(A)) array of multi-indices where A == TRUE
+#' @export 
+multi.which <- function(A){
+  if ( is.vector(A) ) return(which(A))
+  d <- dim(A)
+  T <- which(A) - 1
+  nd <- length(d)
+  t( sapply(T, function(t){
+    I <- integer(nd)
+    I[1] <- t %% d[1]
+    sapply(2:nd, function(j){
+      I[j] <<- (t %/% prod(d[1:(j-1)])) %% d[j]
+    })
+    I
+  }) + 1 )
+}
+
+#' can determine the array-'position' of an element number
+#' 
+#' @param element integer coming usually coming from which(...). Note: can only
+#'  be a single number
+#' @param dimensions dimensions of the (multidimensional) array from which
+#'  the element comes
+#' 
+#' @note based on multi.which by M vd Loo, 2011
+#' @note https://www.r-bloggers.com/2011/09/a-multidimensional-which-function/
+#' 
+#' example code:
+#' set.seed(83)
+#' ar3 <- array(rbinom(20,1,0.5), dim = c(4,5))
+#' ar3
+#' 
+#' ar3[1,1] <- 2
+#' ar3[2,1] <- 2
+#' ar3[1,2] <- 2
+#' ar3[3,4] <- 2
+#' ar3[2,5] <- 2
+#' ar3[4,5] <- 2
+#' 
+#' ar3
+#' 
+#' which(ar3 == 2)
+#' multi.which(ar3 == 2)
+#' whichDim(20, dimensions = dim(ar3))
+#' # to get positions of all elements that are 2
+#' purrr::map_df(which(ar3 == 2), ~as.data.frame(whichDim(.x, dimensions = dim(ar3))))
+
+#' 
+#' 
+#' @return array with position of the element
+#' 
+#' @export
+whichDim <- function(element, dimensions){
+  element <- element - 1
+  nd <- length(dimensions)
+  I <- integer(nd)
+  I[1] <- element %% dimensions[1]
+  sapply(2:nd, function(j){
+    I[j] <<- (element %/% prod(dimensions[1:(j-1)])) %% dimensions[j]
+  })
+  return(matrix(I, nrow = 1) + 1)
+}
+

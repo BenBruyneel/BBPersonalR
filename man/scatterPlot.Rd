@@ -27,6 +27,7 @@ scatterPlot(
   smoothOrientation = "x",
   smoothConfidence = FALSE,
   smoothMethod = NULL,
+  smoothFormula = NULL,
   title = paste(c(yLabel, " vs ", xLabel), collapse = ""),
   vertical = FALSE,
   xAxis = TRUE,
@@ -50,6 +51,7 @@ scatterPlot(
   gridLines = TRUE,
   gridLinesX = TRUE,
   gridLinesY = TRUE,
+  abLine = NULL,
   ...
 )
 }
@@ -106,6 +108,9 @@ smoothing line}
 
 \item{smoothMethod}{defines smoothin method. See ?ggplot2::geom_smooth for
 more info}
+
+\item{smoothFormula}{formula to use in smoothing function, See
+?ggplot2::stat_smooth for more info}
 
 \item{title}{specifies the title}
 
@@ -172,6 +177,9 @@ FALSE when using this)}
 
 \item{gridLinesY}{if TRUE then horizontal gridlines are shown (set gridLines
 to FALSE when using this)}
+
+\item{abLine}{for adding an geom_abline(), geom_hline or geom_vline function,
+see ggplot2::geom_abline}
 
 \item{...}{can be used to pass on other arguments to graphAdjust()}
 }

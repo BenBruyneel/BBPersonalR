@@ -2,14 +2,17 @@
 % Please edit documentation in R/generalStat.R
 \name{statViolinPlotMultiple}
 \alias{statViolinPlotMultiple}
-\title{creates a ggplot object showing a violin plot of multiple columns}
+\title{creates a ggplot object showing a violin plots of multiple columns}
 \usage{
 statViolinPlotMultiple(
   data,
   column = 1:ncol(data),
+  melted = FALSE,
+  varColumn = NA,
   sampleSize = NA,
   removeNA = TRUE,
-  variableName = "variable",
+  meltOrder = NA,
+  newNames = NA,
   outlineColor = "black",
   fillColor = NA,
   outlineSize = 0.5,
@@ -19,11 +22,6 @@ statViolinPlotMultiple(
   trim = TRUE,
   bandwidth = 1,
   quantiles = NULL,
-  jitter = 0.05,
-  alpha = 0.5,
-  size = 3,
-  shape = 16,
-  jitterFill = "black",
   vertical = FALSE,
   xAxis = TRUE,
   yAxis = TRUE,
@@ -32,6 +30,7 @@ statViolinPlotMultiple(
   xLabel = "",
   yLabel = "",
   title = "",
+  legend.title = NA,
   showLegend = TRUE,
   legend.position = "bottom",
   ...
@@ -47,14 +46,30 @@ Can be integer or character (column name), note that if both (character)
 column and yLabel are defined, column is used as label for the Y-axis. If
 not defined, then all columns of the data.frame will be used.}
 
+\item{melted}{boolean that defines whether the specified columns still need
+to be melted into a single column for a graph. If melted = TRUE then
+the argument "column" should be a single column!}
+
+\item{varColumn}{this boolean argument is only used in case melted = TRUE.
+It specifies the column to be used as variable name column}
+
 \item{sampleSize}{allows to the use of a sample of the data to be used for
 the boxplot. By default sampleSize = NA, in which case all data is used}
 
 \item{removeNA}{if TRUE, the NA 'values' in the vector will be removed prior
 to plotting. @note this will remove warning messages and errors}
 
-\item{variableName}{sets the 'combined' name of the columns (IF there is more
-than one!)}
+\item{meltOrder}{numeric vector which allows to define the order in which
+columns should be melted onto each other. Normally the order is the same as
+the column order specifoed (default NA), but this parameter allows some
+extra flexibility. Be aware that columns are first melted and then
+newNames is applied (if not NA)}
+
+\item{newNames}{redefines the names of the different data columns. In
+principle this could be done before this function is called, but using this
+argument circumvents some issues with column names. Note that the length
+of this argument (character vector) should be the same as the number of
+columns, otherwise it will be ignored}
 
 \item{outlineColor}{defines the color of the line around the 'violin'}
 
@@ -85,19 +100,6 @@ outline more 'jagged'}
 \item{quantiles}{draws lines at the specified quantiles, eg c(0.25,0.5,0.25).
 If NULL, nothing is drawn}
 
-\item{jitter}{if NA, then the data points will not be shown (only outliers!),
-otherwise it adds a random value to the x-values of the data points plotted.
-Note: If set to 0 then they will be located on a straight line}
-
-\item{alpha}{alpha ('see through' value) of the data points}
-
-\item{size}{size of the data points}
-
-\item{shape}{shape of the datapoints (default = 16), see vignette
-ggplot2::ggplot2-specs}
-
-\item{jitterFill}{fill color of the data points}
-
 \item{vertical}{if TRUE, flips x- and y-axis}
 
 \item{xAxis}{defines if the x-axis is shown}
@@ -116,6 +118,8 @@ used to define the exact range of the Y-axis}
 
 \item{title}{sets title of graph}
 
+\item{legend.title}{if not NA, then to give a non-default name to the legend}
+
 \item{showLegend}{defines if the legend is to be shown or not}
 
 \item{legend.position}{defines where a legend is to be placed}
@@ -127,5 +131,5 @@ used to define the exact range of the Y-axis}
 a ggplot object
 }
 \description{
-creates a ggplot object showing a violin plot of multiple columns
+creates a ggplot object showing a violin plots of multiple columns
 }

@@ -1,3 +1,120 @@
+#' prepare data.frame for display in one of the ...multi functions, eg
+#'  statHistMultiple
+#'
+#' @param data the data to be used, can be a numeric/character/etc vector or
+#'  data.frame like (or tibble etc). If it is data.frame or similar the column
+#'  argument defines which column is to be used
+#' @param column defines which columns are to be used. Can be integer or
+#'  character (column name), note that if both (character) column and yLabel
+#'  are defined, column is used as label for the Y-axis. If not defined, then
+#'  all columns of the data.frame will be used.
+#' @param melted boolean that defines whether the specified columns still need
+#'  to be melted into a single column for a graph. If melted = TRUE then
+#'  the argument "column" should be a single column!
+#' @param varColumn this boolean argument is only used in case melted = TRUE.
+#'  It specifies the column to be used as variable name column
+#' @param sampleSize allows to the use of a sample of the data to be used for
+#'  the boxplot. By default sampleSize = NA, in which case all data is used
+#' @param removeNA if TRUE, the NA 'values' in the vector will be removed 
+#' @param meltOrder numeric vector which allows to define the order in which
+#'  columns should be melted onto each other. Normally the order is the same as
+#'  the column order specifoed (default NA), but this parameter allows some
+#'  extra flexibility. Be aware that columns are first melted and then
+#'  newNames is applied (if not NA)
+#' @param newNames redefines the names of the different data columns. In
+#'  principle this could be done before this function is called, but using this
+#'  argument circumvents some issues with column names. Note that the length
+#'  of this argument (character vector) should be the same as the number of
+#'  columns, otherwise it will be ignored
+#'
+#' @returns a data.frame
+#' @export
+statPrepareData <- function(data, column = 1:ncol(data),
+                            melted = FALSE, varColumn = NA,
+                            sampleSize = NA, removeNA = TRUE,
+                            meltOrder = NA,
+                            newNames = NA){
+  if ((length(column) <= 1) & !((length(column) == 1) & melted & !is.na(varColumn))){
+    return(NA)
+  }
+  if (!is.character(column)){
+    column = colnames(data)[column]
+  }
+  if (melted){
+    if (!is.character(varColumn)){
+      varColumn = colnames(data)[varColumn]
+    }
+  }
+  if (!melted){
+    if (!is.na(sampleSize)){
+      data <- data[sample(1:nrow(data), sampleSize, replace = FALSE), column]
+    } else {
+      data <- data[,column]
+    }
+    measureOrder <- 1:length(column)
+    if (!identical(meltOrder, NA)){
+      if (length(meltOrder) == length(column)){
+        measureOrder <- meltOrder
+      }
+    }
+    data <- as.data.frame(reshape2::melt(data.table::as.data.table(data),
+                                         measure = measureOrder,
+                                         variable.name = "variable",
+                                         value.name = "value"))
+    variableName <- "variable"
+  } else {
+    data <- data %>% dplyr::select(dplyr::all_of(varColumn), dplyr::all_of(column))
+    colnames(data) <- c("variable","value")
+    variableName <- varColumn
+  }
+  if (!identical(newNames,NA)){
+    if (!melted){
+      if (length(levels(data[,variableName])) == length(newNames)){
+        if (!identical(meltOrder, NA)){
+          newNames <- newNames[meltOrder]
+        }
+        levels(data[,variableName]) <- newNames
+      }
+    } else {
+      if (!is.factor(data$variable)){
+        data$variable <- as.factor(data$variable)
+      }
+      if (length(levels(data[,"variable"])) == length(newNames)){
+        levels(data[,"variable"]) <- newNames
+        if (!identical(meltOrder, NA)){
+          data$variable <- factor(as.character(data$variable),
+                                  levels = newNames[meltOrder])
+        }
+      }
+    }
+  }
+  else {
+    if (!identical(meltOrder, NA)){
+      data$variable <- factor(as.character(data$variable),
+                              levels = levels(as.factor(as.character(data$variable)))[meltOrder])
+    }
+  }
+  if (removeNA){
+    data <- data %>% stats::na.omit()
+  }
+  return(data)
+}
+
+#' Plots a histogram with percentages in stead of frequencies on the y-axis
+#'
+#' @param data data to be made into a histogram
+#' @param breaks see ?graphics::hist
+#' @param ylab label for y-axis, default is 'Percentage'
+#' @param ... further arguments to be passed onto the graphics::plot function
+#'
+#' @return a (base) plot
+#' @export
+histP <- function(data, breaks = "Sturges", ylab = "Percentage", ...){
+  his <- graphics::hist(data, breaks = breaks, plot = FALSE)
+  his$density <- (his$counts / sum(his$counts)) * 100
+  plot(his, freq = FALSE, ylab = ylab, ...)
+}
+
 #' creates a ggplot object showing a histogram
 #' 
 #' @param data the data tp be plotted, can be a numeric/character/etc vector or
@@ -7,7 +124,7 @@
 #'  Can be integer or character (column name(s))
 #' @param binwidth defines width of the 'bins' of the histogram, if NULL
 #'  (default), then it will be set automatically (with a warning). This setting
-#'  is ignored in case of statCount is set tp TRUE
+#'  is ignored in case statCount is set tp TRUE
 #' @param bins defines the number of 'bins' of the histogram, overriden by
 #'  binwidth
 #' @param statCount set to TRUE if the data is not numerical
@@ -17,6 +134,8 @@
 #'  to plotting. @note this has consquence that ROWS will be removed when using
 #'  multiple columns with data.frame's
 #' @param outlineColor defines the color of the line around the bars
+#' @param outlineWidth defines the width of the line around the bars
+#' @param outlineType defines the linetype of the line around the bars
 #' @param fillColor defines the color of the bars themselves. If a multi-column
 #'  data.frame is plotted, the same number as the number of columns used should
 #'  be used. If not the same number, then the graph will revert to default
@@ -43,7 +162,7 @@
 #'  standard deviation are used
 #' @param xDeviations defines how many deviations the range of the x-axis may
 #'  differ from the mean or median. Range will be either (median-xDeviations*mad
-#'  ,median+xDeviations**mad) or (mean - xDeviations*sd,mean + xDeviations*sd)
+#'  ,median+xDeviations*mad) or (mean - xDeviations*sd,mean + xDeviations*sd)
 #' @param showLegend defines if the legend is to be shown or not
 #' @param legend.position defines where a legend is to be placed
 #' @param vertical if TRUE, flips x- and y-axis
@@ -55,7 +174,9 @@
 statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
                      statCount = FALSE,
                      variableName = "variable", removeNA = TRUE,
-                     outlineColor = "white", fillColor = "red",
+                     outlineColor = "white", outlineWidth = 0.5,
+                     outlineType = "solid",
+                     fillColor = "red",
                      xLabel = ifelse(!is.Class(data,"data.frame"),
                                      NA,
                                      ifelse(is.character(column),
@@ -85,21 +206,25 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
     if (length(column) == 1){
       if (!statCount){
         if (removeNA){
-          g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes_string("x"))
+          g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x = !!dplyr::sym("x")))
         } else {
-          g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes_string("x"))
+          g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x = !!dplyr::sym("x")))
         }
         g <- g + ggplot2::geom_histogram(binwidth = binwidth, bins = bins,
-                                col = outlineColor,
+                                col = outlineColor, linewidth = outlineWidth,
+                                linetype = outlineType,
                                 fill = fillColor) + ggplot2::theme_classic()
       } else {
         if (removeNA){
-          g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes_string("x"))
+          g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x = !!dplyr::sym("x")))
         } else {
-          g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes_string("x"))
+          g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x = !!dplyr::sym("x")))
         }
         suppressWarnings(
-          g <- g + ggplot2::geom_histogram(col = outlineColor, fill = fillColor,
+          g <- g + ggplot2::geom_histogram(col = outlineColor,
+                                           linewidth = outlineWidth,
+                                           linetype = outlineType,
+                                           fill = fillColor,
                                   stat = 'count') + ggplot2::theme_classic())
       }
     } else {
@@ -109,13 +234,14 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
                                    variable.name = variableName,
                                    value.name = "value"))
         if (removeNA){
-          g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes_string("value"))
+          g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes(!!dplyr::sym("value")))
         } else {
-          g <- ggplot2::ggplot(data = data, ggplot2::aes_string("value"))
+          g <- ggplot2::ggplot(data = data, ggplot2::aes(!!dplyr::sym("value")))
         }
         g <- g + ggplot2::geom_histogram(binwidth = binwidth, bins = bins,
-                                col = outlineColor,
-                                ggplot2::aes_string(fill = variableName))
+                                col = outlineColor, linewidth = outlineWidth,
+                                linetype = outlineType,
+                                ggplot2::aes(fill = !!dplyr::sym(variableName)))
         if (length(fillColor) == length(column)){
           g <- g + ggplot2::scale_fill_manual(values = fillColor)
         }
@@ -126,12 +252,13 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
                                    variable.name = variableName,
                                    value.name = "value"))
         if (removeNA){
-          g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes_string("value"))
+          g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes(!!dplyr::sym("value")))
         } else {
-          g <- ggplot2::ggplot(data = data, ggplot2::aes_string("value"))
+          g <- ggplot2::ggplot(data = data, ggplot2::aes(!!dplyr::sym("value")))
         }
         g <- g + ggplot2::geom_histogram(binwidth = binwidth, col = outlineColor,
-                                ggplot2::aes_string(fill = variableName),
+                                         linetype = outlineType,
+                                ggplot2::aes(fill = variableName),
                                 stat = 'count')
         if (length(fillColor) == length(column)){
           g <- g + ggplot2::scale_fill_manual(values = fillColor)
@@ -142,21 +269,24 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
   } else {
     if (!statCount){
       if (removeNA){
-        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes_string("x"))
+        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x = !!dplyr::sym("x")))
       } else {
-        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes_string("x"))
+        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x = !!dplyr::sym("x")))
       }
       g <- g + ggplot2::geom_histogram(binwidth = binwidth, bins = bins,
-                              col = outlineColor,
+                              col = outlineColor, linewidth = outlineWidth,
+                              linetype = outlineType,
                               fill = fillColor) + ggplot2::theme_classic()
     } else {
       if (removeNA){
-        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes_string("x"))
+        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x = !!dplyr::sym("x")))
       } else {
-        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes_string("x"))
+        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x = !!dplyr::sym("x")))
       }
       suppressWarnings(
-        g <- g + ggplot2::geom_histogram(col = outlineColor, fill = fillColor,
+        g <- g + ggplot2::geom_histogram(col = outlineColor, linewidth = outlineWidth,
+                                         linetype = outlineType,
+                                         fill = fillColor,
                                 stat = 'count') + ggplot2::theme_classic()
       )
     }
@@ -198,6 +328,123 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
   return(g)
 }
 
+#' generates a ggplot object which shows several histograms in one plot
+#'
+#' @param data the data to be used, can be a numeric/character/etc vector or
+#'  data.frame like (or tibble etc). If it is data.frame or similar the column
+#'  argument defines which column is to be used
+#' @param column defines which columns are to be used. Can be integer or
+#'  character (column name), note that if both (character) column and yLabel
+#'  are defined, column is used as label for the Y-axis. If not defined, then
+#'  all columns of the data.frame will be used.
+#' @param melted boolean that defines whether the specified columns still need
+#'  to be melted into a single column for a graph. If melted = TRUE then
+#'  the argument "column" should be a single column!
+#' @param varColumn this boolean argument is only used in case melted = TRUE.
+#'  It specifies the column to be used as variable name column
+#' @param sampleSize allows to the use of a sample of the data to be used for
+#'  the boxplot. By default sampleSize = NA, in which case all data is used
+#' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
+#'  to plotting. @note this will remove warning messages and errors
+#' @param meltOrder numeric vector which allows to define the order in which
+#'  columns should be melted onto each other. Normally the order is the same as
+#'  the column order specifoed (default NA), but this parameter allows some
+#'  extra flexibility. Be aware that columns are first melted and then
+#'  newNames is applied (if not NA)
+#' @param newNames redefines the names of the different data columns. In
+#'  principle this could be done before this function is called, but using this
+#'  argument circumvents some issues with column names. Note that the length
+#'  of this argument (character vector) should be the same as the number of
+#'  columns, otherwise it will be ignored
+#' @param outlineColor defines the color of the line around the bars
+#' @param fillColor defines the color of the bars themselves. If a multi-column
+#'  data.frame is plotted, the same number as the number of columns used should
+#'  be used. If not the same number, then the graph will revert to default
+#'  colors of ggplot
+#' @param alpha alpha ('see through' value) of the histogram bars
+#' @param position defines the positioning of the histogram bars with regard to
+#'  each other. Options are 'identity','dodge' and 'stack'
+#' @param vertical defines wether the ggplot object's x- and y-axis should
+#'  be swapped (essentially a 90 degree rotation)
+#' @param xAxis defines if the x-axis is shown
+#' @param yAxis defines if the x-axis is shown
+#' @param yDefault this defines if default y-sxis limits should be used or not,
+#'  see also graphAdjust() for info
+#' @param yLimits  default = c(0,NA), together with yDefault, this can be
+#'  used to define the exact range of the y-axis
+#' @param xLabel sets x-axis title
+#' @param yLabel set y-axos title
+#' @param title sets title of graph, if NA then the titleDefault will be used
+#' @param legend.title sets title of the legend (default NA)
+#' @param showLegend defines if the legend is to be shown or not
+#' @param legend.position defines where a legend is to be placed
+#' @param ... can be used to pass on other arguments to graphAdjust()
+#'  (like xLimits, xExpand, etc)
+#'  
+#' @returns a ggplot object
+#' @export
+statHistMultiple <- function(data, column = 1:ncol(data),
+                             melted = FALSE, varColumn = NA,
+                             sampleSize = NA, removeNA = TRUE,
+                             meltOrder = NA,
+                             newNames = NA,
+                             outlineColor = "black", fillColor = NA,
+                             alpha = 1,
+                             position = "identity", # identity, dodge or stack
+                             vertical = FALSE,
+                             xAxis = TRUE, yAxis = TRUE,
+                             yDefault = TRUE, yLimits = c(0,NA),
+                             xLabel = "", yLabel = "",
+                             title ="",
+                             legend.title = NA,
+                             showLegend = TRUE, legend.position = "bottom",
+                             ...){
+  data <- statPrepareData(data = data, column = column,
+                          melted = melted, varColumn = varColumn,
+                          sampleSize = sampleSize, removeNA = removeNA,
+                          meltOrder = meltOrder, newNames = newNames)
+  if (identical(data, NA)){
+    return(NA)
+  }
+  variableName <- "variable"
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(x = !!dplyr::sym("value")))
+  g <- g + ggplot2::geom_histogram(na.rm = removeNA, col = outlineColor,
+                                   alpha = alpha,
+                                   position = position, stat = "bin",
+                                   ggplot2::aes(group = !!dplyr::sym("variable"), fill = !!dplyr::sym("variable")))
+  g <- graphsAdjust(list(g), vertical = vertical,
+                    xDefault = TRUE,
+                    yDefault = yDefault, yLimits = yLimits,
+                    xDiscrete = FALSE,
+                    xLabel = xLabel, yLabel = yLabel, titles = title,
+                    setTheme = theme_minimal_adapted(xAxis = xAxis,
+                                                     yAxis = yAxis,
+                                                     showLegend = showLegend,
+                                                     legend.position = legend.position),
+                    ...)[[1]]
+  
+  if (identical(legend.title,NA)){
+    if (!melted){
+      if (identical(fillColor, NA)){
+        return(g)
+      } else {
+        return(g + ggplot2::scale_fill_manual(values = fillColor))
+      }
+    } else {
+      if (!identical(fillColor, NA)){
+        return(g + ggplot2::scale_fill_manual(name = variableName, values = fillColor))
+      } else {
+        return(g + ggplot2::scale_fill_discrete(name = variableName))
+      }
+    }
+  } else {
+    if (!identical(fillColor, NA)){
+      return(g + ggplot2::scale_fill_manual(name = legend.title, values = fillColor))
+    } else {
+      return(g + ggplot2::scale_fill_discrete(name = legend.title))
+    }
+  }
+}
 
 #' creates a ggplot object showing a densityplot
 #' 
@@ -288,9 +535,9 @@ statDensity <- function(data, column = 1,
     data <- data[,column]
     if (length(column) == 1){
       if (removeNA){
-        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes_string("x"))
+        g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x = !!dplyr::sym("x")))
       } else {
-        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes_string("x"))
+        g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(x = !!dplyr::sym("x")))
       }
       g <- g + ggplot2::geom_density(col = outlineColor, fill = fillColor,
                             alpha = alpha) + ggplot2::theme_classic()
@@ -300,19 +547,19 @@ statDensity <- function(data, column = 1,
                                  variable.name = variableName,
                                  value.name = "value"))
       if (removeNA){
-        g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes_string("value"))
+        g <- ggplot2::ggplot(data = data %>% stats::na.omit(), ggplot2::aes(!!dplyr::sym("value")))
       } else {
-        g <- ggplot2::ggplot(data = data, ggplot2::aes_string("value"))
+        g <- ggplot2::ggplot(data = data, ggplot2::aes(!!dplyr::sym("value")))
       }
       g <- g + ggplot2::geom_density(col = outlineColor, alpha = alpha,
-                            ggplot2::aes_string(fill = variableName))
+                            ggplot2::aes(fill = variableName))
       if (length(fillColor) == length(column)){
         g <- g + ggplot2::scale_fill_manual(values = fillColor)
       }
       g <- g + ggplot2::theme_classic()
     }
   } else {
-    g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes_string("x")) +
+    g <- ggplot2::ggplot(data = data.frame(x = data) %>% stats::na.omit(), ggplot2::aes(x = !!dplyr::sym("x"))) +
       ggplot2::geom_density(col = outlineColor,
                    fill = fillColor, alpha = alpha) + ggplot2::theme_classic()
   }
@@ -354,6 +601,185 @@ statDensity <- function(data, column = 1,
   return(g)
 }
 
+#' generates a ggplot object which shows several density plots in one
+#'
+#' @param data the data to be used, can be a numeric/character/etc vector or
+#'  data.frame like (or tibble etc). If it is data.frame or similar the column
+#'  argument defines which column is to be used
+#' @param column defines which columns are to be used. Can be integer or
+#'  character (column name), note that if both (character) column and yLabel
+#'  are defined, column is used as label for the Y-axis. If not defined, then
+#'  all columns of the data.frame will be used.
+#' @param melted boolean that defines whether the specified columns still need
+#'  to be melted into a single column for a graph. If melted = TRUE then
+#'  the argument "column" should be a single column!
+#' @param varColumn this boolean argument is only used in case melted = TRUE.
+#'  It specifies the column to be used as variable name column
+#' @param sampleSize allows to the use of a sample of the data to be used for
+#'  the boxplot. By default sampleSize = NA, in which case all data is used
+#' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
+#'  to plotting. @note this will remove warning messages and errors
+#' @param meltOrder numeric vector which allows to define the order in which
+#'  columns should be melted onto each other. Normally the order is the same as
+#'  the column order specifoed (default NA), but this parameter allows some
+#'  extra flexibility. Be aware that columns are first melted and then
+#'  newNames is applied (if not NA)
+#' @param newNames redefines the names of the different data columns. In
+#'  principle this could be done before this function is called, but using this
+#'  argument circumvents some issues with column names. Note that the length
+#'  of this argument (character vector) should be the same as the number of
+#'  columns, otherwise it will be ignored
+#' @param outlineColor defines the color of the line around the bars
+#' @param fillColor defines the color of the bars themselves. If a multi-column
+#'  data.frame is plotted, the same number as the number of columns used should
+#'  be used. If not the same number, then the graph will revert to default
+#'  colors of ggplot
+#' @param alpha alpha ('see through' value) of the histogram bars
+#' @param position defines the positioning of the histogram bars with regard to
+#'  each other. Options are 'identity','dodge' and 'stack'
+#' @param vertical defines wether the ggplot object's x- and y-axis should
+#'  be swapped (essentially a 90 degree rotation)
+#' @param xAxis defines if the x-axis is shown
+#' @param yAxis defines if the x-axis is shown
+#' @param yDefault this defines if default y-sxis limits should be used or not,
+#'  see also graphAdjust() for info
+#' @param yLimits  default = c(0,NA), together with yDefault, this can be
+#'  used to define the exact range of the y-axis
+#' @param xLabel sets x-axis title
+#' @param yLabel set y-axos title
+#' @param title sets title of graph, if NA then the titleDefault will be used
+#' @param legend.title sets title of the legend (default NA)
+#' @param showLegend defines if the legend is to be shown or not
+#' @param legend.position defines where a legend is to be placed
+#' @param ... can be used to pass on other arguments to graphAdjust()
+#'  (like xLimits, xExpand, etc)
+#'  
+#' @returns a ggplot object
+#' @export
+statDensityMultiple <- function(data, column = 1:ncol(data),
+                                melted = FALSE, varColumn = NA,
+                                sampleSize = NA, removeNA = TRUE,
+                                meltOrder = NA,
+                                newNames = NA,
+                                outlineColor = "black", fillColor = NA,
+                                alpha = 1,
+                                position = "identity",
+                                vertical = FALSE,
+                                xAxis = TRUE, yAxis = TRUE,
+                                yDefault = TRUE, yLimits = c(0,NA),
+                                xLabel = "", yLabel = "",
+                                title ="",
+                                legend.title = NA,
+                                showLegend = TRUE, legend.position = "bottom",
+                                ...){
+  data <- statPrepareData(data = data, column = column,
+                          melted = melted, varColumn = varColumn,
+                          sampleSize = sampleSize, removeNA = removeNA,
+                          meltOrder = meltOrder, newNames = newNames)
+  if (identical(data, NA)){
+    return(NA)
+  }
+  variableName <- "variable"
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(x = !!dplyr::sym("value")))
+  g <- g + ggplot2::geom_density(na.rm = removeNA, col = outlineColor,
+                                 alpha = alpha,
+                                 position = position, stat = "bin",
+                                 ggplot2::aes(group = !!dplyr::sym("variable"),
+                                              fill = !!dplyr::sym("variable")))
+  g <- graphsAdjust(list(g), vertical = vertical,
+                    xDefault = TRUE,
+                    yDefault = yDefault, yLimits = yLimits,
+                    xDiscrete = FALSE,
+                    xLabel = xLabel, yLabel = yLabel, titles = title,
+                    setTheme = theme_minimal_adapted(xAxis = xAxis,
+                                                     yAxis = yAxis,
+                                                     showLegend = showLegend,
+                                                     legend.position = legend.position),
+                    ...)[[1]]
+  
+  if (identical(legend.title,NA)){
+    if (!melted){
+      if (identical(fillColor, NA)){
+        return(g)
+      } else {
+        return(g + ggplot2::scale_fill_manual(values = fillColor))
+      }
+    } else {
+      if (!identical(fillColor, NA)){
+        return(g + ggplot2::scale_fill_manual(name = variableName, values = fillColor))
+      } else {
+        return(g + ggplot2::scale_fill_discrete(name = variableName))
+      }
+    }
+  } else {
+    if (!identical(fillColor, NA)){
+      return(g + ggplot2::scale_fill_manual(name = legend.title, values = fillColor))
+    } else {
+      return(g + ggplot2::scale_fill_discrete(name = legend.title))
+    }
+  }
+}
+
+#' Takes a list of data.frame's and melts together the specified column from
+#'  each data.frame. The resulting data.frame can be used for ...multi
+#'  functions, eg statHistMultiple. Essentially this is a 'melt' function to
+#'  join together data from different data.frame's
+#'  
+#' @param data the data to be used, should be a list of data.frames
+#' @param column defines which column (must be a single one) from each of the
+#'  data.frame's is to be used to melt together.
+#' @param variableName character vector, name(s)/identifier(s) of the different
+#'  data.frame's. If length of this argument is 1, then it is used together with
+#'  useWidth and padChar arguments. The full names of the elements of the list
+#'  will then be eg norm001, norm002, etc. If length is same as the length of
+#'  the list (of data.frame's), then the character vectors will be used as names
+#'  without adding numbers
+#' @param useWidth 'width' of the number to use together with the variableName
+#'  argument, see also the function stringr::str_pad which is used in this
+#'  function
+#' @param padChar padding character to use together with useWidth and padChar
+#'  when using numbered identifiers, see also variableName and useWidth
+#'  arguments
+#' @param variableClass character vector: defines the class for the variable
+#'  column of the resulting data.frame. Options are "character" (default), "integer"
+#'  and "numeric"
+#' @param variableColumn character vector: defines the name of the variable
+#'  column of the resulting data.frame (identifier column for the list elements
+#'  from which the data was taken to melt together)
+#' @param valueColumn character vector: defines the name of the value column of
+#'  the resulting data.frame
+#'  
+#' @return a data.frame
+#' @export
+combineDFSingleColumn <- function(data, column = 1,
+                                  variableName, useWidth = 1, padChar = "0",
+                                  variableClass = "character",
+                                  variableColumn = "variable",
+                                  valueColumn = "value"){
+  if (length(variableName) < length(data)){
+    if (length(variableName) != 1){
+      stop("Length 'nameColumn' should be 1 or same as the length of 'data'")
+    } else {
+      variableName <- paste(variableName,
+                            stringr::str_pad(1:length(data),
+                                             width = useWidth,
+                                             pad = padChar),
+                            sep = "")
+    }
+  }
+  newdf <- data.frame()
+  for (counter in 1:length(data)){
+    newdf <- dplyr::bind_rows(newdf, data.frame(v1 = variableName[counter], v2 = data[[counter]][, column]))
+  }
+  newdf$v1 <- switch(variableClass,
+                     "integer" = as.integer(newdf$v1),
+                     "numeric" = as.numeric(newdf$v1),
+                     as.character(newdf$v1))
+  colnames(newdf) <- c(variableColumn, valueColumn)
+  return(newdf)
+}
+
+
 #' creates a ggplot object showing a violin plot
 #' 
 #' @param data the data to be plotted, can be a numeric/character/etc vector or
@@ -384,13 +810,6 @@ statDensity <- function(data, column = 1,
 #'  outline more 'jagged'
 #' @param quantiles draws lines at the specified quantiles, eg c(0.25,0.5,0.25).
 #'  If NULL, nothing is drawn
-#' @param jitter if NA, then the data points will not be shown (only outliers!),
-#'  otherwise it adds a random value to the x-values of the data points plotted.
-#'  Note: If set to 0 then they will be located on a straight line
-#' @param alpha alpha ('see through' value) of the data points
-#' @param size size of the data points
-#' @param shape shape of the datapoints (default = 16), see vignette
-#'  ggplot2::ggplot2-specs
 #' @param xAxis defines if the x-axis is shown
 #' @param yAxis defines if the x-axis is shown
 #' @param yLabel set y-axis title
@@ -417,7 +836,6 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
                                  scale = c("area","count","width")[1],
                                  trim = TRUE,
                                  bandwidth = 1, quantiles = NULL,
-                                 jitter = NA, alpha = 0.5, size = 3, shape = 16,
                                  xAxis = FALSE, yAxis = TRUE,
                                  yLabel = ifelse(!is.Class(data,"data.frame"),
                                                  NA,
@@ -432,7 +850,7 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
                                  xDefault = FALSE, xLimits = c(-0.75,0.75),
                                  yDefault = TRUE, yLimits = c(0,NA),
                                  ...){
-  # in not data.frame, then make into one
+  # if not data.frame, then make into one
   if (!is.Class(data, "data.frame")){
     data <- data.frame(y = data)
     if (is.character(column)){
@@ -456,17 +874,9 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
   g <- ggplot2::ggplot(data = data, ggplot2::aes(x = 0, y = !!dplyr::sym(whichColumn)))
   g <- g + ggplot2::geom_violin(na.rm = removeNA,
                        fill = fillColor, col = outlineColor,
-                       size = outlineSize, linetype = outlineType,
+                       linewidth = outlineSize, linetype = outlineType,
                        alpha = violinAlpha, scale = scale, trim = trim,
                        adjust = bandwidth, draw_quantiles = quantiles)
-  # g <- g + stat_boxplot(geom = "errorbar", width = whiskerWidth,
-  #                       na.rm = removeNA)
-  if (!identical(jitter,NA)){
-    g <- g + ggplot2::geom_jitter(ggplot2::aes(x = 0, y = !!dplyr::sym(whichColumn)), na.rm = removeNA,
-                         position = ggplot2::position_jitter(jitter),
-                         fill = fillColor, col = outlineColor, alpha = alpha,
-                         size = size, shape = shape)
-  }
   g <- graphsAdjust(list(g), vertical = vertical,
                     xDefault = xDefault, xLimits = xLimits,
                     yDefault = yDefault, yLimits = yLimits,
@@ -475,7 +885,7 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
   return(g)
 }
 
-#' creates a ggplot object showing a violin plot of multiple columns
+#' creates a ggplot object showing a violin plots of multiple columns
 #' 
 #' @param data the data to be plotted, can be a numeric/character/etc vector or
 #'  data.frame like (or tibble etc). If it is data.frame or similar the column
@@ -484,10 +894,25 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #'  Can be integer or character (column name), note that if both (character)
 #'  column and yLabel are defined, column is used as label for the Y-axis. If
 #'  not defined, then all columns of the data.frame will be used.
+#' @param melted boolean that defines whether the specified columns still need
+#'  to be melted into a single column for a graph. If melted = TRUE then
+#'  the argument "column" should be a single column!
+#' @param varColumn this boolean argument is only used in case melted = TRUE.
+#'  It specifies the column to be used as variable name column
+#' @param sampleSize allows to the use of a sample of the data to be used for
+#'  the boxplot. By default sampleSize = NA, in which case all data is used
 #' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
 #'  to plotting. @note this will remove warning messages and errors
-#' @param variableName sets the 'combined' name of the columns (IF there is more
-#'  than one!)
+#' @param meltOrder numeric vector which allows to define the order in which
+#'  columns should be melted onto each other. Normally the order is the same as
+#'  the column order specifoed (default NA), but this parameter allows some
+#'  extra flexibility. Be aware that columns are first melted and then
+#'  newNames is applied (if not NA)
+#' @param newNames redefines the names of the different data columns. In
+#'  principle this could be done before this function is called, but using this
+#'  argument circumvents some issues with column names. Note that the length
+#'  of this argument (character vector) should be the same as the number of
+#'  columns, otherwise it will be ignored
 #' @param sampleSize allows to the use of a sample of the data to be used for
 #'  the boxplot. By default sampleSize = NA, in which case all data is used
 #' @param outlineColor defines the color of the line around the 'violin'
@@ -510,20 +935,13 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #'  outline more 'jagged'
 #' @param quantiles draws lines at the specified quantiles, eg c(0.25,0.5,0.25).
 #'  If NULL, nothing is drawn
-#' @param jitter if NA, then the data points will not be shown (only outliers!),
-#'  otherwise it adds a random value to the x-values of the data points plotted.
-#'  Note: If set to 0 then they will be located on a straight line
-#' @param alpha alpha ('see through' value) of the data points
-#' @param size size of the data points
-#' @param shape shape of the datapoints (default = 16), see vignette
-#'  ggplot2::ggplot2-specs
-#' @param jitterFill fill color of the data points
 #' @param xAxis defines if the x-axis is shown
 #' @param yAxis defines if the x-axis is shown
 #' @param xLabel set x-axis title
 #' @param yLabel set y-axis title
 #' @param title sets title of graph
 #' @param showLegend defines if the legend is to be shown or not
+#' @param legend.title if not NA, then to give a non-default name to the legend
 #' @param legend.position defines where a legend is to be placed
 #' @param vertical if TRUE, flips x- and y-axis
 #' @param yDefault default is set to TRUE, together with yLimits, this can be
@@ -536,64 +954,69 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #' @returns a ggplot object
 #' @export
 statViolinPlotMultiple <- function(data, column = 1:ncol(data),
+                                   melted = FALSE, varColumn = NA,
                                    sampleSize = NA, removeNA = TRUE,
-                                   variableName = "variable",
+                                   meltOrder = NA,
+                                   newNames = NA,
                                    outlineColor = "black", fillColor = NA,
-                                   outlineSize = 0.5, outlineType = "solid",
-                                   violinAlpha = 1,
-                                   scale = c("area","count","width")[1],
-                                   trim = TRUE,
-                                   bandwidth = 1, quantiles = NULL,
-                                   jitter = 0.05, alpha = 0.5, size = 3,
-                                   shape = 16, jitterFill = "black",
+                                   outlineSize = 0.5, outlineType = "solid", violinAlpha = 1, 
+                                   scale = c("area", "count", "width")[1], trim = TRUE, bandwidth = 1, 
+                                   quantiles = NULL,
                                    vertical = FALSE,
                                    xAxis = TRUE, yAxis = TRUE,
                                    yDefault = TRUE, yLimits = c(0,NA),
                                    xLabel = "", yLabel = "",
                                    title ="",
+                                   legend.title = NA,
                                    showLegend = TRUE, legend.position = "bottom",
                                    ...){
-  if (length(column) <= 1){
+  data <- statPrepareData(data = data, column = column,
+                          melted = melted, varColumn = varColumn,
+                          sampleSize = sampleSize, removeNA = removeNA,
+                          meltOrder = meltOrder, newNames = newNames)
+  if (identical(data, NA)){
     return(NA)
   }
-  if (!is.na(sampleSize)){
-    data <- data[sample(1:nrow(data), sampleSize, replace = FALSE), column]
-  } else {
-    data <- data[,column]
-  }
-  data <- as.data.frame(reshape2::melt(data.table::as.data.table(data),
-                             measure = 1:length(column),
-                             variable.name = variableName,
-                             value.name = "value"))
-  if (removeNA){
-    data <- data %>% stats::na.omit()
-  }
-  g <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = variableName, y = "value"))
+  variableName <- "variable"
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(x = !!dplyr::sym("variable"), y = !!dplyr::sym("value")))
   g <- g + ggplot2::geom_violin(na.rm = removeNA, col = outlineColor, 
-                       ggplot2::aes_string(group = variableName,
-                                  fill = variableName),
-                       size = outlineSize, linetype = outlineType,
-                       alpha = violinAlpha, scale = scale, trim = trim,
-                       adjust = bandwidth, draw_quantiles = quantiles)
-  if (!is.na(jitter)){
-    g <- g + ggplot2::geom_jitter(ggplot2::aes_string(x = variableName, y = "value"),
-                         position = ggplot2::position_jitter(jitter),
-                         fill = jitterFill, col = outlineColor,
-                         alpha = alpha, size = size, shape = shape)
-  }
-  if (length(fillColor) == length(column)){
-    g <- g + ggplot2::scale_fill_manual(values = fillColor)
-  }
+                                ggplot2::aes(group = !!dplyr::sym("variable"),
+                                             fill = !!dplyr::sym("variable")),
+                                linewidth = outlineSize, linetype = outlineType,
+                                alpha = violinAlpha, scale = scale, trim = trim,
+                                adjust = bandwidth, draw_quantiles = quantiles)
   g <- graphsAdjust(list(g), vertical = vertical,
                     xDefault = TRUE,
                     yDefault = yDefault, yLimits = yLimits,
+                    xDiscrete = TRUE,
                     xLabel = xLabel, yLabel = yLabel, titles = title,
                     setTheme = theme_minimal_adapted(xAxis = xAxis,
                                                      yAxis = yAxis,
                                                      showLegend = showLegend,
                                                      legend.position = legend.position),
                     ...)[[1]]
-  return(g)
+  
+  if (identical(legend.title,NA)){
+    if (!melted){
+      if (identical(fillColor, NA)){
+        return(g)
+      } else {
+        return(g + ggplot2::scale_fill_manual(values = fillColor))
+      }
+    } else {
+      if (!identical(fillColor, NA)){
+        return(g + ggplot2::scale_fill_manual(name = variableName, values = fillColor))
+      } else {
+        return(g + ggplot2::scale_fill_discrete(name = variableName))
+      }
+    }
+  } else {
+    if (!identical(fillColor, NA)){
+      return(g + ggplot2::scale_fill_manual(name = legend.title, values = fillColor))
+    } else {
+      return(g + ggplot2::scale_fill_discrete(name = legend.title))
+    }
+  }
 }
 
 #' creates a ggplot object showing a boxplot
@@ -726,15 +1149,15 @@ statBoxPlotSingle <- function(data, column = 1, removeNA = TRUE,
 
 #' creates a ggplot object showing a boxplot of multiple columns
 #' 
-#' @param data the data to be plotted, can be a numeric/character/etc vector or
+#' @param data the data to be used, can be a numeric/character/etc vector or
 #'  data.frame like (or tibble etc). If it is data.frame or similar the column
 #'  argument defines which column is to be used
-#' @param column defines which columns are to be used for the boxplot.
-#'  Can be integer or character (column name), note that if both (character)
-#'  column and yLabel are defined, column is used as label for the Y-axis. If
-#'  not defined, then all columns of the data.frame will be used.
+#' @param column defines which columns are to be used. Can be integer or
+#'  character (column name), note that if both (character) column and yLabel
+#'  are defined, column is used as label for the Y-axis. If not defined, then
+#'  all columns of the data.frame will be used.
 #' @param melted boolean that defines whether the specified columns still need
-#'  to be melted into a single column for the graph. If melted = TRUE then
+#'  to be melted into a single column for a graph. If melted = TRUE then
 #'  the argument "column" should be a single column!
 #' @param varColumn this boolean argument is only used in case melted = TRUE.
 #'  It specifies the column to be used as variable name column
@@ -742,8 +1165,11 @@ statBoxPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #'  the boxplot. By default sampleSize = NA, in which case all data is used
 #' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
 #'  to plotting. @note this will remove warning messages and errors
-#' @param variableName sets the 'combined' name of the columns, 
-#'  must be a single word
+#' @param meltOrder numeric vector which allows to define the order in which
+#'  columns should be melted onto each other. Normally the order is the same as
+#'  the column order specifoed (default NA), but this parameter allows some
+#'  extra flexibility. Be aware that columns are first melted and then
+#'  newNames is applied (if not NA)
 #' @param newNames redefines the names of the different data columns. In
 #'  principle this could be done before this function is called, but using this
 #'  argument circumvents some issues with column names. Note that the length
@@ -767,7 +1193,6 @@ statBoxPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #' @param yAxis defines if the x-axis is shown
 #' @param xLabel set x-axis title
 #' @param yLabel set y-axis title
-#' @param xDiscrete defines if x-axis should be/is discrete
 #' @param title sets title of graph
 #' @param yDefault default is set to TRUE, together with yLimits, this can be
 #'  used to define the exact range of the Y-axis
@@ -796,7 +1221,7 @@ statBoxPlotSingle <- function(data, column = 1, removeNA = TRUE,
 statBoxPlotMultiple <- function(data, column = 1:ncol(data),
                                 melted = FALSE, varColumn = NA,
                                 sampleSize = NA, removeNA = TRUE,
-                                variableName = "variable",
+                                meltOrder = NA,
                                 newNames = NA,
                                 outlineColor = "black", fillColor = NA,
                                 jitter = 0.05, alpha = 0.5, size = 3,
@@ -806,7 +1231,6 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
                                 xAxis = TRUE, yAxis = TRUE,
                                 yDefault = TRUE, yLimits = c(0,NA),
                                 xLabel = "", yLabel = "",
-                                xDiscrete = TRUE,
                                 title ="",
                                 showMean = TRUE, meanShape = 23,
                                 meanColor = "black", meanFill = "orange",
@@ -814,94 +1238,76 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
                                 legend.title = NA,
                                 showLegend = TRUE, legend.position = "bottom",
                                 ...){
-  if ((length(column) <= 1) & !((length(column) == 1) & melted & !is.na(varColumn))){
+  data <- statPrepareData(data = data, column = column,
+                          melted = melted, varColumn = varColumn,
+                          sampleSize = sampleSize, removeNA = removeNA,
+                          meltOrder = meltOrder, newNames = newNames)
+  if (identical(data, NA)){
     return(NA)
   }
-  if (!is.character(column)){
-    column = colnames(data)[column]
-  }
-  if (melted){
-    if (!is.character(varColumn)){
-      varColumn = colnames(data)[varColumn]
-    }
-  }
-  if (!melted){
-    if (!is.na(sampleSize)){
-      data <- data[sample(1:nrow(data), sampleSize, replace = FALSE), column]
-    } else {
-      data <- data[,column]
-    }
-    data <- as.data.frame(reshape2::melt(data.table::as.data.table(data),
-                               measure = 1:length(column),
-                               variable.name = variableName,
-                               value.name = "value"))
-  } else {
-    data <- data %>% dplyr::select(dplyr::all_of(varColumn), dplyr::all_of(column))
-    colnames(data) <- c(variableName,"value")
-  }
-  if (!identical(newNames,NA)){
-    if (length(levels(data[,variableName])) == length(newNames)){
-      levels(data[,variableName]) <- newNames
-    }
-  }
-  if (removeNA){
-    data <- data %>% stats::na.omit()
-  }
-  g <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = variableName, y = "value"))
+  variableName <- "variable"
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(x = !!dplyr::sym("variable"), y = !!dplyr::sym("value")))
   if (!is.na(jitter)){
     g <- g + ggplot2::geom_boxplot(na.rm = removeNA, col = outlineColor, 
                           outlier.shape = NA,
-                          width = boxWidth, ggplot2::aes_string(group = variableName,
-                                                       fill = variableName))
-    g <- g + ggplot2::stat_boxplot(geom = "errorbar", width = whiskerWidth, ggplot2::aes_string(group = variableName))
-    g <- g + ggplot2::geom_jitter(ggplot2::aes_string(x = variableName, y = "value"),
+                          width = boxWidth, ggplot2::aes(group = !!dplyr::sym("variable"),
+                                                         fill = !!dplyr::sym("variable")))
+    g <- g + ggplot2::stat_boxplot(geom = "errorbar", width = whiskerWidth,
+                                   ggplot2::aes(group = !!dplyr::sym("variable")))
+    g <- g + ggplot2::geom_jitter(ggplot2::aes(x = !!dplyr::sym("variable"), y = !!dplyr::sym("value")),
                          position = ggplot2::position_jitter(jitter),
                          fill = jitterFill, col = outlineColor, alpha = alpha, size = size, shape = shape)
   } else {
     g <- g + ggplot2::geom_boxplot(na.rm = removeNA, col = outlineColor, 
-                          width = boxWidth, ggplot2::aes_string(group = variableName,
-                                                       fill = variableName),
+                          width = boxWidth, ggplot2::aes(group = !!dplyr::sym("variable"),
+                                                       fill = !!dplyr::sym("variable")),
                           outlier.color = outlineColor, outlier.fill = jitterFill, outlier.alpha = alpha,
                           outlier.shape = shape, outlier.size = size)
-    g <- g + ggplot2::stat_boxplot(geom = "errorbar", width = whiskerWidth, ggplot2::aes_string(group = variableName))
+    g <- g + ggplot2::stat_boxplot(geom = "errorbar", width = whiskerWidth,
+                                   ggplot2::aes(group = !!dplyr::sym("variable")))
   }
   if (showMean){
     value = NULL  # for work around purposes only
     means <- data %>%
-      dplyr::group_by(!!dplyr::sym(variableName)) %>%
+      dplyr::group_by(!!dplyr::sym("variable")) %>%
       dplyr::summarize(theMean = mean(value, na.rm = removeNA))
-    g <- g + ggplot2::geom_jitter(data = means, ggplot2::aes_string(x = variableName, y = "theMean"),
+    g <- g + ggplot2::geom_jitter(data = means, ggplot2::aes(x = !!dplyr::sym("variable"), y = !!dplyr::sym("theMean")),
                          shape = meanShape, size = meanSize, col = meanColor, fill = meanFill,
                          width = 0, height = 0)
-  }
-  if (!identical(fillColor,NA)){
-    if (!melted){
-      if (length(fillColor) == length(column)){
-        g <- g + ggplot2::scale_fill_manual(values = fillColor)
-      }
-    } else {
-      if (length(fillColor) == length(levels(factor(data$variable)))){
-        g <- g + ggplot2::scale_fill_manual(values = fillColor)
-      }
-    }
   }
   g <- graphsAdjust(list(g), vertical = vertical,
                     xDefault = TRUE,
                     yDefault = yDefault, yLimits = yLimits,
-                    xDiscrete = xDiscrete,
+                    xDiscrete = TRUE,
                     xLabel = xLabel, yLabel = yLabel, titles = title,
                     setTheme = theme_minimal_adapted(xAxis = xAxis,
                                                      yAxis = yAxis,
                                                      showLegend = showLegend,
                                                      legend.position = legend.position),
                     ...)[[1]]
+  
   if (identical(legend.title,NA)){
-    return(g)
+    if (!melted){
+      if (identical(fillColor, NA)){
+        return(g)
+      } else {
+        return(g + ggplot2::scale_fill_manual(values = fillColor))
+      }
+    } else {
+      if (!identical(fillColor, NA)){
+        return(g + ggplot2::scale_fill_manual(name = variableName, values = fillColor))
+      } else {
+        return(g + ggplot2::scale_fill_discrete(name = variableName))
+      }
+    }
   } else {
-    return(g + ggplot2::scale_fill_discrete(name = legend.title))
+    if (!identical(fillColor, NA)){
+      return(g + ggplot2::scale_fill_manual(name = legend.title, values = fillColor))
+    } else {
+      return(g + ggplot2::scale_fill_discrete(name = legend.title))
+    }
   }
 }
-
 
 #' creates a ggplot object showing a boxplot of a single column, split (cut)
 #'  along another column (or itself)
@@ -923,8 +1329,7 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
 #'  ignored if the varColumn is not numerical
 #' @param varLabels specfies labels to use when splitting the varColumn,
 #'  see ?base::cut (labels argument).
-#' @param forceLabels with this boolean the labels specified by the argument
-#'  varLabels can be enforced onto the x-axis if needed
+#'  
 #' @param varIncludeLowest specfies the include.lowest argument of base::cut,
 #'  see ?base::cut
 #' @param varRight specfies the right argument of base::cut, see ?base::cut
@@ -952,7 +1357,6 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
 #' @param yAxis defines if the x-axis is shown
 #' @param xLabel set x-axis title
 #' @param yLabel set y-axis title
-#' @param xDiscrete defines if x-axis should be/is discrete
 #' @param title sets title of graph
 #' @param yDefault default is set to TRUE, together with yLimits, this can be
 #'  used to define the exact range of the Y-axis
@@ -966,6 +1370,7 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
 #' @param meanSize size of the mean symbol
 #' @param showLegend defines if the legend is to be shown or not
 #' @param legend.position defines where a legend is to be placed
+#' @param legend.title if not NA, then to give a non-default name to the legend
 #' @param returnData if TRUE then a list with 2 elements is returned. The first
 #'  element is the data.frame used to generate the graph and the second element
 #'  is the graph itself
@@ -982,7 +1387,7 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
 #' @export
 statBoxPlotMultipleVar <- function(data, column = 1,
                                    varColumn = 2, varBreaks = 4,
-                                   varLabels = NA, forceLabels = FALSE,
+                                   varLabels = NA,
                                    varIncludeLowest = FALSE, varRight = TRUE, 
                                    sampleSize = NA, removeNA = TRUE,
                                    variableName = "variable",
@@ -994,12 +1399,12 @@ statBoxPlotMultipleVar <- function(data, column = 1,
                                    xAxis = TRUE, yAxis = TRUE,
                                    yDefault = TRUE, yLimits = c(0,NA),
                                    xLabel = "", yLabel = "",
-                                   xDiscrete = TRUE,
                                    title ="",
                                    showMean = TRUE, meanShape = 23,
                                    meanColor = "black", meanFill = "orange",
                                    meanSize = 5,
                                    showLegend = TRUE, legend.position = "bottom",
+                                   legend.title = "cut",
                                    returnData = FALSE,
                                    ...){
   if (length(column) > 1){
@@ -1034,7 +1439,7 @@ statBoxPlotMultipleVar <- function(data, column = 1,
   isVarNumeric <- (is.Class(data[whichVarColumn][,1],"numeric") |
                      is.Class(data[whichVarColumn][,1],"integer"))
   if (isVarNumeric){
-    data$cut <- cut(data[whichVarColumn][,1],
+    data$cutt <- cut(data[whichVarColumn][,1],
                     breaks = varBreaks,
                     labels = varLabels,
                     include.lowest = varIncludeLowest,
@@ -1050,7 +1455,7 @@ statBoxPlotMultipleVar <- function(data, column = 1,
     }
   } else {
     if (isVarNumeric){
-      data <- data %>% dplyr::select(dplyr::all_of(whichColumn), dplyr::all_of(varColumn),dplyr::all_of("cut"))
+      data <- data %>% dplyr::select(dplyr::all_of(whichColumn), dplyr::all_of(varColumn),dplyr::all_of("cutt"))
     } else {
       data <- data %>% dplyr::select(dplyr::all_of(whichColumn), dplyr::all_of(varColumn))
     }
@@ -1058,82 +1463,100 @@ statBoxPlotMultipleVar <- function(data, column = 1,
   if (removeNA){
     data <- data %>% stats::na.omit()
   }
-  g <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = ifelse(isVarNumeric,
-                                                 "cut",
-                                                 varColumn),
-                                      y = whichColumn))
+  g <- ifelseProper(isVarNumeric,
+                    ggplot2::ggplot(data = data, ggplot2::aes(x = !!dplyr::sym("cutt"),
+                                                              y = !!dplyr::sym(whichColumn))),
+                    ggplot2::ggplot(data = data, ggplot2::aes(x = varColumn,
+                                                              y = !!dplyr::sym(whichColumn)))
+                    )
   if (identical(fillColor,NA)){
     if (isVarNumeric){
       g <- g + ggplot2::geom_boxplot(na.rm = removeNA, outlier.shape = NA,
                             col = outlineColor,
-                            ggplot2::aes(fill = cut),
+                            ggplot2::aes(fill = !!dplyr::sym("cutt")),
                             width = boxWidth)
     } else {
       g <- g + ggplot2::geom_boxplot(na.rm = removeNA, outlier.shape = NA,
                             col = outlineColor,
-                            ggplot2::aes_string(fill = varColumn),
+                            ggplot2::aes(fill = varColumn),
                             width = boxWidth)
     }
   } else {
     if (isVarNumeric){
       g <- g + ggplot2::geom_boxplot(na.rm = removeNA, outlier.shape = NA,
                             col = outlineColor,
-                            ggplot2::aes(fill = cut),
+                            ggplot2::aes(fill = !!dplyr::sym("cutt")),
                             width = boxWidth)
     } else {
       g <- g + ggplot2::geom_boxplot(na.rm = removeNA, outlier.shape = NA,
                             col = outlineColor,
-                            ggplot2::aes_string(fill = varColumn),
+                            ggplot2::aes(fill = varColumn),
                             width = boxWidth)
     }
   }
   g <- g + ggplot2::stat_boxplot(geom = "errorbar", width = whiskerWidth,
                         na.rm = removeNA)
   if (!is.na(jitter)){
-    g <- g + ggplot2::geom_jitter(ggplot2::aes_string(x = ifelse(isVarNumeric,
-                                               "cut",
-                                               varColumn),
-                                    y = whichColumn), na.rm = removeNA,
-                         position = ggplot2::position_jitter(jitter), 
-                         fill = jitterFill, col = outlineColor, alpha = alpha,
-                         size = size, shape = shape)
+    g <- g + ifelseProper(isVarNumeric,
+                          ggplot2::geom_jitter(ggplot2::aes(x = !!dplyr::sym("cutt"),
+                                                            y = !!dplyr::sym(whichColumn)), na.rm = removeNA,
+                                               position = ggplot2::position_jitter(jitter), 
+                                               fill = jitterFill, col = outlineColor, alpha = alpha,
+                                               size = size, shape = shape),
+                          ggplot2::geom_jitter(ggplot2::aes(x = varColumn,
+                                                            y = !!dplyr::sym(whichColumn)), na.rm = removeNA,
+                                               position = ggplot2::position_jitter(jitter), 
+                                               fill = jitterFill, col = outlineColor, alpha = alpha,
+                                               size = size, shape = shape)
+                        )
   }
   if (showMean){
     means <- data %>%
-      dplyr::group_by(dplyr::across(dplyr::all_of(ifelse(isVarNumeric,
-                                    "cut",
+      dplyr::group_by(dplyr::across(dplyr::all_of(ifelseProper(isVarNumeric,
+                                    "cutt",
                                     varColumn)))) %>%
       dplyr::summarize(theMean = mean(!!dplyr::sym(whichColumn), na.rm = removeNA))
-    g <- g + ggplot2::geom_jitter(data = means, ggplot2::aes_string(x = ifelse(isVarNumeric,
-                                                             "cut",
-                                                             varColumn),
-                                                  y = "theMean"),
-                         shape = meanShape, size = meanSize,
-                         col = meanColor, fill = meanFill,
-                         width = 0, height = 0)
-  }
-  if (!identical(fillColor,NA)){
-    if (length(varBreaks) == 1){
-      if (length(fillColor) == varBreaks){
-        g <- g + ggplot2::scale_fill_manual(values = fillColor)
-      }
-    } else {
-      g <- g + ggplot2::scale_fill_manual(values = fillColor)
-    }
+    g <- g + ifelseProper(isVarNumeric,
+                          ggplot2::geom_jitter(data = means, ggplot2::aes(x = !!dplyr::sym("cutt"),
+                                                                          y = !!dplyr::sym("theMean")),
+                                               shape = meanShape, size = meanSize,
+                                               col = meanColor, fill = meanFill,
+                                               width = 0, height = 0),
+                          ggplot2::geom_jitter(data = means, ggplot2::aes(x =!!dplyr::sym(varColumn),
+                                                                          y = !!dplyr::sym("theMean")),
+                                               shape = meanShape, size = meanSize,
+                                               col = meanColor, fill = meanFill,
+                                               width = 0, height = 0)) 
   }
   g <- graphsAdjust(list(g), vertical = vertical,
                     xDefault = TRUE,
                     yDefault = yDefault, yLimits = yLimits,
-                    xDiscrete = xDiscrete,
+                    xDiscrete = TRUE,
                     xLabel = xLabel, yLabel = yLabel, titles = title,
                     setTheme = theme_minimal_adapted(xAxis = xAxis,
                                                      yAxis = yAxis,
                                                      showLegend = showLegend,
                                                      legend.position = legend.position, ...),
                     ...)[[1]]
-  if (!identical(varLabels, NA)){
-    if (forceLabels){
-      g <- g + ggplot2::scale_x_discrete(limits = varLabels)
+  if (identical(legend.title,NA)){
+    if (!identical(fillColor, NA)){
+      if (length(fillColor) == length(varBreaks)){
+        g <- g + ggplot2::scale_fill_manual(name = variableName, values = fillColor)
+      } else {
+        g <- g + ggplot2::scale_fill_manual(name = variableName)
+      }
+    } else {
+      g <- g + ggplot2::scale_fill_discrete(name = variableName)
+    }
+  } else {
+    if (!identical(fillColor, NA)){
+      if (length(fillColor) == length(varBreaks)){
+        g <- g + ggplot2::scale_fill_manual(name = legend.title, values = fillColor)
+      } else {
+        g <- g + ggplot2::scale_fill_discrete(name = legend.title)
+      }
+    } else {
+      g <- g + ggplot2::scale_fill_discrete(name = legend.title)
     }
   }
   if (returnData){
@@ -1143,168 +1566,6 @@ statBoxPlotMultipleVar <- function(data, column = 1,
     return(tempList)
   } else {
     return(g)
-  }
-}
-
-#' takes a lists of data.frame's and generates a boxplot using data from the
-#'  different data.frame's in the list as elements in the boxplot
-#'  
-#' @param data the data to be plotted. Must be a list of data.frame's with each
-#'  at least the same idColumn & varColumn present
-#' @param idColumn defines which column is to be used for x-axis of the boxplot.
-#'  Can be integer or character (column name)
-#' @param varColumn defines which column is to be used for the y-axis of the
-#'  boxplot
-#' @param sortIDs if TRUE then data in the idColumn will be sorted
-#' @param sortDescending if TRUE then the data will be sorted in a descending
-#' @param sampleSize allows to the use of a sample of the data to be used for
-#'  the boxplot. By default sampleSize = NA, in which case all data is used
-#' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
-#'  to plotting. @note this will remove warning messages and errors
-#' @param variableName sets the 'combined' name of the columns, 
-#'  must be a single word
-#' @param valueName sets the name of the 'y'-values, must be a single word
-#' @param outlineColor defines the color of the line around the box
-#' @param fillColor defines the color of the boxes themselves. Note: if the 
-#'  number of colors does not match the number of columns then ggplot2 default
-#'  colors will be used
-#' @param jitter if NA, then the data points will not be shown (only outliers!),
-#'  otherwise it adds a random value to the x-values of the data points plotted.
-#'  Note: If set to 0 then they will be located on a straight line
-#' @param alpha alpha ('see through' value) of the data (jitter) points
-#' @param size size of the data (jitter) points
-#' @param shape shape of the data (default = 16), see vignette
-#'  ggplot2::ggplot2-specs
-#' @param jitterFill defines color of the jitter (single color!)
-#' @param whiskerWidth defines the width of the whiskers (0-1)
-#' @param boxWidth defines the width of the box (0-1)
-#' @param xAxis defines if the x-axis is shown
-#' @param yAxis defines if the x-axis is shown
-#' @param xLabel set x-axis title
-#' @param yLabel set y-axis title
-#' @param xDiscrete defines if x-axis should be/is discrete
-#' @param title sets title of graph
-#' @param yDefault default is set to TRUE, together with yLimits, this can be
-#'  used to define the exact range of the Y-axis
-#' @param yLimits  default = c(0,NA), together with yLimits, this can be
-#'  used to define the exact range of the Y-axis
-#' @param vertical if TRUE, flips x- and y-axis
-#' @param showMean defines if the mean value of the data should be shown
-#' @param meanShape shape of the mean symbol (default = 23)
-#' @param meanColor color of the line around the mean symbol
-#' @param meanFill fill color of the shape of the mean symbol
-#' @param meanSize size of the mean symbol
-#' @param returnData if TRUE then a list with 2 elements is returned. The first
-#'  element is the data.frame used to generate the graph and the second element
-#'  is the graph itself
-#' @param ... can be used to pass on other arguments to graphAdjust()
-#'  (like xLimits, xExpand, etc)
-#'
-#' @note the data in the idColumns & varColumns are essentially x,y paurs, this
-#'  function combines all the x's from the different data.frame's in the list
-#'  and then makes a boxplot. Example code:
-#'  l <- list()
-#'  l[[1]] <- data.frame(name = c("P1","P2","P3","P4"), value = c(1,2,3,2))
-#'  l[[2]] <- data.frame(name = c("P1","P2","P3","P4"), value = c(4,5,10,5.5))
-#'  l[[3]] <- data.frame(name = c("P1","P2","P3","P4"), value = c(10,2,23,5))
-#'  l[[4]] <- data.frame(name = c("P1","P2","P4"), value = c(10,2,6.7))
-#'  statBoxPlotMultiTable(l, idColumn = "name",
-#'                         varColumn = "value", returnData = T)
-#'
-#' @note box itself:
-#'  bottom = 25% quantile, top = 75% quantile, middle = 50% quantile (median),
-#'  lower whisker = 25% quantile + 1.5*IQR,
-#'  upper whisker= 75% quantile + 1.5*IQR 
-#'  IQR = (75% quantile) - (25% quantile) (Inter Quantile Range)
-#' 
-#' @returns a ggplot object or a list
-#' @export
-statBoxPlotMultiTable <- function(data, idColumn = 1, varColumn = 2,  
-                                  sortIDs = FALSE, sortDescending = FALSE,
-                                  sampleSize = NA, removeNA = FALSE,
-                                  variableName = "variable",
-                                  valueName = "value",
-                                  outlineColor = "black", fillColor = "red",
-                                  jitter = 0.05, alpha = 0.5, size = 3,
-                                  shape = 16, jitterFill = "black",
-                                  whiskerWidth = 0.5, boxWidth = 0.5,
-                                  vertical = FALSE,
-                                  xAxis = TRUE, yAxis = TRUE,
-                                  xDiscrete = TRUE,
-                                  yDefault = TRUE, yLimits = c(0,NA),
-                                  xLabel = "", yLabel = "",
-                                  title ="",
-                                  showMean = TRUE, meanShape = 23,
-                                  meanColor = "black", meanFill = "orange",
-                                  meanSize = 5,
-                                  returnData = FALSE,
-                                  ...){
-  if (!is.character(idColumn)){
-    idColumn = colnames(data[[1]])[idColumn]
-  }
-  if (!is.na(sampleSize)){
-    data <- lapply(data, function(x){
-      x <- x[sample(1:nrow(data[x]), sampleSize, replace = FALSE),]
-    })
-  }
-  data <- lapply(data, function(x){
-    dplyr::bind_cols(x %>% dplyr::select(dplyr::all_of(idColumn)),
-              x %>% dplyr::select(-dplyr::all_of(idColumn)) %>%    # cannot export where() normally from tidyselect 
-                dplyr::mutate(dplyr::across(tidyselect::vars_select_helpers$where(is.character),~as.numeric(.x))))
-  })
-  if (!is.character(varColumn)){
-    varColumn = colnames(data[[1]])[varColumn]
-  }
-  data <- lapply(data, function(x){
-    x <- x[,c(idColumn, varColumn)]
-  })
-  if (sortIDs){
-    if (sortDescending){
-      data <- lapply(data, function(x){
-        x <- x %>% dplyr::arrange(dplyr::desc(dplyr::across(dplyr::all_of(idColumn))))
-      })
-    } else {
-      data <- lapply(data, function(x){
-        x <- x %>% dplyr::arrange(dplyr::across(dplyr::all_of(idColumn)))
-      })
-    }
-    xTickLabels <- as.character(data[[1]][,1])
-  } else {
-    xTickLabels <- NA
-  }
-  suppressMessages(
-  data <- dplyr::bind_rows(lapply(lapply(data,t), function(x){
-    x <- as.data.frame(x)
-    colnames(x) <- as.character(x[1,])
-    row.names(x) <- NULL
-    x <- x[-1,]
-    return(x)
-  })))
-  data <- data %>% dplyr::mutate(dplyr::across(tidyselect::vars_select_helpers$where(is.character),~as.numeric(.x)))
-  g <- statBoxPlotMultiple(data = data, column = 1:ncol(data),
-                           sampleSize = NA, removeNA = removeNA,
-                           variableName = variableName,
-                           outlineColor = outlineColor,
-                           fillColor = rep(fillColor,ncol(data)),
-                           jitter = jitter, alpha = alpha, size = size,
-                           shape = shape, jitterFill = jitterFill,
-                           whiskerWidth = whiskerWidth,
-                           boxWidth = boxWidth, vertical = vertical,
-                           xAxis = xAxis, yAxis = yAxis,
-                           xDiscrete = xDiscrete,
-                           yDefault = yDefault, yLimits = yLimits,
-                           xLabel = xLabel, yLabel = yLabel,
-                           title = title,
-                           showMean = showMean, meanShape = meanShape,
-                           meanColor = meanColor, meanFill = meanFill,
-                           meanSize = meanSize, showLegend = FALSE, ...)
-  if (!identical(xTickLabels, NA)){
-    g <- g + ggplot2::scale_x_discrete(labels=xTickLabels)
-  }
-  if (!returnData){
-    return(g)
-  } else {
-    return(list(data, g))
   }
 }
 
@@ -1362,7 +1623,7 @@ statBoxPlotMultiTable <- function(data, idColumn = 1, varColumn = 2,
 #' P2 = c( 4.0, 5.0,10.0, 5.5), 
 #' P3 = c(10, 2,23, 5), 
 #' P4 = c(10.0, 2.0, 6.7, 3.0))
-#' statBarPlot(ll, idColumn = "id", varColumn = 1:5, returnData = T)
+#' statBarPlot(ll, idColumn = "id", varColumn = 2:5, returnData = T)
 #' 
 #' @returns a ggplot object or a list
 #' @export
@@ -1401,9 +1662,9 @@ statBarPlot <- function(data, idColumn = 1,
                         measure.vars = varColumn,
                         variable.name = variableName,
                         value.name = valueName)
-  g <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = idColumn,
-                                      y = valueName,
-                                      fill = variableName))
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(x = !!dplyr::sym("id"),
+                                      y = !!ggplot2::sym(valueName),
+                                      fill = !!ggplot2::sym(variableName)))
   g <- g + ggplot2::geom_bar(position = barPosition, stat = "identity",
                     linetype = outlineType, color = outlineColor,
                     size = outlineWidth, alpha = fillAlpha)
@@ -1421,6 +1682,7 @@ statBarPlot <- function(data, idColumn = 1,
                     xDefault = TRUE,
                     yDefault = yDefault, yLimits = yLimits,
                     xLabel = xLabel, yLabel = yLabel, titles = title,
+                    xDiscrete = TRUE,
                     setTheme = theme_minimal_adapted(xAxis = TRUE,
                                                      yAxis = yAxis,
                                                      showLegend = showLegend,
@@ -1504,11 +1766,11 @@ normalQuantilePlot <- function(data, column, removeNA = TRUE, sampleSize = NA,
   theoryQuantiles <- stats::qnorm(qpoints, mean = 0, sd = 1)
   theoryQuantiles <- ((theoryQuantiles - mean(theoryQuantiles))/((max(theoryQuantiles) - min(theoryQuantiles)))) + 0.5
   data <- data.frame(Sample = data %>% sort(), Theoretical = theoryQuantiles)
-  g <- ggplot2::ggplot(data = data, ggplot2::aes_string("Theoretical","Sample"))
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(!!ggplot2::sym("Theoretical"),!!ggplot2::sym("Sample")))
   g <- g + ggplot2::geom_point(col = pointColor, fill = pointFill, shape = pointShape, size = pointSize, alpha = pointAlpha)
   qlm <-stats::lm(data = data, Sample~Theoretical)
   g <- g + ggplot2::geom_abline(slope = stats::coef(qlm)[2], intercept = stats::coef(qlm)[1],
-                       col = lineColor, linetype = lineType, size = lineWidth, alpha = lineAlpha)
+                       col = lineColor, linetype = lineType, linewidth = lineWidth, alpha = lineAlpha)
   g <- graphsAdjust(list(g), vertical = vertical, titles = title,
                     xDefault = xDefault, xLimits = xLimits,
                     yDefault = yDefault, yLimits = yLimits,
@@ -1519,6 +1781,8 @@ normalQuantilePlot <- function(data, column, removeNA = TRUE, sampleSize = NA,
 
 #' creates a ggplot object showing a normal quantile plot with
 #'  confidence intervals
+#'  
+#'  qqplot: https://github.com/aloy/qqplotr
 #' 
 #' @param data the data to be plotted, can be a numeric/character/etc vector or
 #'  data.frame like (or tibble etc). If it is data.frame or similar the column
@@ -1548,6 +1812,11 @@ normalQuantilePlot <- function(data, column, removeNA = TRUE, sampleSize = NA,
 #' @param xAxis defines if the x-axis is shown
 #' @param yAxis defines if the x-axis is shown
 #' @param title sets title of graph
+#' @param distribution character vector, default is 'norm', see
+#'  qqplotr::geom_qq_band for more info
+#' @param distributionParameters list of additional parameters passed on to the
+#'  previously chosen distribution function, see 
+#'  qqplotr::geom_qq_band for more info
 #' @param xDefault default is set to TRUE, together with xLimits, this can be
 #'  used to define the exact range of the X-axis
 #' @param xLimits  default = c(0,NA), together with xDefault, this can be
@@ -1556,6 +1825,8 @@ normalQuantilePlot <- function(data, column, removeNA = TRUE, sampleSize = NA,
 #'  used to define the exact range of the Y-axis
 #' @param yLimits  default = c(0,NA), together with yDefault, this can be
 #'  used to define the exact range of the Y-axis
+#' @param xLabel specifies the label on the x-axis (theoretical)
+#' @param yLabel specifies the label on the y-axis (sample)
 #' @param vertical if TRUE, flips x- and y-axis
 #' @param ... can be used to pass on other arguments to graphAdjust()
 #'  (like xLimits, xExpand, etc)
@@ -1569,11 +1840,13 @@ normalQQPlot <- function(data, column, removeNA = TRUE,
                          lineColor = "red", lineType = "solid",
                          lineWidth = 1, lineAlpha = 1,
                          title = NULL,
+                         distribution = "norm", distributionParameters = list(),
                          bandType = c("pointwise","boot","ks","ts")[3], 
                          bandFill = "blue", bandAlpha = 0.10,
                          xAxis = TRUE, yAxis = TRUE, vertical = FALSE,
                          xDefault = TRUE, xLimits = c(0,NA),
                          yDefault = TRUE, yLimits = c(0,NA),
+                         xLabel = "Theoretical", yLabel = "Sample",
                          ...){
   if (is.Class(data,"data.frame")){
     data <- data[,column]
@@ -1584,15 +1857,22 @@ normalQQPlot <- function(data, column, removeNA = TRUE,
   if (!is.na(sampleSize)){
     data <- data[sample(1:length(data), sampleSize, replace = FALSE)]
   }
-  g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes_string(sample = "x"))
-  g <- g + qqplotr::geom_qq_band(bandType = bandType, alpha = bandAlpha, fill = bandFill)
+  g <- ggplot2::ggplot(data = data.frame(x = data), ggplot2::aes(sample = !!ggplot2::sym("x")))
+  g <- g + qqplotr::geom_qq_band(bandType = bandType, alpha = bandAlpha,
+                                 fill = bandFill, distribution = distribution,
+                                 dparams = distributionParameters)
   g <- g + qqplotr::stat_qq_point(col = pointColor, fill = pointFill,
                          shape = pointShape, size = pointSize,
-                         alpha = pointAlpha)
-  g <- g + qqplotr::stat_qq_line(col = lineColor, linetype = lineType, size = lineWidth, alpha = lineAlpha)
+                         alpha = pointAlpha, distribution = distribution,
+                         dparams = distributionParameters)
+  g <- g + qqplotr::stat_qq_line(col = lineColor, linetype = lineType,
+                                 linewidth = lineWidth, alpha = lineAlpha,
+                                 distribution = distribution,
+                                 dparams = distributionParameters)
   g <- graphsAdjust(list(g), vertical = vertical, titles = title,
                     xDefault = xDefault, xLimits = xLimits,
                     yDefault = yDefault, yLimits = yLimits,
+                    xLabel = xLabel, yLabel = yLabel,
                     ...)[[1]]
   
   g <- g + theme_minimal_adapted(xAxis = xAxis, yAxis = yAxis, showLegend = FALSE)
@@ -1726,12 +2006,12 @@ controlChart <- function(data, yColumn, xColumn = NA, removeNA = TRUE,
   if (removeNA) {
     data <- data %>% stats::na.omit()
   }
-  g <- ggplot2::ggplot(data = data, ggplot2::aes_string(colnames(data)[1],colnames(data)[2]))
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(!!dplyr::sym(colnames(data)[1]),!!dplyr::sym(colnames(data)[2])))
   if (drawPoints){
     g <- g + ggplot2::geom_point(col = pointColor, fill = pointFill, shape = pointShape, size = pointSize, alpha = pointAlpha)
   }
   if (drawLine) {
-    g <- g + ggplot2::geom_line(col = lineColor, linetype = lineType, size = lineWidth, alpha = lineAlpha)
+    g <- g + ggplot2::geom_line(col = lineColor, linetype = lineType, linewidth = lineWidth, alpha = lineAlpha)
   }
   if (!identical(controlLines,NA)){
     for (counter in 1:(nrow(controlLines))){
@@ -1913,9 +2193,20 @@ volcanoPlot <- function(data, quantColumn = 1, statColumn = 2,
     data[(data[,xColumn] <= xCutoffs[1] | data[,xColumn] >= xCutoffs[2]) &
            (data[,yColumn] < yCutoff),]$col <- "2"
   }
-  data$x <- quantTransform(data[,xColumn])
-  data$y <- statTransform(data[,yColumn])
-  g <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = "x", y = "y", color = "col", fill = "col"))
+  if (!identical(quantTransform,NA)){
+    data$x <- quantTransform(data[,xColumn])
+  } else {
+    data$x <- data[,xColumn]
+  }
+  if (!identical(statTransform, NA)){
+    data$y <- statTransform(data[,yColumn])
+  } else {
+    data$y <- data[,yColumn]
+  }
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(x = !!dplyr::sym("x"),
+                                                 y = !!dplyr::sym("y"),
+                                                 color = !!dplyr::sym("col"),
+                                                 fill = !!dplyr::sym("col")))
   g <- g + ggplot2::geom_point(shape = pointShape, size = pointSize, alpha = pointAlpha)
   if (length(unique(data$col)) > 1){
     g <- g + ggplot2::scale_color_manual(values = c(pointColor, significantPointColor))
@@ -2178,6 +2469,8 @@ clearPlot <- function(){
 #' @param smoothFill specifies fill color pf tje smoothing confidence 'band'
 #' @param smoothMethod defines smoothin method. See ?ggplot2::geom_smooth for
 #'  more info
+#' @param smoothFormula formula to use in smoothing function, See
+#'  ?ggplot2::stat_smooth for more info
 #' @param title specifies the title
 #' @param vertical if TRUE then the plot is rotated 90 degrees (swap of X & Y)
 #' @param xAxis if TRUE, the x-axis is properly draw with label, ticks etc
@@ -2221,6 +2514,8 @@ clearPlot <- function(){
 #'  FALSE when using this)
 #' @param gridLinesY if TRUE then horizontal gridlines are shown (set gridLines
 #'  to FALSE when using this)
+#' @param abLine for adding an geom_abline(), geom_hline or geom_vline function,
+#'  see ggplot2::geom_abline
 #' @param ... can be used to pass on other arguments to graphAdjust()
 #'  
 #' @return a ggplot object
@@ -2242,6 +2537,7 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
                         smoothAlpha = 0.1, smoothFill = "lightblue",
                         smoothWidth = 0.5, smoothOrientation = "x",
                         smoothConfidence = FALSE, smoothMethod = NULL,
+                        smoothFormula = NULL,
                         title = paste(c(yLabel, " vs ", xLabel),
                                       collapse = ""),
                         vertical = FALSE,
@@ -2258,6 +2554,7 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
                         gridLines = TRUE,
                         gridLinesX = TRUE,
                         gridLinesY = TRUE,
+                        abLine = NULL,
                         ...){
   if (!is.character(xColumn)){
     xColumn <- colnames(data)[xColumn]
@@ -2278,17 +2575,18 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
   }
   g <- ggplot2::ggplot(data = data, (ggplot2::aes(x = !!dplyr::sym(xColumn), y = !!dplyr::sym(yColumn)))) +
     ggplot2::geom_point(alpha = pointAlpha, color = pointColor,
-               fill = pointFill, shape = pointShape,
-               size = pointSize)
+                        fill = pointFill, shape = pointShape,
+                        size = pointSize)
   if (smoothLine){
     g <- g + ggplot2::stat_smooth(color = smoothLineColor,
-                         fill = smoothFill,
-                         linetype = smoothLineType,
-                         size = smoothWidth,
-                         se = smoothConfidence,
-                         na.rm = removeNA,
-                         method = smoothMethod,
-                         orientation = smoothOrientation)
+                                  fill = smoothFill,
+                                  linetype = smoothLineType,
+                                  linewidth = smoothWidth,
+                                  se = smoothConfidence,
+                                  na.rm = removeNA,
+                                  method = smoothMethod,
+                                  orientation = smoothOrientation,
+                                  formula = smoothFormula)
   }
   if (xSymmetric){
     if (!xCentered){
@@ -2336,6 +2634,9 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
     }
     yDefault <- FALSE
   }
+  if (!is.null(abLine)){
+    g <- g + abLine
+  }
   g <- graphsAdjust(list(g),
                     vertical = vertical,
                     xLabel = xLabel, xDefault = xDefault, xLimits = xLimits,
@@ -2360,14 +2661,14 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
 #'  x-data (refer to column via number or character vector (column name))
 #' @param yColumn specifies which column in the data argument contains the
 #'  y-data (refer to column via number or character vector (column name))
-#' @param logTransform do logaithmic transformation o/t data
-#' @param log2Transform if TRUE do log2 transformation o/t data in stead of
-#'  log10 (if logTransform = TRUE!)
 #' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
 #'  to plotting. Note: this has consquence that ROWS will be removed when using
 #'  multiple columns with data.frame's
 #' @param xLabel defines x-axis label
 #' @param yLabel defines y-axis label
+#' @param xLog if TRUE then logarithmic scale is used for the x-axis
+#' @param yLog if TRUE then logarithmic scale is used for the y-axis, note: this
+#'  will lead to errors if the difference is eg 0
 #' @param title specifies the title
 #' @param ... can be used to pass on other arguments to graphAdjust()
 #'  
@@ -2377,20 +2678,12 @@ scatterPlot <- function(data, xColumn = 1, yColumn = 2,
 #' 
 #' @export
 scatterBlandAltman <- function(data, xColumn = 1, yColumn = 2,
-                               logTransform = FALSE, log2Transform = TRUE,
-                               removeNA = FALSE,
-                               xLabel = ifelse(logTransform,
-                                               ifelse(log2Transform,
-                                                      "Average of log2(x,y)",
-                                                      "Average of log10(x,y)"),
-                                               "Average of c(x,y)"),
-                               yLabel = ifelse(logTransform,
-                                               ifelse(log2Transform,
-                                                      "Difference of log2(x,y)",
-                                                      "Difference of log10(x,y)"),
-                                               "Difference of c(x,y)"),
-                               title = paste(c("Bland-Altman plot/Tukey mean-difference plot: ", yLabel, " vs ", xLabel),
-                                             collapse = ""),
+                              removeNA = FALSE,
+                              xLabel = "Mean",
+                              yLabel = "Difference",
+                              title = paste(c("Bland-Altman plot/Tukey mean-difference plot: ", yLabel, " vs ", xLabel),
+                                            collapse = ""),
+                              xLog = FALSE, yLog = FALSE,
                               ...){
   if (!is.character(xColumn)){
     xColumn <- colnames(data)[xColumn]
@@ -2410,21 +2703,12 @@ scatterBlandAltman <- function(data, xColumn = 1, yColumn = 2,
     colnames(data) <- c(xColumn, yColumn)
   }
   data2 <- data
-  if (!logTransform){
-    data[,xColumn] <- (data2[,xColumn] + data2[,yColumn])/2 # average
-    data[,yColumn] <- data2[,xColumn] - data2[,yColumn]     # difference
-  } else {
-    if (log2Transform){
-      transformer <- transformData("log2(data)")
-    } else {
-      transformer <- transformData("log10(data)")
-    }
-    data[,xColumn] <- (transformer(data2[,xColumn]) + transformer(data2[,yColumn]))/2
-    data[,yColumn] <- transformer(data2[,xColumn]) - transformer(data2[,yColumn])
-  }
+  data[,xColumn] <- (data2[,xColumn] + data2[,yColumn])/2 # average
+  data[,yColumn] <- data2[,xColumn] - data2[,yColumn]     # difference
   scatterPlot(data = data, xColumn = xColumn, yColumn = yColumn,
               removeNA = removeNA,
-              xLabel = xLabel, yLabel = yLabel, title = title, ...)
+              xLabel = xLabel, yLabel = yLabel, title = title,
+              xLog = xLog, yLog = yLog, ...)
 }
 
 #' function to generate an aligned set of (maximum 4) plots as a 2x2 matrix

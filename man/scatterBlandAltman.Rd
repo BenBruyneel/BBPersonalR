@@ -9,15 +9,13 @@ scatterBlandAltman(
   data,
   xColumn = 1,
   yColumn = 2,
-  logTransform = FALSE,
-  log2Transform = TRUE,
   removeNA = FALSE,
-  xLabel = ifelse(logTransform, ifelse(log2Transform, "Average of log2(x,y)",
-    "Average of log10(x,y)"), "Average of c(x,y)"),
-  yLabel = ifelse(logTransform, ifelse(log2Transform, "Difference of log2(x,y)",
-    "Difference of log10(x,y)"), "Difference of c(x,y)"),
+  xLabel = "Mean",
+  yLabel = "Difference",
   title = paste(c("Bland-Altman plot/Tukey mean-difference plot: ", yLabel, " vs ",
     xLabel), collapse = ""),
+  xLog = FALSE,
+  yLog = FALSE,
   ...
 )
 }
@@ -30,11 +28,6 @@ x-data (refer to column via number or character vector (column name))}
 \item{yColumn}{specifies which column in the data argument contains the
 y-data (refer to column via number or character vector (column name))}
 
-\item{logTransform}{do logaithmic transformation o/t data}
-
-\item{log2Transform}{if TRUE do log2 transformation o/t data in stead of
-log10 (if logTransform = TRUE!)}
-
 \item{removeNA}{if TRUE, the NA 'values' in the vector will be removed prior
 to plotting. Note: this has consquence that ROWS will be removed when using
 multiple columns with data.frame's}
@@ -44,6 +37,11 @@ multiple columns with data.frame's}
 \item{yLabel}{defines y-axis label}
 
 \item{title}{specifies the title}
+
+\item{xLog}{if TRUE then logarithmic scale is used for the x-axis}
+
+\item{yLog}{if TRUE then logarithmic scale is used for the y-axis, note: this
+will lead to errors if the difference is eg 0}
 
 \item{...}{can be used to pass on other arguments to graphAdjust()}
 }

@@ -1,25 +1,3 @@
-#' converts integer date format as used by eg SQLite to R's Date format
-#'
-#' @param aDate days since origin, integer numbers to be converted Date format
-#' @param origin character vector specifying the origin date
-#'
-#' @returns converted dates in Date format
-#' @export
-integerToDate <- function(aDate, origin = "1970-01-01"){
-  return(as.Date(aDate, origin = origin))
-}
-
-#' converts date format to integer numbers
-#'
-#' @param aDate Date formatted dates to be converted integer
-#' @param origin date vector specifying the origin date
-#'
-#' @returns converted dates in integer format
-#' @export
-dateToInteger <- function(aDate, origin = as.Date("1970-01-01")){
-  return(as.integer(julian(aDate, origin = origin)))
-}
-
 #' Converts a numeric, integer or character vector (multiple elements) to a
 #'  single element character vector (a string)
 #'
@@ -131,7 +109,7 @@ blobToVector <- function(blobData = NA,
                     vectorClass = vectorClass))
 }
 
-#' Converts a data.frames to a single data.frame where each data.frame from the
+#' Converts data.frames to a single data.frame where each data.frame from the
 #'  list is a row of blobs or character separated strings
 #'
 #' @param dfData the data to be converted: a list of data.frames; they can be
@@ -139,6 +117,8 @@ blobToVector <- function(blobData = NA,
 #'  present
 #' @param columnNames character vector specifying which columns from the
 #'  data.frame(s) to convert
+#' @param saveClasses default FALSE. If TRUE then the first row of the resulting
+#'  data.frame will be the class name (as a character vector)
 #' @param collapseChar the character to be used as seperator in the end result.
 #'  Note: this seperator should not be present in the dataVector (especially
 #'  after transformation) as it will give problems when using the DBToVector
@@ -151,9 +131,10 @@ blobToVector <- function(blobData = NA,
 #' @param ... further arguments to be passed onto to base::format, see
 #'  ?base::format for more information. Ignored when formatNumbers == FALSE
 #'
-#' @returns a raw vector
+#' @returns a data.frame
 #' @export
-convertDFToDB <- function(dfData, columnNames = colnames(dfData[[1]]),
+convertDFtoDB <- function(dfData, columnNames = colnames(dfData[[1]]),
+                          saveClasses = FALSE,
                           collapseChar = ";", formatNumbers = FALSE,
                           toBlob = TRUE, type = "gzip",
                           ...){
@@ -194,6 +175,10 @@ convertDFToDB <- function(dfData, columnNames = colnames(dfData[[1]]),
     }
     df <- dplyr::bind_rows(df, df2)
   }
+  if (saveClasses){
+    tempClasses <- unlist(lapply(dfData[[1]], class))
+    df <- dplyr::bind_rows(tempClasses, df)
+  }
   return(df)
 }
 
@@ -204,6 +189,9 @@ convertDFToDB <- function(dfData, columnNames = colnames(dfData[[1]]),
 #' @param df data.frame to be converted
 #' @param columnNames character vector specifying which columns from the df
 #'  argument are to be put in the converted data.frame(s)
+#' @param restoreClasses default is FALSE. IF TRUE then the first row of the
+#'  data.frame argument (df) must contain the classes (as character vectors) to
+#'  be used for the columns
 #' @param collapseChar the character to be used as seperator
 #' @param vectorClass class of the seperate elements, default = "integer".
 #'  Other tested options are "numeric" and "character". Note: all columns are
@@ -214,21 +202,27 @@ convertDFToDB <- function(dfData, columnNames = colnames(dfData[[1]]),
 #' @param type character string, the type of compression. See ?memCompress for
 #'  details
 #'
-#' @returns a raw vector
+#' @returns a data.frame
 #' @export
 convertDBtoDF <- function(df, columnNames = colnames(df),
+                          restoreClasses = FALSE,
                           collapseChar = ";",
                           vectorClass = "integer",
                           fromBlob = TRUE, type = "gzip"){
   if (identical(columnNames,NA)){
     stop("Error : no column names defined")
   }
-  if (length(vectorClass) == 1){
-    vectorClass <- rep(vectorClass, length(columnNames))
-  } else {
-    if (length(vectorClass) != length(columnNames)){
-      stop("Error : length vectorClass argument != length columnNames")
+  if (!restoreClasses){
+    if (length(vectorClass) == 1){
+      vectorClass <- rep(vectorClass, length(columnNames))
+    } else {
+      if (length(vectorClass) != length(columnNames)){
+        stop("Error : length vectorClass argument != length columnNames")
+      }
     }
+  } else {
+    vectorClass <- unname(unlist((df[1,])))
+    df <- df %>% dplyr::slice(-1)
   }
   dfData <- list()
   for (counter in 1:(nrow(df))){
@@ -242,27 +236,29 @@ convertDBtoDF <- function(df, columnNames = colnames(df),
                      type = "gzip"),
         DBtoVector(dbData = as.data.frame(df)[counter,columnNames[1]],
                    collapseChar = collapseChar[[1]],
-                   vectorClass = vectorClass)
+                   vectorClass = vectorClass[[1]])
       )
     )
     if (length(columnNames)>1){
       for (counter2 in 2:(length(columnNames))){
         suppressMessages(
           dfData[[counter]] <- dplyr::bind_cols(dfData[[counter]],
-                                         ifelse(fromBlob,
                                                 data.frame(
-                                                  blobToVector(blobData = unlist(as.data.frame(df)[counter,
-                                                                                                   columnNames[counter2]]),
-                                                               collapseChar = collapseChar,
-                                                               vectorClass = vectorClass[[counter2]],
-                                                               type = "gzip")
-                                                ),
-                                                data.frame(
-                                                  DBtoVector(dbData = as.data.frame(df)[counter,columnNames[counter2]],
-                                                             collapseChar = collapseChar,
-                                                             vectorClass = vectorClass[[counter2]])
+                                                  ifelse(fromBlob,
+                                                         data.frame(
+                                                           blobToVector(blobData = unlist(as.data.frame(df)[counter,
+                                                                                                            columnNames[counter2]]),
+                                                                        collapseChar = collapseChar,
+                                                                        vectorClass = vectorClass[[counter2]],
+                                                                        type = "gzip")
+                                                         ),
+                                                         data.frame(
+                                                           DBtoVector(dbData = as.data.frame(df)[counter,columnNames[counter2]],
+                                                                      collapseChar = collapseChar,
+                                                                      vectorClass = vectorClass[[counter2]])
+                                                         )
+                                                  )
                                                 )
-                                         )
           )
         )
       }
@@ -1046,4 +1042,61 @@ db_getLinkColumns <- function(db, linkedTableName, hasPrimaryKey = FALSE,
   pool::dbCommit(conn = conn)
   pool::poolReturn(conn)
   return(result)
+}
+
+#' Copies a single table from one database to another (only sqlite type
+#'  databases have been tested). Internal function
+#'
+#' @param dbFrom database from which tables are to be copied, must be open when
+#'  calling this function
+#' @param dbTo database to which tables are to be copied, must be open when
+#'  calling this function
+#' @param noWarnings suppress warnings while copying data, default = TRUE
+#' @param tableName character vector specifying which table to copy
+#' @return nothing
+#' @note internal function
+copyTable <- function(dbFrom, dbTo, tableName, noWarnings = TRUE){
+  if (noWarnings){
+    suppressWarnings({
+      tempTibble <- dplyr::tbl(dbFrom, tableName) %>% dplyr::collect()
+      pool::dbWriteTable(dbTo, tableName, tempTibble)
+    })
+  } else {
+    tempTibble <- dplyr::tbl(dbFrom, tableName) %>% dplyr::collect()
+    pool::dbWriteTable(dbTo, tableName, tempTibble)
+  }
+}
+
+#' copies contents of a sqlite database to another one (default is into
+#'  :memory:)
+#' @param dbFrom database from which tables are to be copied, must be open when
+#'  calling this function
+#' @param dbTo database to which tables are to be copied
+#' @param noWarnings suppress warnings while copying data, default = TRUE
+#' @param copyTables character vector specifying which tables to copy (default
+#'  NA, copies all tables)
+#' @param doNotCopyTables character vector that specifies which tables are not
+#'  to be copied (default = 'sqlite_sequence'). Overrules the copyTables
+#'  argument. If NA then this parameter is ignored
+#' @return an in memory database database, note that this database is returned
+#'  in an 'open state'
+#' @export
+copyDBtoMemory <- function(dbFrom, dbTo = ":memory:", noWarnings = TRUE, copyTables = NA, doNotCopyTables = "sqlite_sequence"){
+  if (identical(copyTables, NA)){
+    copyTables <- pool::dbListTables(dbFrom)
+  }
+  if (!identical(doNotCopyTables, NA)){
+    toRemove <- which(copyTables %in% doNotCopyTables)
+    if (length(toRemove) > 0){
+      copyTables <- copyTables[-toRemove]
+    }
+  }
+  dbTo <- db_open(dbTo)
+  if (length(copyTables) > 0){
+    purrr::walk(copyTables, ~copyTable(dbFrom = dbFrom,
+                                       dbTo = dbTo,
+                                       tableName = .x,
+                                       noWarnings = noWarnings))
+  }
+  return(dbTo)
 }

@@ -9,6 +9,7 @@
 convertDBtoDF(
   df,
   columnNames = colnames(df),
+  restoreClasses = FALSE,
   collapseChar = ";",
   vectorClass = "integer",
   fromBlob = TRUE,
@@ -20,6 +21,10 @@ convertDBtoDF(
 
 \item{columnNames}{character vector specifying which columns from the df
 argument are to be put in the converted data.frame(s)}
+
+\item{restoreClasses}{default is FALSE. IF TRUE then the first row of the
+data.frame argument (df) must contain the classes (as character vectors) to
+be used for the columns}
 
 \item{collapseChar}{the character to be used as seperator}
 
@@ -35,7 +40,7 @@ c("numeric", "integer")}
 details}
 }
 \value{
-a raw vector
+a data.frame
 }
 \description{
 Does the reverse of convertDFtoDB: converts a data.frame of converted

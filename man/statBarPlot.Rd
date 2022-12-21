@@ -113,7 +113,7 @@ P1 = c(1,2,3,2),
 P2 = c( 4.0, 5.0,10.0, 5.5), 
 P3 = c(10, 2,23, 5), 
 P4 = c(10.0, 2.0, 6.7, 3.0))
-statBarPlot(ll, idColumn = "id", varColumn = 1:5, returnData = T)}
+statBarPlot(ll, idColumn = "id", varColumn = 2:5, returnData = T)}
 }
 \value{
 a ggplot object or a list

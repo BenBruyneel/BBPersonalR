@@ -11,7 +11,6 @@ statBoxPlotMultipleVar(
   varColumn = 2,
   varBreaks = 4,
   varLabels = NA,
-  forceLabels = FALSE,
   varIncludeLowest = FALSE,
   varRight = TRUE,
   sampleSize = NA,
@@ -33,7 +32,6 @@ statBoxPlotMultipleVar(
   yLimits = c(0, NA),
   xLabel = "",
   yLabel = "",
-  xDiscrete = TRUE,
   title = "",
   showMean = TRUE,
   meanShape = 23,
@@ -42,6 +40,7 @@ statBoxPlotMultipleVar(
   meanSize = 5,
   showLegend = TRUE,
   legend.position = "bottom",
+  legend.title = "cut",
   returnData = FALSE,
   ...
 )
@@ -68,9 +67,6 @@ ignored if the varColumn is not numerical}
 
 \item{varLabels}{specfies labels to use when splitting the varColumn,
 see ?base::cut (labels argument).}
-
-\item{forceLabels}{with this boolean the labels specified by the argument
-varLabels can be enforced onto the x-axis if needed}
 
 \item{varIncludeLowest}{specfies the include.lowest argument of base::cut,
 see ?base::cut}
@@ -125,8 +121,6 @@ used to define the exact range of the Y-axis}
 
 \item{yLabel}{set y-axis title}
 
-\item{xDiscrete}{defines if x-axis should be/is discrete}
-
 \item{title}{sets title of graph}
 
 \item{showMean}{defines if the mean value of the data should be shown}
@@ -142,6 +136,8 @@ used to define the exact range of the Y-axis}
 \item{showLegend}{defines if the legend is to be shown or not}
 
 \item{legend.position}{defines where a legend is to be placed}
+
+\item{legend.title}{if not NA, then to give a non-default name to the legend}
 
 \item{returnData}{if TRUE then a list with 2 elements is returned. The first
 element is the data.frame used to generate the graph and the second element

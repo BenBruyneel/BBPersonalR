@@ -13,6 +13,8 @@ statHist(
   variableName = "variable",
   removeNA = TRUE,
   outlineColor = "white",
+  outlineWidth = 0.5,
+  outlineType = "solid",
   fillColor = "red",
   xLabel = ifelse(!is.Class(data, "data.frame"), NA, ifelse(is.character(column),
     paste(column, collapse = ", "), paste(colnames(data)[column], collapse = ", "))),
@@ -45,7 +47,7 @@ Can be integer or character (column name(s))}
 
 \item{binwidth}{defines width of the 'bins' of the histogram, if NULL
 (default), then it will be set automatically (with a warning). This setting
-is ignored in case of statCount is set tp TRUE}
+is ignored in case statCount is set tp TRUE}
 
 \item{bins}{defines the number of 'bins' of the histogram, overriden by
 binwidth}
@@ -60,6 +62,10 @@ to plotting. @note this has consquence that ROWS will be removed when using
 multiple columns with data.frame's}
 
 \item{outlineColor}{defines the color of the line around the bars}
+
+\item{outlineWidth}{defines the width of the line around the bars}
+
+\item{outlineType}{defines the linetype of the line around the bars}
 
 \item{fillColor}{defines the color of the bars themselves. If a multi-column
 data.frame is plotted, the same number as the number of columns used should
@@ -100,7 +106,7 @@ standard deviation are used}
 
 \item{xDeviations}{defines how many deviations the range of the x-axis may
 differ from the mean or median. Range will be either (median-xDeviations*mad
-,median+xDeviations**mad) or (mean - xDeviations*sd,mean + xDeviations*sd)}
+,median+xDeviations*mad) or (mean - xDeviations*sd,mean + xDeviations*sd)}
 
 \item{showLegend}{defines if the legend is to be shown or not}
 

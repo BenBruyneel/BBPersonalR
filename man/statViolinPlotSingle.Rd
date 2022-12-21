@@ -18,10 +18,6 @@ statViolinPlotSingle(
   trim = TRUE,
   bandwidth = 1,
   quantiles = NULL,
-  jitter = NA,
-  alpha = 0.5,
-  size = 3,
-  shape = 16,
   xAxis = FALSE,
   yAxis = TRUE,
   yLabel = ifelse(!is.Class(data, "data.frame"), NA, ifelse(is.character(column),
@@ -76,17 +72,6 @@ outline more 'jagged'}
 
 \item{quantiles}{draws lines at the specified quantiles, eg c(0.25,0.5,0.25).
 If NULL, nothing is drawn}
-
-\item{jitter}{if NA, then the data points will not be shown (only outliers!),
-otherwise it adds a random value to the x-values of the data points plotted.
-Note: If set to 0 then they will be located on a straight line}
-
-\item{alpha}{alpha ('see through' value) of the data points}
-
-\item{size}{size of the data points}
-
-\item{shape}{shape of the datapoints (default = 16), see vignette
-ggplot2::ggplot2-specs}
 
 \item{xAxis}{defines if the x-axis is shown}
 

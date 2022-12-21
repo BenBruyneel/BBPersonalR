@@ -1,8 +1,8 @@
 Package: BBPersonalR
 Type: Package
-Imports: stats, DBI, RSQLite, magrittr, pool, dplyr, stringr, purrr, tibble, sf, wkb, ggplot2, qqplotr, grid, gridExtra, cowplot, tolerance, scales, data.table, ggforce, MASS, tidyselect, flextable, reshape2
+Imports: stats, DBI, RSQLite, magrittr, pool, dplyr, stringr, purrr, tibble, sf, wkb, ggplot2, qqplotr, grid, gridExtra, cowplot, tolerance, scales, data.table, ggforce, MASS, tidyselect, flextable, reshape2, tidyr
 Title: BBPersonalR
-Version: 0.1.7
+Version: 0.2.0
 Author: Ben Bruyneel <benbruyneel@gmail.com>
 Maintainer: Ben Bruyneel <benbruyneel@gmail.com>
 Description: Provides a number of routines I developed and found useful
@@ -10,4 +10,4 @@ License: GPL (>= 3)
 Encoding: UTF-8
 URL: https://github.com/BenBruyneel/BBPersonalR
 LazyData: true
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3

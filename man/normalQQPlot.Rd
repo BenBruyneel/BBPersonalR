@@ -3,7 +3,9 @@
 \name{normalQQPlot}
 \alias{normalQQPlot}
 \title{creates a ggplot object showing a normal quantile plot with
- confidence intervals}
+ confidence intervals
+ 
+ qqplot: https://github.com/aloy/qqplotr}
 \usage{
 normalQQPlot(
   data,
@@ -20,6 +22,8 @@ normalQQPlot(
   lineWidth = 1,
   lineAlpha = 1,
   title = NULL,
+  distribution = "norm",
+  distributionParameters = list(),
   bandType = c("pointwise", "boot", "ks", "ts")[3],
   bandFill = "blue",
   bandAlpha = 0.1,
@@ -30,6 +34,8 @@ normalQQPlot(
   xLimits = c(0, NA),
   yDefault = TRUE,
   yLimits = c(0, NA),
+  xLabel = "Theoretical",
+  yLabel = "Sample",
   ...
 )
 }
@@ -68,6 +74,13 @@ the boxplot. By default sampleSize = NA, in which case all data is used}
 
 \item{title}{sets title of graph}
 
+\item{distribution}{character vector, default is 'norm', see
+qqplotr::geom_qq_band for more info}
+
+\item{distributionParameters}{list of additional parameters passed on to the
+previously chosen distribution function, see 
+qqplotr::geom_qq_band for more info}
+
 \item{bandType}{sets the type of confidence bands calculations.
 Default = "ks" (Kolmogorov-Smirnov test), for descriptions of the other
 options ("pointwise","boot","ts") see ?geom_qq_band}
@@ -95,6 +108,10 @@ used to define the exact range of the Y-axis}
 \item{yLimits}{default = c(0,NA), together with yDefault, this can be
 used to define the exact range of the Y-axis}
 
+\item{xLabel}{specifies the label on the x-axis (theoretical)}
+
+\item{yLabel}{specifies the label on the y-axis (sample)}
+
 \item{...}{can be used to pass on other arguments to graphAdjust()
 (like xLimits, xExpand, etc)}
 }
@@ -104,4 +121,6 @@ a ggplot object
 \description{
 creates a ggplot object showing a normal quantile plot with
  confidence intervals
+ 
+ qqplot: https://github.com/aloy/qqplotr
 }
