@@ -13,6 +13,9 @@
 #'  the argument "column" should be a single column!
 #' @param varColumn this boolean argument is only used in case melted = TRUE.
 #'  It specifies the column to be used as variable name column
+#' @param varToChar default FALSE, gnored if melted = FALSE. Specifies if the
+#'  variable name column should be converted into a character vector (need
+#'  discrete values)
 #' @param sampleSize allows to the use of a sample of the data to be used for
 #'  the boxplot. By default sampleSize = NA, in which case all data is used
 #' @param removeNA if TRUE, the NA 'values' in the vector will be removed 
@@ -31,6 +34,7 @@
 #' @export
 statPrepareData <- function(data, column = 1:ncol(data),
                             melted = FALSE, varColumn = NA,
+                            varToChar = FALSE,
                             sampleSize = NA, removeNA = TRUE,
                             meltOrder = NA,
                             newNames = NA){
@@ -43,6 +47,9 @@ statPrepareData <- function(data, column = 1:ncol(data),
   if (melted){
     if (!is.character(varColumn)){
       varColumn = colnames(data)[varColumn]
+      if (varToChar) {
+        data[, varColumn] <- as.character(data[, varColumn])
+      }
     }
   }
   if (!melted){
@@ -342,6 +349,9 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
 #'  the argument "column" should be a single column!
 #' @param varColumn this boolean argument is only used in case melted = TRUE.
 #'  It specifies the column to be used as variable name column
+#' @param varToChar default FALSE, gnored if melted = FALSE. Specifies if the
+#'  variable name column should be converted into a character vector (need
+#'  discrete values)
 #' @param sampleSize allows to the use of a sample of the data to be used for
 #'  the boxplot. By default sampleSize = NA, in which case all data is used
 #' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
@@ -385,6 +395,7 @@ statHist <- function(data, column = 1, binwidth = NULL, bins = NULL,
 #' @export
 statHistMultiple <- function(data, column = 1:ncol(data),
                              melted = FALSE, varColumn = NA,
+                             varToChar = FALSE,
                              sampleSize = NA, removeNA = TRUE,
                              meltOrder = NA,
                              newNames = NA,
@@ -401,6 +412,7 @@ statHistMultiple <- function(data, column = 1:ncol(data),
                              ...){
   data <- statPrepareData(data = data, column = column,
                           melted = melted, varColumn = varColumn,
+                          varToChar = varToChar,
                           sampleSize = sampleSize, removeNA = removeNA,
                           meltOrder = meltOrder, newNames = newNames)
   if (identical(data, NA)){
@@ -615,6 +627,9 @@ statDensity <- function(data, column = 1,
 #'  the argument "column" should be a single column!
 #' @param varColumn this boolean argument is only used in case melted = TRUE.
 #'  It specifies the column to be used as variable name column
+#' @param varToChar default FALSE, gnored if melted = FALSE. Specifies if the
+#'  variable name column should be converted into a character vector (need
+#'  discrete values)
 #' @param sampleSize allows to the use of a sample of the data to be used for
 #'  the boxplot. By default sampleSize = NA, in which case all data is used
 #' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
@@ -658,6 +673,7 @@ statDensity <- function(data, column = 1,
 #' @export
 statDensityMultiple <- function(data, column = 1:ncol(data),
                                 melted = FALSE, varColumn = NA,
+                                varToChar = FALSE,
                                 sampleSize = NA, removeNA = TRUE,
                                 meltOrder = NA,
                                 newNames = NA,
@@ -674,6 +690,7 @@ statDensityMultiple <- function(data, column = 1:ncol(data),
                                 ...){
   data <- statPrepareData(data = data, column = column,
                           melted = melted, varColumn = varColumn,
+                          varToChar = varToChar,
                           sampleSize = sampleSize, removeNA = removeNA,
                           meltOrder = meltOrder, newNames = newNames)
   if (identical(data, NA)){
@@ -899,6 +916,9 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #'  the argument "column" should be a single column!
 #' @param varColumn this boolean argument is only used in case melted = TRUE.
 #'  It specifies the column to be used as variable name column
+#' @param varToChar default FALSE, gnored if melted = FALSE. Specifies if the
+#'  variable name column should be converted into a character vector (need
+#'  discrete values)
 #' @param sampleSize allows to the use of a sample of the data to be used for
 #'  the boxplot. By default sampleSize = NA, in which case all data is used
 #' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
@@ -955,6 +975,7 @@ statViolinPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #' @export
 statViolinPlotMultiple <- function(data, column = 1:ncol(data),
                                    melted = FALSE, varColumn = NA,
+                                   varToChar = FALSE,
                                    sampleSize = NA, removeNA = TRUE,
                                    meltOrder = NA,
                                    newNames = NA,
@@ -972,6 +993,7 @@ statViolinPlotMultiple <- function(data, column = 1:ncol(data),
                                    ...){
   data <- statPrepareData(data = data, column = column,
                           melted = melted, varColumn = varColumn,
+                          varToChar = varToChar,
                           sampleSize = sampleSize, removeNA = removeNA,
                           meltOrder = meltOrder, newNames = newNames)
   if (identical(data, NA)){
@@ -1161,6 +1183,9 @@ statBoxPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #'  the argument "column" should be a single column!
 #' @param varColumn this boolean argument is only used in case melted = TRUE.
 #'  It specifies the column to be used as variable name column
+#' @param varToChar default FALSE, gnored if melted = FALSE. Specifies if the
+#'  variable name column should be converted into a character vector (need
+#'  discrete values)
 #' @param sampleSize allows to the use of a sample of the data to be used for
 #'  the boxplot. By default sampleSize = NA, in which case all data is used
 #' @param removeNA if TRUE, the NA 'values' in the vector will be removed prior
@@ -1220,6 +1245,7 @@ statBoxPlotSingle <- function(data, column = 1, removeNA = TRUE,
 #' @export
 statBoxPlotMultiple <- function(data, column = 1:ncol(data),
                                 melted = FALSE, varColumn = NA,
+                                varToChar = FALSE,
                                 sampleSize = NA, removeNA = TRUE,
                                 meltOrder = NA,
                                 newNames = NA,
@@ -1240,6 +1266,7 @@ statBoxPlotMultiple <- function(data, column = 1:ncol(data),
                                 ...){
   data <- statPrepareData(data = data, column = column,
                           melted = melted, varColumn = varColumn,
+                          varToChar = varToChar,
                           sampleSize = sampleSize, removeNA = removeNA,
                           meltOrder = meltOrder, newNames = newNames)
   if (identical(data, NA)){

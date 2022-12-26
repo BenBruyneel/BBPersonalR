@@ -10,6 +10,7 @@ statPrepareData(
   column = 1:ncol(data),
   melted = FALSE,
   varColumn = NA,
+  varToChar = FALSE,
   sampleSize = NA,
   removeNA = TRUE,
   meltOrder = NA,
@@ -32,6 +33,10 @@ the argument "column" should be a single column!}
 
 \item{varColumn}{this boolean argument is only used in case melted = TRUE.
 It specifies the column to be used as variable name column}
+
+\item{varToChar}{default FALSE, gnored if melted = FALSE. Specifies if the
+variable name column should be converted into a character vector (need
+discrete values)}
 
 \item{sampleSize}{allows to the use of a sample of the data to be used for
 the boxplot. By default sampleSize = NA, in which case all data is used}
