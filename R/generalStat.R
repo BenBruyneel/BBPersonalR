@@ -47,9 +47,9 @@ statPrepareData <- function(data, column = 1:ncol(data),
   if (melted){
     if (!is.character(varColumn)){
       varColumn = colnames(data)[varColumn]
-      if (varToChar) {
-        data[, varColumn] <- as.character(data[, varColumn])
-      }
+    }
+    if (varToChar) {
+      data[, varColumn] <- as.character(data[, varColumn])
     }
   }
   if (!melted){
