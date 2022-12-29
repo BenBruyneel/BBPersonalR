@@ -72,6 +72,18 @@ theme_minimal_adapted <- function(base_size = 11, base_family = "",
   return(theTheme)
 }
 
+#' Function to convert numerical vectors into strings. This specific one can be
+#'  used in stead of the function factories below if needed when no options are
+#'  needed
+#' @param v numeric vector to be converted to a character vector
+#'  
+#' @return a character vector
+#'  
+#' @export
+formatDigitsWaiver <- function(v){
+  return(as.character(v))
+}
+
 #' Function factoru to be used to specify the number of digits to be used
 #'  in numbers
 #'
@@ -92,6 +104,23 @@ formatDigits <- function(digits){
   }
 }
 
+#' Function factoru to be used to specify the number of digits to be used
+#'  in large numbers. The function generates numbers as strings w/o big marks
+#'  (in US/UK commas)
+#'
+#' @param digits integer value that specifies the number of digits to be used
+#'  by the resulting function
+#'  
+#' @returns a function that will take a numeric vector as an argument and 
+#'  returns a character vector of the numeric vector with the set number of
+#'  digits (see ?scales::lebel_number for more info) but w/o big marks
+#'  
+#' @export
+formatDigitsLargeNumbers <- function(digits){
+  function(v){
+    return(scales::comma(v, accuracy = 10^(-digits), big.mark = ""))
+  }
+}
 
 #' Function factoru to be used to specify the number of digits to be used
 #'  in numbers when using scientific notation
