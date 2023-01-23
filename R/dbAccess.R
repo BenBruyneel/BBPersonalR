@@ -481,6 +481,9 @@ db_writeTable <- function(db, tableName, theTable,
 #'                          set, otherwise it should be a character vector
 #'                          specifying the column names to be set as unique
 #' @param primaryKeyName    name of the primary key if used (default = "id_")
+#'  note: if this argument is the name of an existing column, the primary key
+#'  will not be added, but the column will be set to 'primary key'. The
+#'  primary key will not be set to autoincrement in this case!
 #' @param dataframe         data.frame containing data to be written to the
 #'                          newly created database
 #' @param dbType            default is "SQLite", only one alternative ("MySQL")
@@ -527,22 +530,37 @@ db_createTable <- function(db, tableName, dataframe = NA,
   conn <- pool::poolCheckout(db)
   pool::dbBegin(conn)
   if (addPrimary){
-    pool::dbExecute(conn,
-              paste(c("CREATE TABLE ",
-                      tableName,
-                      " (",
-                      paste(c(paste(primaryKeyName,
-                                    " INTEGER PRIMARY KEY ",
-                                    ifelse(dbType == "SQLite",
-                                           "AUTOINCREMENT",
-                                           "AUTO_INCREMENT"),
-                                    sep = ""),
-                              columnDefinitions),
-                            collapse = ", "),
-                      foreignKeySQL,
-                      ")"),
-                    collapse = "")
-    )
+    if (!(primaryKeyName %in% colnames(dataframe))){
+      pool::dbExecute(conn,
+                paste(c("CREATE TABLE ",
+                        tableName,
+                        " (",
+                        paste(c(paste(primaryKeyName,
+                                      " INTEGER PRIMARY KEY ",
+                                      ifelse(dbType == "SQLite",
+                                             "AUTOINCREMENT",
+                                             "AUTO_INCREMENT"),
+                                      sep = ""),
+                                columnDefinitions),
+                              collapse = ", "),
+                        foreignKeySQL,
+                        ")"),
+                      collapse = "")
+      )
+    } else {
+      columnDefinitions[which(colnames(dataframe) == primaryKeyName)] <- 
+        paste(columnDefinitions[which(colnames(dataframe) == primaryKeyName)], " PRIMARY KEY", sep ="")
+      pool::dbExecute(conn,
+                      paste(c("CREATE TABLE ",
+                              tableName,
+                              " (",
+                              paste(columnDefinitions,
+                                    collapse = ", "),
+                              foreignKeySQL,
+                              ")"),
+                            collapse = "")
+      )
+    }
   } else {
     pool::dbExecute(conn,
               paste(c("CREATE TABLE ",

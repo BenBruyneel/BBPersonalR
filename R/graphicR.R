@@ -84,7 +84,7 @@ formatDigitsWaiver <- function(v){
   return(as.character(v))
 }
 
-#' Function factoru to be used to specify the number of digits to be used
+#' Function factory to be used to specify the number of digits to be used
 #'  in numbers
 #'
 #' @param digits integer value that specifies the number of digits to be used
@@ -104,9 +104,9 @@ formatDigits <- function(digits){
   }
 }
 
-#' Function factoru to be used to specify the number of digits to be used
+#' Function factory to be used to specify the number of digits to be used
 #'  in large numbers. The function generates numbers as strings w/o big marks
-#'  (in US/UK commas)
+#'  (US/UK commas)
 #'
 #' @param digits integer value that specifies the number of digits to be used
 #'  by the resulting function
@@ -122,7 +122,7 @@ formatDigitsLargeNumbers <- function(digits){
   }
 }
 
-#' Function factoru to be used to specify the number of digits to be used
+#' Function factory to be used to specify the number of digits to be used
 #'  in numbers when using scientific notation
 #'  
 #' @param digits integer value that specifies the number of digits to be used
