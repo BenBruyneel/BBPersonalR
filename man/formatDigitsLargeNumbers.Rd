@@ -2,9 +2,9 @@
 % Please edit documentation in R/graphicR.R
 \name{formatDigitsLargeNumbers}
 \alias{formatDigitsLargeNumbers}
-\title{Function factoru to be used to specify the number of digits to be used
+\title{Function factory to be used to specify the number of digits to be used
  in large numbers. The function generates numbers as strings w/o big marks
- (in US/UK commas)}
+ (US/UK commas)}
 \usage{
 formatDigitsLargeNumbers(digits)
 }
@@ -18,7 +18,7 @@ a function that will take a numeric vector as an argument and
  digits (see ?scales::lebel_number for more info) but w/o big marks
 }
 \description{
-Function factoru to be used to specify the number of digits to be used
+Function factory to be used to specify the number of digits to be used
  in large numbers. The function generates numbers as strings w/o big marks
- (in US/UK commas)
+ (US/UK commas)
 }

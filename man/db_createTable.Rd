@@ -13,8 +13,12 @@ db_createTable(
   uniqueConstraints = NA,
   primaryKeyName = defaultPrimaryKey(),
   dbType = "SQLite",
+  dateAsInteger = FALSE,
+  preferredText = "LONGTEXT",
+  preferredBlob = "LONGBLOB",
   columnDefinitions = ifelseProper(identical(dataframe, NA), NA,
-    db_createColumnDefinitions(dataframe, dbType = dbType))
+    db_createColumnDefinitions(dataframe, dbType = dbType, dateAsInteger = dateAsInteger,
+    preferredText = preferredText, preferredBlob = preferredBlob))
 )
 }
 \arguments{
@@ -38,10 +42,23 @@ the form UNIQUE(..., ...). If NA, no constraints are
 set, otherwise it should be a character vector
 specifying the column names to be set as unique}
 
-\item{primaryKeyName}{name of the primary key if used (default = "id_")}
+\item{primaryKeyName}{name of the primary key if used (default = "id_")
+note: if this argument is the name of an existing column, the primary key
+will not be added, but the column will be set to 'primary key'. The
+primary key will not be set to autoincrement in this case!}
 
 \item{dbType}{default is "SQLite", only one alternative ("MySQL")
 has been tested}
+
+\item{dateAsInteger}{boolean, if FALSE the type "DATE" is used, otherwise
+"INTEGER" is used. This is to circumvent data type
+conventions}
+
+\item{preferredText}{character string specifying which text field type is to
+be used. Ignored when dbType = "SQLite"}
+
+\item{preferredBlob}{character string specifying which blob field type is to
+be used. Ignored when dbType = "SQLite"}
 
 \item{columnDefinitions}{vector of character strings with each string of the
 format "columnName columnType", eg

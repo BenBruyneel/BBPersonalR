@@ -488,6 +488,13 @@ db_writeTable <- function(db, tableName, theTable,
 #'                          newly created database
 #' @param dbType            default is "SQLite", only one alternative ("MySQL")
 #'                          has been tested
+#' @param dateAsInteger boolean, if FALSE the type "DATE" is used, otherwise
+#'                      "INTEGER" is used. This is to circumvent data type
+#'                      conventions
+#' @param preferredText character string specifying which text field type is to
+#'  be used. Ignored when dbType = "SQLite"
+#' @param preferredBlob character string specifying which blob field type is to
+#'  be used. Ignored when dbType = "SQLite"
 #'
 #' @return nothing
 #' @note this may seem somewhat cumbersome way to create a table, when compared
@@ -498,11 +505,17 @@ db_createTable <- function(db, tableName, dataframe = NA,
                            addPrimary = TRUE, uniqueConstraints = NA,
                            primaryKeyName = defaultPrimaryKey(),
                            dbType = "SQLite",
+                           dateAsInteger = FALSE,
+                           preferredText = "LONGTEXT",
+                           preferredBlob = "LONGBLOB",
                            columnDefinitions = ifelseProper(
                              identical(dataframe, NA),
                              NA,
                              db_createColumnDefinitions(dataframe,
-                                                        dbType = dbType))){
+                                                        dbType = dbType,
+                                                        dateAsInteger = dateAsInteger,
+                                                        preferredText = preferredText,
+                                                        preferredBlob = preferredBlob))){
   if (!identical(uniqueConstraints,NA)){
     uniqueSQL <- paste(c(", UNIQUE (",
                          paste(uniqueConstraints, collapse = ", ")

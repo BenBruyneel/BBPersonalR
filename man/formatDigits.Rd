@@ -2,7 +2,7 @@
 % Please edit documentation in R/graphicR.R
 \name{formatDigits}
 \alias{formatDigits}
-\title{Function factoru to be used to specify the number of digits to be used
+\title{Function factory to be used to specify the number of digits to be used
  in numbers}
 \usage{
 formatDigits(digits)
@@ -17,7 +17,7 @@ a function that will take a numeric vector as an argument and
  digits (see ?scales::lebel_number for more info)
 }
 \description{
-Function factoru to be used to specify the number of digits to be used
+Function factory to be used to specify the number of digits to be used
  in numbers
 }
 \note{
