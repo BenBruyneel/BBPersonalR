@@ -504,9 +504,10 @@ residualPlot <- function(fitTable,
                       col = pointsColor, fill = pointsFill,
                       alpha = pointsAlpha)
   l <- l + ggplot2::ylab(ifelse(useYLabel,
-                       ifelse(standardized,"Standardized Residuals","Residuals"),
-                       "")
-  )
+                                ifelse(is.null(yLabel),
+                                       ifelse(standardized,"Standardized Residuals","Residuals"),
+                                       yLabel),
+                                ""))
   # if not names of columns, put column names in predictorColumn & responseColumn
   if (!is.character(predictorColumn)){
     prColumn <- colnames(fitTable)[predictorColumn]
@@ -518,9 +519,10 @@ residualPlot <- function(fitTable,
   } else {
     rsColumn <- responseColumn 
   }
-  l <- l + ggplot2::xlab(ifelse(usePredictor,
-                       prColumn,
-                       rsColumn))
+  l <- l + ggplot2::xlab(ifelse(is.null(xLabel),
+                                ifelse(usePredictor,prColumn,rsColumn),
+                                xLabel))
+
   l <- l + ggplot2::ggtitle(title)
   l <- l + ggplot2::labs(caption = caption)
   if (showLimits){
@@ -689,8 +691,14 @@ recoveryPlot <- function(fitTable,
   } else {
     rsColumn <- responseColumn 
   }
-  l <- l + ggplot2::xlab(ifelse(usePredictor,prColumn,rsColumn))
-  l <- l + ggplot2::ylab(ifelse(useYLabel,"Recovery (%)",""))
+  l <- l + ggplot2::xlab(ifelse(is.null(xLabel),
+                                ifelse(usePredictor,prColumn,rsColumn),
+                                xLabel))
+  l <- l + ggplot2::ylab(ifelse(useYLabel,
+                                ifelse(is.null(yLabel),
+                                       "Recovery (%)",
+                                       yLabel),
+                                ""))
   l <- l + ggplot2::ggtitle(title)
   l <- l + ggplot2::labs(caption = caption)
   if (showLimits){
