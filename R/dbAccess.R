@@ -784,11 +784,11 @@ db_getSQLQuery <- function(db, SQLString, doNotChangePool = FALSE){
   if (!doNotChangePool){
     conn <- pool::poolCheckout(db)
     pool::dbBegin(conn)
-  }
-  result <- pool::dbGetQuery(conn, SQLString)
-  if (!doNotChangePool){
+    result <- pool::dbGetQuery(conn, SQLString)
     pool::dbCommit(conn = conn)
     pool::poolReturn(conn)
+  } else {
+    result <- pool::dbGetQuery(db, SQLString)
   }
   return(result)
 }
@@ -815,11 +815,11 @@ db_ExecuteSQL <- function(db, SQLString, doNotChangePool = FALSE,
   if (!doNotChangePool){
     conn <- pool::poolCheckout(db)
     pool::dbBegin(conn)
-  }
-  result <- pool::dbExecute(conn, SQLString)
-  if (!doNotChangePool){
+    result <- pool::dbExecute(conn, SQLString)
     pool::dbCommit(conn = conn)
     pool::poolReturn(conn)
+  } else {
+    result <- pool::dbExecute(db, SQLString)
   }
   if (!invisibleReturn){
     return(result)
