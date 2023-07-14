@@ -1689,12 +1689,12 @@ statBarPlot <- function(data, idColumn = 1,
                         measure.vars = varColumn,
                         variable.name = variableName,
                         value.name = valueName)
-  g <- ggplot2::ggplot(data = data, ggplot2::aes(x = !!dplyr::sym("id"),
-                                      y = !!ggplot2::sym(valueName),
-                                      fill = !!ggplot2::sym(variableName)))
+  g <- ggplot2::ggplot(data = data, ggplot2::aes(x = !!dplyr::sym(idColumn),
+                                                 y = !!ggplot2::sym(valueName),
+                                                 fill = !!ggplot2::sym(variableName)))
   g <- g + ggplot2::geom_bar(position = barPosition, stat = "identity",
-                    linetype = outlineType, color = outlineColor,
-                    size = outlineWidth, alpha = fillAlpha)
+                             linetype = outlineType, color = outlineColor,
+                             linewidth = outlineWidth, alpha = fillAlpha)
   if (yDefault){
     yDefault <- FALSE
     minY <- min(data[,valueName])
