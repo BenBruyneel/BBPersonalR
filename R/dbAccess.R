@@ -14,6 +14,8 @@
 #' @param ... further arguments to be passed onto to base::format, see
 #'  ?base::format for more information. Ignored when formatNumbers == FALSE
 #'
+#' @note dataVectors of the 'factor' class are changed into character class!
+#'
 #' @returns a single element character vector
 #' @export
 vectorToDB <- function(dataVector = NA, collapseChar = ";",
@@ -24,6 +26,9 @@ vectorToDB <- function(dataVector = NA, collapseChar = ";",
   if (!formatNumbers){
     return(paste(dataVector,collapse = collapseChar))
   } else {
+    if (is.Class(dataVector, whichClass = "factor")){
+      dataVector <- as.character(dataVector)
+    }
     return(paste(format(dataVector, ...),
                  collapse = collapseChar))
   }
@@ -131,6 +136,8 @@ blobToVector <- function(blobData = NA,
 #' @param ... further arguments to be passed onto to base::format, see
 #'  ?base::format for more information. Ignored when formatNumbers == FALSE
 #'
+#' @note columns of the 'factor' class are changed into character class!
+#'
 #' @returns a data.frame
 #' @export
 convertDFtoDB <- function(dfData, columnNames = colnames(dfData[[1]]),
@@ -177,6 +184,7 @@ convertDFtoDB <- function(dfData, columnNames = colnames(dfData[[1]]),
   }
   if (saveClasses){
     tempClasses <- unlist(lapply(dfData[[1]], class))
+    tempClasses[tempClasses == "factor"] <- "character"
     df <- dplyr::bind_rows(tempClasses, df)
   }
   return(df)
