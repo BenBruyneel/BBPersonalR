@@ -50,3 +50,6 @@ a data.frame
 Converts data.frames to a single data.frame where each data.frame from the
  list is a row of blobs or character separated strings
 }
+\note{
+columns of the 'factor' class are changed into character class!
+}

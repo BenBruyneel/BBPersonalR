@@ -38,3 +38,6 @@ a single element character vector
 Converts a numeric, integer or character vector (multiple elements) to a
  single element character vector (a string)
 }
+\note{
+dataVectors of the 'factor' class are changed into character class!
+}

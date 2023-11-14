@@ -142,6 +142,26 @@ formatScientificDigits <- function(digits){
   }
 }
 
+#' Function factory to be used to specify the minimum number of digits to be used
+#'  in numbers when using scientific notation
+#'  
+#' @param digits integer value that specifies the number of digits to be used
+#'  by the resulting function
+#'  
+#' @returns a function that will take a numeric vector as an argument and 
+#'  returns a character vector of the numeric vector in scientific format with
+#'  the set number of digits (see ?formatC for more info)
+#'  
+#' @note this is more or less an example of a function to be used to specify
+#'  axis-label formats with the function graphAdjust(). More complex functions
+#'  are possible
+#' @export
+formatScientificMinimumDigits <- function(digits){
+  function(v){
+    return(formatC(v, format = "e", digits = digits))
+  }
+}
+
 #' Make adjustments to a graph eg zoom, titles etc etc
 #' 
 #' @param graphs list of ggplot-objects to which the adjustments have to be made
