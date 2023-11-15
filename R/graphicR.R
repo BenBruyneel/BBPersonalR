@@ -104,6 +104,23 @@ formatDigits <- function(digits){
   }
 }
 
+#' Function factory to be used to specify the minimum number of digits to be
+#'  used in numbers. The function generates numbers as strings
+#'
+#' @param digits integer value that specifies the number of digits to be used
+#'  by the resulting function
+#'  
+#' @returns a function that will take a numeric vector as an argument and 
+#'  returns a character vector of the numeric vector with the set minimum number
+#'  of digits (see ?formatC for more info)
+#'  
+#' @export
+formatMinimumDigits <- function(digits){
+  function(v){
+    return(formatC(v, format = "f", digits = digits))
+  }
+}
+
 #' Function factory to be used to specify the number of digits to be used
 #'  in large numbers. The function generates numbers as strings w/o big marks
 #'  (US/UK commas)
